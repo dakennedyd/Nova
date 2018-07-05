@@ -1,0 +1,56 @@
+-------------NEED TO IMPLEMENT--------------
+implement the layer system
+---> resources ids are strings, find some way to make them a number
+create a real renderer(sort by material before rendering)
+create a generic input system(process inputs(network too maybe in future) in a message pump for debugging)
+Maybe replace normal inheritance with policy based design(compile time polimorphism)
+make resouce object manage cpu and gpu memory(have to read more about templates)
+manage state in the renderer efficiently
+change raw pointers to smart pointers ASAP!!!!(smart pointers are used in the resource manager)
+Get rid of exceptions!(maybe switch to EASTL?)
+support compressed textures
+implement a rendering culler that fills the actual render list
+implement a memory allocator for the render packets
+
+---------------IMPLEMENTED-----------------
+add options to transform propagation to ignore scaling and or rotation
+
+-------------NEED TO FIX-------------------
+add the includes only on the files that need them not globaly
+Comment the code!
+coordinates sometimes are reversed why???
+dark outline when moving camera??
+complete the math library implement all operators(maybe some optimizations)
+GPUprogram Uniform mess!
+make settings not ignore resolution when starting in fulscreen mode(also fullscreen uses all available cpu for some reason)
+Logger is too slow
+ECS system should recieve as parameter only the required components not the whole entity
+fix the input actions they are weird now
+removeComponent might not delete the component
+entity scaling bug
+rotation component should rotate over final transform not world axis
+unregister an non existent entity from system produces a crash
+when registering an entity to a system, the program should check if the entity in question contains the required components for that system
+Texture and FrameBuffer constructors are silly change them!!
+camera doesn't turn well after rotating in the forward direction
+Fix the Framebuffer creation, attachTexture is just silly
+resource manager get method is just stupid.. need to find way of not casting across types
+the whole input subsystem is shit probably need to rewrite it
+the code launches an exception on startup in release mode(dont know why)
+
+----------FIXED FOR THE MOMENT-------------
+ecs transform propagation doesnt work well when parent object rotates around 2 axis
+Material takes an empty texture pointer when the texture is a cube texture for some reason
+attach entities needs to detect if there is any loops in the entities hierarchy
+test functions are really bad
+mouselook - need to implement with quaternions
+entity transform propagation does not work
+makeRotationMatrix is wrong!
+camera api is wrong fix it - fixed for now
+integrate stb_image into the engine better
+
+----------NOTE-------------
+the reason for all the basically empty interfaces is to define a contract for all the
+platform dependent objects, the reason they are empty is because the api is still evolving
+once the api mature i will define the methods as all virtual methods so i can have a common interface (hopefuly)
+for all the different platforms supported

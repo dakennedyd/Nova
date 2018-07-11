@@ -2,6 +2,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "ISingleton.h"
+#include "ISubSystem.h"
 
 namespace Nova {
 
@@ -19,8 +21,8 @@ namespace Nova {
 	class FileSystem :public ISingleton<FileSystem>, public ISubSystem
 	{
 	public:
-		FileSystem() {};
-		~FileSystem() {};
+		FileSystem() = default;
+		virtual ~FileSystem() = default;
 		void startUp() override;
 		void shutDown() override;
 

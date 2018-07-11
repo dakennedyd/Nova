@@ -17,8 +17,8 @@ namespace Nova
 		std::time_t startUpTime = std::chrono::system_clock::to_time_t(now);
 		std::string timeAndDateString(std::ctime(&startUpTime));
 		//mLogFile.open(mLogFileAndPath, std::ofstream::out | std::ofstream::trunc);
-		mLogFile << NOVA_DESCRIPTION_STRING;
-		mLogFile << std::setprecision(std::numeric_limits<long double>::digits10 + 1) << " Log started " << timeAndDateString;
+		(*mOutStream) << NOVA_DESCRIPTION_STRING;
+		(*mOutStream) << std::setprecision(std::numeric_limits<long double>::digits10 + 1) << " Log started " << timeAndDateString;
 		//mLogFile.close();
 	}
 

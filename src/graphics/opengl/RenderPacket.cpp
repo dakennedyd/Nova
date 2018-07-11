@@ -6,8 +6,16 @@
 #include "graphics/opengl/GraphicsSystem.h"
 #include "graphics/opengl/GPUProgramParameter.h"
 #include "ECS/Entity.h"
+#include "PreInit.h"
+#ifdef NOVA_OPENGL
+	#include "graphics/opengl/RendererInit.h"
+#endif
 
 namespace Nova {	
+	void RenderPacket::draw() const
+	{ 
+		glDrawElements(GL_TRIANGLES, mMesh->getNumIndices(), GL_UNSIGNED_INT, 0);
+	};
 	//std::uint64_t RenderPacket::mIDCounter = 0;
 	RenderPacket::RenderPacket(const std::shared_ptr<Mesh> & mesh, const std::shared_ptr<Material> & material,
 		const Transform * transform)		

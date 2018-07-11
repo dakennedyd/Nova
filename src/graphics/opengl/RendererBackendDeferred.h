@@ -1,7 +1,18 @@
 #pragma once
 #include "graphics/IRendererBackend.h"
+#include "resource_manager/ResourceBase.h"
+#include "graphics/opengl/FrameBuffer.h"
+#include "RenderPacket.h"
+#ifdef NOVA_WINDOWS_PLATFORM
+	#include "windows/Window.h"
+#else
+	#include "linux/Window.h"
+#endif
+#include "Mesh.h"
 
 namespace Nova {
+	//class Mesh;
+	class TextureCube;
 	struct IBL_Data : public ResourceBase
 	{
 		IBL_Data(const std::shared_ptr<TextureCube> &irradiance,

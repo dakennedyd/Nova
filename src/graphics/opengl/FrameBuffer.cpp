@@ -1,4 +1,5 @@
 #include <memory>
+#include <glad/glad.h>
 #include "FrameBuffer.h"
 #include "graphics/opengl/Texture.h"
 #include "Error.h"
@@ -9,6 +10,14 @@ namespace Nova {
 	{
 		glGenFramebuffers(1, &mFrameBufferID);
 	}
+	void FrameBuffer::bind() const
+	{ 
+		glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferID);
+	};
+	void FrameBuffer::unBind() const
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	};
 	void FrameBuffer::attachTexture(const std::shared_ptr<Texture> texture)
 	{
 		TextureType texType = texture->getTextureType();
@@ -44,8 +53,8 @@ namespace Nova {
 			|| texType == TextureType::NORMAL_MAP || texType == TextureType::COLOR_HDR
 			|| texType == TextureType::MONOCHROME)
 		{
-			int maxColorAttachments;
-			glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
+			int maxColorAttachments = getMaxColorAttachments();
+			//glGetIntegerv(getMaxColorAttachments(), &maxColorAttachments);			
 			if (mColorTextures.size()+1 > maxColorAttachments) LOG_ERROR("too many color buffers on framebuffer");
 
 			mColorTextures.push_back(texture);

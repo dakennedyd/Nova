@@ -1,5 +1,6 @@
 #pragma once
 #include "graphics/ILight.h"
+#include "math/Vector.h"
 
 namespace Nova {
 	class Light :public ILight		

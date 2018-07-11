@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(Nova)
 
-
 option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
@@ -22,15 +21,15 @@ option(BUILD_UNIT_TESTS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(MSVC)
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
-    add_compile_options(/W4 /permissive-)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
+    #add_compile_options(/W4 /permissive-)
 else()
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++11")
     #add_compile_options(-Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14)    
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-Wfatal-errors -std=c++14")    
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")    
     #add_compile_options(-j8)    
-    if(NOT WIN32)
+    if(LINUX)
         set(GLAD_LIBRARIES dl)
     endif()
 endif()
@@ -46,12 +45,33 @@ include_directories(src/
                     Dependencies/glfw/include/
                     Dependencies/stb/)
 
-file(GLOB PROJECT_SOURCES src/math/Quaternion.cpp src/math/Matrix.cpp src/math/Vector.cpp src/Main.cpp)
-# file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c)
-# file(GLOB PROJECT_HEADERS src/*.hpp
-#                           src/*.h)
-# file(GLOB PROJECT_SOURCES src/*.cpp
-#                           src/*.c)
+# file(GLOB PROJECT_SOURCES 
+#                           src/Error.cpp
+#                           src/graphics/ImageDecoder.cpp
+#                           src/linux/FileSystem.cpp  #fix this for windows!!
+#                           src/Timer.cpp
+#                           src/logger/Logger.cpp
+#                           src/Settings.cpp
+#                           src/linux/Window.cpp  #fix this for windows!!
+#                           src/linux/InputSystem.cpp
+#                           src/graphics/opengl/RendererInit.cpp
+#                           src/graphics/opengl/GraphicsSystem.cpp
+#                           src/resource_manager/ResourceManager.cpp
+#                           src/math/Quaternion.cpp
+#                           src/math/Matrix.cpp
+#                           src/math/Vector.cpp
+#                           src/Main.cpp)
+file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c)
+# file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
+file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
+# set (EXCLUDE_DIR "/windows/")
+# file (GLOB_RECURSE PROJECT_SOURCES "*.cpp" "*.c")
+# foreach (TMP_PATH ${SOURCE_FILES})
+#     string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+#     if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+#         list (REMOVE_ITEM ${SOURCE_FILES} ${TMP_PATH})
+#     endif ()
+# endforeach(TMP_PATH)
 # file(GLOB PROJECT_SHADERS Resources/Shaders/glsl/*.glsl
 #                           Resources/Shaders/glsl/*.frag
 #                           Resources/Shaders/glsl/*.geom
@@ -76,7 +96,7 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${DEPENDENCIES_SOURCES})
                                
-target_link_libraries(${PROJECT_NAME} glfw assimp
+target_link_libraries(${PROJECT_NAME} glfw assimp #dl
                                ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
 #                      BulletDynamics BulletCollision LinearMath)
                                

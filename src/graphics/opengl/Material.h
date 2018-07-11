@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <memory>
 #include "graphics/IMaterial.h"
 #include "graphics/opengl/GPUProgram.h"
 #include "graphics/ITexture.h"

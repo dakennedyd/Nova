@@ -73,7 +73,7 @@
 #include "graphics/ImageDecoder.h"
 #include "graphics/Bindable.h"
 #include "graphics/IRendererFrontend.h"
-#if GRAPHICS_API == OPENGL	
+#ifdef NOVA_OPENGL
 	#include "graphics/opengl/Light.h"
 	#include "graphics/opengl/RendererInit.h"
 	#include "graphics/opengl/Mesh.h"
@@ -98,5 +98,5 @@
 #include "graphics/RendererFrontend.h"
 
 #ifdef COMPILE_TEST_FUNCTIONS
-	#include "tests/test.h"
+//	#include "tests/test.h"
 #endif

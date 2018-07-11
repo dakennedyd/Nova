@@ -1,5 +1,7 @@
 #include <memory>
 #include <vector>
+#include <utility>
+#include <string>
 #include "RendererBackendDeferred.h"
 #include "graphics/opengl/FrameBuffer.h"
 #include "resource_manager/ResourceManager.h"
@@ -7,7 +9,9 @@
 #include "graphics/opengl/GPUProgram.h"
 #include "graphics/opengl/GPUProgramParameter.h"
 #include "graphics/opengl/Mesh.h"
+#include "graphics/ITexture.h"
 #include "graphics/opengl/Texture.h"
+#include "graphics/opengl/TextureCube.h"
 
 namespace Nova {
 	RendererBackendDeferred::RendererBackendDeferred()
@@ -17,17 +21,17 @@ namespace Nova {
 			ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->radiance),
 		mLightPassRenderPacket(mScreenQuad,
 			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("light_pass_PBR"),
-				std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
+				std::vector<std::pair<std::shared_ptr<ITexture>, std::string> > {
 					{mGBuffer.getColorTexture(0), "gPosMetal"}, //gBuffer position and metallic channel
 					{mGBuffer.getColorTexture(1), "gNormRough" }, //gBuffer normal and roughness channel
 					{mGBuffer.getColorTexture(2), "gAlbedoSkyboxmask" }, //Albedo and skybox mask
 					{mGBuffer.getColorTexture(3), "gNormalMapAO" },
 					{mIBL.irradiance, "irradianceMap" },
 					{mIBL.radiance, "radianceMap" },
-					{ResourceManager::getInstance().get<Texture>("brdf_LUT"), "brdfLUT" }})),
+					{ResourceManager::getInstance().get<Texture>("brdf_LUT"), "brdfLUT" } })),
 		mCurrentSkyBox(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
 			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),
-				std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
+				std::vector<std::pair<std::shared_ptr<ITexture>, std::string> > {
 					{ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"), "skyboxTexture"} })),
 		mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth/4 , mHeight/4)),
 		mVBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth/4 , mHeight/4)),
@@ -54,12 +58,12 @@ namespace Nova {
 		mLightPassRenderPacket.addParameter(
 			new GPUProgramParameterVec3(glGetUniformLocation(id, "cameraPos"), camera.position->getDataPtr()));
 		
-		//setSkyBox(ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"));
-		//mCurrentSkyBox->setMaterial(ResourceManager::getInstance().get<Material>("skybox_material"));
+		/*setSkyBox(ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"));
+		mCurrentSkyBox->setMaterial(ResourceManager::getInstance().get<Material>("skybox_material"));*/
 	}
 	void RendererBackendDeferred::render()
 	{
-		auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
+		auto & renderPackets = GraphicsSystem::getInstance().getRenderPackets();
 		//auto &lights = GraphicsSystem::getInstance().getLights();
 		//auto& rm = ResourceManager::getInstance();
 		
@@ -85,6 +89,10 @@ namespace Nova {
 			//packet.unBind();
 		}
 		/*glStencilMask(0x00);*/
+
+		// renderPackets[3].bind();
+		// renderPackets[3].updateAllUniforms();
+		// renderPackets[3].draw();
 
 		mCurrentSkyBox.bind();
 		mCurrentSkyBox.updateAllUniforms();
@@ -142,7 +150,7 @@ namespace Nova {
 	{
 		//ResourceManager::getInstance().get<Material>("skybox_material")->ge
 		//mCurrentSkyBox->setMaterial(ResourceManager::getInstance().get<Material>("garden_skybox"));
-		std::vector<std::pair< std::shared_ptr<ITexture>, std::string> > texturesVector{ {skybox.skyboxTexture, "skyboxTexture"} };
+		std::vector<std::pair< std::shared_ptr<ITexture>, std::string>> texturesVector{ {skybox.skyboxTexture, "skyboxTexture"} };
 		mCurrentSkyBox.getMaterial()->setTextures(texturesVector);
 		/*auto skybox = std::make_shared<RenderPacket>(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
 			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),

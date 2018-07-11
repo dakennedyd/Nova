@@ -2,11 +2,11 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
-
+#include "graphics/opengl/RendererInit.h"
 //temp until engine loads its configuration from a file
 namespace Nova {
 	static const int NOVA_VERSION_MAJOR = 0;
-	static const int NOVA_VERSION_MINOR = 0;
+	static const int NOVA_VERSION_MINOR = 1;
 	static const std::string NOVA_VERSION_STAGE("PRE-ALPHA");
 	static const std::string NOVA_DESCRIPTION_STRING("NOVA " + std::to_string(NOVA_VERSION_MAJOR) + "." +
 		std::to_string(NOVA_VERSION_MINOR) + " " + NOVA_VERSION_STAGE + " ");
@@ -14,7 +14,7 @@ namespace Nova {
 	static const std::string DEFAULT_FILE_PATH("");
 	static const std::string RESOURCES_PATH("Resources/");
 	static const std::string TEXTURES_PATH(RESOURCES_PATH + "textures/");
-#if GRAPHICS_API == OPENGL	
+#ifdef NOVA_OPENGL
 	static const std::string RENDERER{"opengl"};
 	static const std::string SHADERS_PATH(RESOURCES_PATH + "shaders/glsl/");
 #endif
@@ -29,7 +29,7 @@ namespace Nova {
 	static const std::chrono::time_point<std::chrono::high_resolution_clock> ENGINE_EPOCH = std::chrono::high_resolution_clock::now();
 
 	/*takes an std::vector<string> and converts it to a std::vector<float>*/
-	 std::vector<float> vectorStringToFloat(const std::vector<std::string>& stringVector) {
+	 static std::vector<float> vectorStringToFloat(const std::vector<std::string>& stringVector) {
 		std::vector<float> floatVector(stringVector.size());
 		std::transform(stringVector.begin(), stringVector.end(), floatVector.begin(), [](const std::string& val)
 		{
@@ -47,7 +47,7 @@ namespace Nova {
 	/**
 	trim string from start (in place)
 	*/
-	 void ltrim(std::string &s) {
+	 static void ltrim(std::string &s) {
 		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
 			return !std::isspace(ch);
 		}));
@@ -56,7 +56,7 @@ namespace Nova {
 	/**
 	trim string from end (in place)
 	*/
-	 void rtrim(std::string &s) {
+	 static void rtrim(std::string &s) {
 		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
 			return !std::isspace(ch);
 		}).base(), s.end());
@@ -65,7 +65,7 @@ namespace Nova {
 	/** 
 	trim string from both ends (in place)
 	*/
-	 void trim(std::string &s) {
+	 static void trim(std::string &s) {
 		ltrim(s);
 		rtrim(s);
 	}

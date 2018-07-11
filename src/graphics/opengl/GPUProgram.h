@@ -1,4 +1,5 @@
 #pragma once
+#include <glad/glad.h>
 #include "graphics/IGPUProgram.h"
 #include "graphics/IGPUProgramParameter.h"
 

@@ -3,9 +3,20 @@
 most of them are created for convenience as they are
 common enough to be necessary in any game*/
 #include "ECS/DefaultComponents.h"
+#include "math/miscellaneous.h"
+#include "Init.h"
+#include "Crc.h"
+#include "ECS/System.h"
+#include "ECS/Entity.h"
+#include "Init.h"
+#ifdef NOVA_LINUX_PLATFORM
+	#include "linux/InputSystem.h"
+#endif
+#ifdef NOVA_OPENGL
+	#include "graphics/opengl/GraphicsSystem.h"
+#endif
 
 namespace Nova {
-
 	class VisualSystem final :public System
 	{
 		void processEntity(Entity* entity) override

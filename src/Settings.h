@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include "ISingleton.h"
 #include "ISubSystem.h"
+#include "Init.h"
 
 namespace Nova {
 	/*this class is created just so that MSVC does not trow a warning*/

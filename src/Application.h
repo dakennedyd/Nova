@@ -6,9 +6,11 @@
 	#include "linux/InputSystem.h"
 #endif
 #include "ECS/Entity.h"
+
 #include "ECS/System.h"
 
 namespace Nova {
+	//class Entity;
 	class Application final :public ISingleton<Application>, public IKeyboardObserver
 	{
 		friend class Entity;
@@ -42,7 +44,7 @@ namespace Nova {
 				static_assert(std::is_base_of<System, T>::value,
 					"Invalid System: a valid system has to be a subclass of System");
 				mSystems.emplace(std::make_pair(std::type_index(typeid(T)), new T));
-			};
+			}
 
 			/*Gets a system of the type specified. If the type specified does not exist then
 			it launches an exception*/

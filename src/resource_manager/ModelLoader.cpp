@@ -1,4 +1,16 @@
+#include <memory>
+//#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
 #include "ModelLoader.h"
+#include "Init.h"
+#ifdef NOVA_OPENGL
+	#include "graphics/opengl/Mesh.h"
+#endif
+#ifdef NOVA_LINUX_PLATFORM
+	#include "linux/FileSystem.h"
+#endif
+#include "ResourceManager.h"
+#include "Error.h"
 
 namespace Nova {
 	std::shared_ptr<Mesh> loadedMesh;

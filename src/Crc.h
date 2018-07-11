@@ -1,8 +1,7 @@
 #pragma once
 
 namespace Nova {
-/*
-	/*
+/*	
 	if (table[1] == 0) {
       for (byte = 0; byte <= 255; byte++) {
          crc = byte;

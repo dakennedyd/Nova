@@ -1,6 +1,7 @@
 #include <string>
 #include <iterator>
 #include <vector>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "GPUProgram.h"
 #include "Error.h"

@@ -1,6 +1,11 @@
 #pragma once
-#include "IWindow.h"
 //#include <GL/glew.h> // GL extension handler library
+//#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include "IWindow.h"
+#include "ISingleton.h"
+#include "ISubSystem.h"
+#include "Timer.h"
 
 namespace Nova {
 	class Window final :public IWindow, public ISingleton<Window>, public ISubSystem
@@ -24,7 +29,7 @@ namespace Nova {
 		void hideCursor() override { glfwSetInputMode(mGLFWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED); mCursorEnabled = false; };
 		bool isCursorShown() override { return mCursorEnabled; };
 		//void close() { glfwDestroyWindow(mGLFWindow); }
-		GLFWwindow* mGLFWindow; //pointer need it by glfw 			
+		GLFWwindow* mGLFWindow; //pointer need it by glfw ---> this is ugly
 	private:	
 		int mWidth;
 		int mHeight;

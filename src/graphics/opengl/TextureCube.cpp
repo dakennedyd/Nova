@@ -2,8 +2,8 @@
 #include <vector>
 #include <cmath>
 #include <string>
-#include <GLFW/glfw3.h>
 #include "TextureCube.h"
+#include <GLFW/glfw3.h>
 #include "Error.h"
 #ifdef NOVA_WINDOWS_PLATFORM
 	#include "windows/FileSystem.h"

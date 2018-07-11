@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <memory>
+#include "resource_manager/ResourceBase.h"
 
 namespace Nova {
 	//temp class until i create some sort of entity component system

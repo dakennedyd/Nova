@@ -1,5 +1,9 @@
+#include "Settings.h"
 #include <GLFW/glfw3.h>
-#include "InputSystem.h"
+#include "linux/InputSystem.h"
+#include "Crc.h"
+#include "logger/Logger.h"
+#include "Window.h"
 
 namespace Nova {
 	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

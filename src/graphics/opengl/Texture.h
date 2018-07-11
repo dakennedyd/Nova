@@ -1,12 +1,16 @@
 #pragma once
+#include <glad/glad.h>
 #include "graphics/ITexture.h"
+#include "PreInit.h"
+#ifdef NOVA_WINDOWS_PLATFORM
+	#include "windows/FileSystem.h"
+#else
+	//#ifdef NOVA_LINUX_PLATFORM
+		#include "linux/FileSystem.h"
+	//#endif
+#endif
 
-namespace Nova {
-	enum MipMapping {NO_MIPMAP, GENERATE_MIPMAP};
-	enum Filtering { LINEAR, NEAREST };
-	enum TextureType {COLOR, COLOR_ALPHA, DEPTHBUFFER, DEPTHSTENCIL, GBUFFER_NORMAL, GBUFFER_POSITION,
-	MONOCHROME, DUAL_COLOR, NORMAL_MAP, COLOR_HDR};
-
+namespace Nova {	
 	class Texture : public ITexture
 	{
 		friend class FrameBuffer;

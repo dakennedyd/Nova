@@ -1,10 +1,12 @@
 #pragma once
 #include "graphics/IRenderPacket.h"
 #include "graphics/opengl/RenderPacket.h"
-#include "graphics/opengl/Mesh.h"
+//#include "graphics/opengl/Mesh.h"
 #include "graphics/opengl/Material.h"
 
 namespace Nova {
+	class Mesh;
+	struct Transform;
 	class RenderPacket :public IRenderPacket
 	{
 	public:
@@ -23,7 +25,7 @@ namespace Nova {
 		
 		void addParameter(IGPUProgramParameter* parameter) override { mParameters.push_back(parameter); };
 		void updateAllUniforms() const override;
-		void draw() const override { glDrawElements(GL_TRIANGLES, mMesh->getNumIndices(), GL_UNSIGNED_INT, 0); };
+		void draw() const override;
 
 		void bind() const override;
 		void unBind() const override;

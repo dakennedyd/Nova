@@ -2,7 +2,9 @@
 #include <vector>
 #include "Material.h"
 #include "graphics/opengl/GPUProgram.h"
+#include "graphics/ITexture.h"
 #include "graphics/opengl/Texture.h"
+#include "graphics/opengl/TextureCube.h"
 
 namespace Nova {	
 	/*Material::Material(GPUProgram & program, std::vector<ITexture*> texArray, MaterialProperties & properties)
@@ -102,13 +104,15 @@ namespace Nova {
 		}*/
 		
 		int index = 0;
-		for (auto &texture : mTextures)
-		{
-			glActiveTexture(GL_TEXTURE0 + index);
-			texture->bind();
-			glUniform1i(glGetUniformLocation(mProgram->getProgramID(), mSamplerNames[index].c_str()), index);
+		if(!mTextures.empty() && mTextures[0].get()){
+			for (auto &texture : mTextures)
+			{
+				glActiveTexture(GL_TEXTURE0 + index);
+				texture->bind();
+				glUniform1i(glGetUniformLocation(mProgram->getProgramID(), mSamplerNames[index].c_str()), index);
 
-			index++;			
+				index++;			
+			}
 		}
 	}
 	void Material::unBind() const

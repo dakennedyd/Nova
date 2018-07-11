@@ -1,5 +1,11 @@
 #pragma once
-//#include "IRendererFrontend.h"
+#include "IRendererFrontend.h"
+#include "PreInit.h"
+#ifdef NOVA_OPENGL
+	#include "graphics/opengl/GraphicsSystem.h"
+#endif
+#include "Application.h"
+#include "ECS/DefaultSystems.h"
 
 namespace Nova {
 	class RendererFrontend :public IRendererFrontend
@@ -23,12 +29,12 @@ namespace Nova {
 			//		&(lc.specularColor) });
 			//}
 
-			auto visualSystem = Application::getInstance().getWorld().GetSystem<VisualSystem>();
+			const auto &visualSystem = Application::getInstance().getWorld().GetSystem<VisualSystem>();
 			auto &visualEntities = visualSystem->getEntities();
-			for (auto &it : visualEntities)//for each renderable entity
+			for (auto &idEntityPair : visualEntities)//for each renderable entity
 			{
-				auto vc = it.second->GetComponent<VisualComponent>();
-				graphicsSystem.addPacket(RenderPacket{ vc.mesh, vc.material, &it.second->getTransformStruct() });
+				auto &vc = idEntityPair.second->GetComponent<VisualComponent>();
+				graphicsSystem.addPacket(RenderPacket{ vc.mesh, vc.material, &idEntityPair.second->getTransformStruct() });
 			}
 		}
 	};

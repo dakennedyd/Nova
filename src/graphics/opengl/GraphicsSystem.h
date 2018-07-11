@@ -9,6 +9,8 @@
 #include "graphics/IRendererBackend.h"
 #include "graphics/IRendererFrontend.h"
 #include "graphics/opengl/RenderPacket.h"
+#include "ISingleton.h"
+#include "ISubSystem.h"
 
 namespace Nova {
 	struct CameraInfo {

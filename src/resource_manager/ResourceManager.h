@@ -1,5 +1,11 @@
 #pragma once
+#include <unordered_map>
 #include "Xml.h"
+#include "ResourceBase.h"
+#include "ISingleton.h"
+#include "ISubSystem.h"
+#include "logger/Logger.h"
+#include "Crc.h"
 
 namespace Nova {
 	struct ResourceData

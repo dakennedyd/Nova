@@ -1,5 +1,6 @@
 #pragma once
 #include "resource_manager/ResourceBase.h"
+#include "graphics/Bindable.h"
 
 namespace Nova {
 	class IMesh :public Bindable, public ResourceBase

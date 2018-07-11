@@ -1,6 +1,10 @@
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "GraphicsSystem.h"
 #include "logger/Logger.h"
+#include "Error.h"
+#include "RendererInit.h"
+#include "linux/Window.h"
 
 namespace Nova {		
 	//RendererBackend GraphicsSystem::mRenderer;
@@ -16,7 +20,13 @@ namespace Nova {
 		// start GLEW extension handler
 		//glewExperimental = GL_TRUE;		
 		//glewInit();
-		
+		if(!gladLoadGL()) {
+			error("could not start GLAD");
+    	}
+		glEnable(GL_MULTISAMPLE);
+		int width, height;
+		glfwGetFramebufferSize(Window::getInstance().mGLFWindow, &width, &height);
+		glViewport(0, 0, width, height); //create a a viewport as big as the framebuffer
 		// get version info
 		const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
 		const GLubyte* version = glGetString(GL_VERSION); // version as a string

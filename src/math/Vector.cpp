@@ -1,7 +1,7 @@
 #include <cmath>
 #include "Vector.h"
 #include "math/Quaternion.h"
-//#include "logger/Logger.h"
+#include "logger/Logger.h"
 
 
 namespace Nova {		
@@ -159,7 +159,7 @@ namespace Nova {
 
 	void Vec3::debugPrint() const
 	{
-		//LOG_DEBUG("Vector:" << mData[0] << " " << mData[1] << " " << mData[2]);
+		LOG_DEBUG("Vector:" << mData[0] << " " << mData[1] << " " << mData[2]);
 	}
 
 	/*======================*/
@@ -275,7 +275,7 @@ namespace Nova {
 
 	void Vec4::debugPrint() const
 	{
-		//LOG_DEBUG("Vector:" << mData[0] << " " << mData[1] << " " << mData[2] << " " << mData[3]);
+		LOG_DEBUG("Vector:" << mData[0] << " " << mData[1] << " " << mData[2] << " " << mData[3]);
 	}
 
 	Vec3 operator+(const Vec3 & left, const Vec3 & right)

@@ -1,8 +1,8 @@
 #include <thread>
+#include "logger/Logger.h"
 #include "Application.h"
 #include "ECS/Entity.h"
 #include "Crc.h"
-#include "logger/Logger.h"
 #ifdef NOVA_WINDOWS_PLATFORM
 	#include "windows/FileSystem.h"
 	#include "windows/Window.h"
@@ -14,8 +14,12 @@
 #include "graphics/opengl/GraphicsSystem.h"
 #include "resource_manager/ResourceManager.h"
 #include "ECS/DefaultSystems.h"
+#include "graphics/RendererFrontend.h"
+#include "graphics/opengl/RendererBackendDeferred.h"
+#include "Init.h"
 
 namespace Nova {	
+	class Entity;
 	Entity & Application::World::createEntity(const std::string & name)
 	{
 		//note: id alwasys has to be a SID of name
@@ -213,7 +217,7 @@ namespace Nova {
 				frameTime = static_cast<long>(clock.getMillis());
 				std::this_thread::sleep_for(std::chrono::milliseconds(targetFrameTime - frameTime)); //UUUUUGGGGGLLLYYYYYY!!!
 				fps =static_cast<long>(1000.0 / clock.getMillis());
-				window.setTitle("| FPS:" + std::to_string(fps) +" Frame time:" + std::to_string(frameTime) + "ms.");
+				window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +" Frame time:" + std::to_string(frameTime) + "ms.");
 				timeDelta += clock.getMillis();
 			}
 		}

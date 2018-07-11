@@ -1,5 +1,6 @@
 #pragma once
 
+namespace Nova {
 #ifdef _WIN32
 	#define NOVA_WINDOWS_PLATFORM //compile for windows platform
 	#ifdef _MSC_VER
@@ -30,8 +31,7 @@
 #define RIGHT_HAND_COORDS
 //#define COMPILE_TEST_FUNCTIONS
 
-
-#define GRAPHICS_API OPENGL //DIRECTX	//just opengl for now
+#define NOVA_OPENGL //just opengl for now
 
 #ifndef NDEBUG
 	#define NOVA_ASSERT(expr) \
@@ -47,3 +47,4 @@
 	#define NOVA_ASSERT(expr) // evaluates to nothing
 #endif
 
+}

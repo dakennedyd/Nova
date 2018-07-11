@@ -3,7 +3,7 @@
 #include "ISingleton.h"
 #include "ISubSystem.h"
 #include "Timer.h"
-
+#include "PreInit.h"
 
 namespace Nova {
 	class Logger : public ISingleton<Logger>, public ISubSystem
@@ -22,7 +22,7 @@ namespace Nova {
 			if (!mOutStream)
 			{ 
 				//error("No stream set for Logger class");
-				//std::cout << "No stream set for Logger class";
+				std::cout << "No stream set for Logger class";
 				return *this; 
 			}
 			else {

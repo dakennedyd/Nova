@@ -1,7 +1,9 @@
 #pragma once
-#include <glad/glad.h>
+//#include <glad/glad.h>
+#include <memory>
 #include "graphics/IFrameBuffer.h"
 #include "graphics/opengl/Texture.h"
+#include "RendererInit.h"
 
 namespace Nova {
 	class FrameBuffer :public IFrameBuffer
@@ -18,8 +20,8 @@ namespace Nova {
 		FrameBuffer& operator=(FrameBuffer const&) = delete;	 //copy assignment op
 		FrameBuffer& operator=(FrameBuffer && other);		 //move assignment op
 
-		void bind() const override { glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferID); };
-		void unBind() const override { glBindFramebuffer(GL_FRAMEBUFFER, 0); };
+		void bind() const override;		
+		void unBind() const override;		
 
 		const std::shared_ptr<Texture> getColorTexture(const int textureNumber);
 

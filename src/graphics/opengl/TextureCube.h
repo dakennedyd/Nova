@@ -1,5 +1,15 @@
 #pragma once
+#include <glad/glad.h>
 #include "graphics/ITexture.h"
+#include "PreInit.h"
+#ifdef NOVA_WINDOWS_PLATFORM
+	#include "windows/FileSystem.h"
+#else
+	//#ifdef NOVA_LINUX_PLATFORM
+		#include "linux/FileSystem.h"
+	//#endif
+#endif
+//#include "Texture.h"
 
 namespace Nova {
 	class TextureCube : public ITexture

@@ -1,5 +1,6 @@
 #pragma once
 #include <typeindex>
+#include <unordered_map>
 #include "math/Vector.h"
 #include "math/Matrix.h"
 #include "math/Quaternion.h"
@@ -43,7 +44,7 @@ namespace Nova {
 			static_assert(std::is_base_of<IComponent, T>::value,
 				"Invalid Component: a valid component has to be a subclass of IComponent class");
 			mComponents.emplace(std::make_pair(std::type_index(typeid(T)), new T(std::forward<Params>(parameters)... )));
-		};
+		}
 		
 		/*Gets a component of the type specified. If the type specified does not exist then
 		it launches an error*/
@@ -60,7 +61,7 @@ namespace Nova {
 		void removeComponent()
 		{
 			mComponents.erase(std::type_index(typeid(T)));			
-		};
+		}
 		
 		/*template<typename T>
 		void subscribeTo()

@@ -2,7 +2,7 @@
 #include "Quaternion.h"
 #include "math/Vector.h"
 #include "math/Matrix.h"
-//#include "logger/Logger.h"
+#include "logger/Logger.h"
 
 namespace Nova {
 	UnitQuat::UnitQuat()
@@ -89,7 +89,7 @@ namespace Nova {
 
 	void UnitQuat::debugPrint()
 	{
-		//LOG_DEBUG("Quaternion:" << mX << " " << mY << " " << mZ << " " << mW);
+		LOG_DEBUG("Quaternion:" << mX << " " << mY << " " << mZ << " " << mW);
 	}
 
 	void UnitQuat::normalizeSelf()

@@ -1,6 +1,8 @@
 #include <utility>
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include "Texture.h"
+//#include <GLFW/glfw3.h>
+
 #include "Error.h"
 #include "logger/Logger.h"
 #include "graphics/opengl/GraphicsSystem.h"

@@ -1,4 +1,7 @@
 #pragma once
+#include <typeindex>
+#include <unordered_map>
+#include "ECS/Component.h"
 
 namespace Nova {
 	class Entity;
@@ -24,7 +27,7 @@ namespace Nova {
 			static_assert(std::is_base_of<IComponent, T>::value,
 				"Invalid Component: a valid component has to be a subclass of IComponent");
 			mRequiredComponents.emplace(std::make_pair(std::type_index(typeid(T)), new T));
-		};
+		}
 
 		auto& getEntities() { return mRegisteredEntities; }
 	protected:

@@ -11,8 +11,8 @@ namespace Nova {
 	class Window final :public IWindow, public ISingleton<Window>, public ISubSystem
 	{
 	public:
-		Window() {};		
-		~Window() {};
+		Window() = default;		
+		~Window() = default;
 		void startUp() override;
 		void shutDown() override;
 		int getWidth() override;

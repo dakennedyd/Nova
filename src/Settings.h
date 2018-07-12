@@ -18,7 +18,7 @@ namespace Nova {
 		Settings() :mFileName(CONFIGURATION_FILE_NAME) {};
 		/*defines the configuration file*/
 		Settings(const std::string & fileName) :mFileName(DEFAULT_FILE_PATH + fileName) {};
-		~Settings() = default;
+		virtual ~Settings() = default;
 
 		void add(const std::string & section, const std::string & property, const std::string & value);
 		const std::string & getString(const std::string & section, const std::string & property);

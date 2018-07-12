@@ -26,11 +26,8 @@ namespace Nova {
 			error("could not start GLFW3");
 		}
 		//this hints have to be set after glfwInit for some reason
-		//glfwWindowHint(GLFW_VISIBLE, GL_FALSE);		
-		glfwWindowHint(GLFW_SAMPLES, 0);
-		// if(!gladLoadGL()) {
-		// 	error("could not start GLAD");
-    	// }
+		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);		
+		glfwWindowHint(GLFW_SAMPLES, 0);		
 		
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 		GLFWmonitor* mon = glfwGetPrimaryMonitor();
@@ -54,7 +51,7 @@ namespace Nova {
 		}
 		
 		setTitle(NOVA_DESCRIPTION_STRING);
-		//hideCursor();
+		hideCursor();
 		glfwSetWindowCloseCallback(mGLFWindow, window_close_callback);		
 		glfwSetWindowPos(mGLFWindow, 50, 50);
 		//glfwSetCursorPosCallback(mGLFWindow, handleMouse);	
@@ -64,7 +61,7 @@ namespace Nova {
 
 	void Window::shutDown()
 	{
-		glfwDestroyWindow(mGLFWindow);  //not necesarily needed, glfwTerminate does the same
+		//glfwDestroyWindow(mGLFWindow);  //not necesarily needed, glfwTerminate does the same
 										//but good to have in case i implement multiple windows
 		glfwTerminate();
 	}
@@ -84,9 +81,7 @@ namespace Nova {
 		if (glfwWindowShouldClose(mGLFWindow) == 1) {
 			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	void Window::setTitle(const std::string &title)

@@ -25,8 +25,8 @@ namespace Nova {
 	class GraphicsSystem final: public ISingleton<GraphicsSystem>, public IGraphicsSystem, public ISubSystem
 	{
 	public:
-		GraphicsSystem() {};
-		~GraphicsSystem() {};
+		GraphicsSystem() = default;
+		~GraphicsSystem() = default;
 		void startUp() override;
 		void shutDown() override;				
 		/*void setCurrentViewMatrix(Mat4& view) { mCurrentCamera.viewMatrix = &view; };

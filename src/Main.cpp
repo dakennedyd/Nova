@@ -328,7 +328,7 @@ int main() {
 	for (auto v : b)
 		s = s + " " + std::to_string(v);
 	LOG_INFO(s);*/
-	engine.shutDown();
+	//engine.shutDown();
 	//Engine::shutDown();			
 	return 0;
 }

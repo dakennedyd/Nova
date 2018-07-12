@@ -22,7 +22,7 @@ namespace Nova {
 	{
 	public:
 		FileSystem() = default;
-		virtual ~FileSystem() = default;
+		~FileSystem() = default;
 		void startUp() override;
 		void shutDown() override;
 

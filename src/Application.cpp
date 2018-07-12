@@ -200,7 +200,7 @@ namespace Nova {
 			window.show();
 			rendererFrontend.createRenderPackets();
 			Timer clock;
-			while (!isClosing() && !window.isClosing()) {
+			while (!this->isClosing() && !window.isClosing()) {
 				clock.reset();			
 				input.processInputs();
 				while (timeDelta >= SIMULATION_TIME_STEP)
@@ -214,12 +214,14 @@ namespace Nova {
 
 				rendererBackend.render();
 				window.swapFrameBuffers();
+				//glFinish();
 				frameTime = static_cast<long>(clock.getMillis());
 				std::this_thread::sleep_for(std::chrono::milliseconds(targetFrameTime - frameTime)); //UUUUUGGGGGLLLYYYYYY!!!
 				fps =static_cast<long>(1000.0 / clock.getMillis());
 				window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +" Frame time:" + std::to_string(frameTime) + "ms.");
 				timeDelta += clock.getMillis();
 			}
+			//this->shutDown();
 		}
 	}
 	void Application::shutDown()
@@ -233,10 +235,10 @@ namespace Nova {
 			Window::getInstance().shutDown();
 			EngineSettings::getInstance().shutDown();
 			#ifdef LOG_ACTIVE
-			Logger::getInstance().shutDown();
+				Logger::getInstance().shutDown();
 			#endif
 			FileSystem::getInstance().shutDown();
-			mIsInitialized = false;
+			this->mIsInitialized = false;
 		}
 	}
 }

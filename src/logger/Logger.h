@@ -61,28 +61,28 @@ namespace Nova {
 #ifdef LOG_ACTIVE	
 	#ifdef INFO_LOG_LEVEL_ACTIVE
 		#define LOG_INFO(msg) {Logger::getInstance().openFile();\
-		Logger::getInstance() << "[INFO]" << Logger::getInstance().showTime() << msg << "\n";\
+		Logger::getInstance() << "\033[1;92m[INFO]" << Logger::getInstance().showTime() << msg << "\033[0m\n";\
 		Logger::getInstance().closeFile();};
 	#else
 		#define LOG_INFO(msg)
 	#endif //INFO_LOG_LEVEL_ACTIVE
 	#ifdef WARNING_LOG_LEVEL_ACTIVE
 		#define LOG_WARNING(msg) {Logger::getInstance().openFile();\
-		Logger::getInstance() << "[WARNING]" << Logger::getInstance().showTime() << msg << "\n";\
+		Logger::getInstance() << "\033[1;93m[WARNING]" << Logger::getInstance().showTime() << msg << "\033[0m\n";\
 		Logger::getInstance().closeFile();};
 	#else
 		#define LOG_WARNING(msg)
 	#endif //WARNING_LOG_LEVEL_ACTIVE
 	#ifdef DEBUG_LOG_LEVEL_ACTIVE
 		#define LOG_DEBUG(msg) {Logger::getInstance().openFile();\
-		Logger::getInstance() << "[DEBUG]" << Logger::getInstance().showTime() << msg << "\n";\
+		Logger::getInstance() << "\033[1;96m[DEBUG]" << Logger::getInstance().showTime() << msg << "\033[0m\n";\
 		Logger::getInstance().closeFile();};
 	#else
 		#define LOG_DEBUG(msg)
 	#endif //DEBUG_LOG_LEVEL_ACTIVE
 	#ifdef ERROR_LOG_LEVEL_ACTIVE
 		#define LOG_ERROR(msg) {Logger::getInstance().openFile();\
-		Logger::getInstance() << "[ERROR]" << Logger::getInstance().showTime() << msg << "\n";\
+		Logger::getInstance() << "\033[1;91m[INFO]" << Logger::getInstance().showTime() << msg << "\033[0m\n";\
 		Logger::getInstance().closeFile();};
 	#else
 		#define LOG_ERROR(msg)

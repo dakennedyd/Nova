@@ -1,8 +1,12 @@
 #pragma once
 #include <vector>
-//#include <glad/glad.h>
+#include "PreInit.h"
 #include "graphics/IMesh.h"
 #include "math/Vector.h"
+#include "PreInit.h"
+#ifdef NOVA_OPENGL
+	#include <glad/glad.h>
+#endif
 
 namespace Nova {
 	struct Box {};

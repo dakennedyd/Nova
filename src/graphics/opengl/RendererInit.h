@@ -1,6 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include "PreInit.h"
+#include "Init.h"
 
 namespace Nova {
 
@@ -15,6 +16,8 @@ namespace Nova {
 	GLint getMRTMaxBuffers();
 	//static const GLuint MAX_COLOR_ATTACHMENTS = getMaxColorAttachments();
 	//static const GLuint MAX_MRT_BUFFERS = getMRTMaxBuffers();
+	static const std::string RENDERER{"opengl"};
+	static const std::string SHADERS_PATH(RESOURCES_PATH + "shaders/glsl/");
 
 	void openglErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
 		const GLchar* message, const void* userParam);

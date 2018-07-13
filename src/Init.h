@@ -2,7 +2,6 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
-#include "graphics/opengl/RendererInit.h"
 //temp until engine loads its configuration from a file
 namespace Nova {
 	static const int NOVA_VERSION_MAJOR = 0;
@@ -14,10 +13,7 @@ namespace Nova {
 	static const std::string DEFAULT_FILE_PATH("");
 	static const std::string RESOURCES_PATH("Resources/");
 	static const std::string TEXTURES_PATH(RESOURCES_PATH + "textures/");
-#ifdef NOVA_OPENGL
-	static const std::string RENDERER{"opengl"};
-	static const std::string SHADERS_PATH(RESOURCES_PATH + "shaders/glsl/");
-#endif
+
 	static const std::string MODELS_PATH(RESOURCES_PATH + "models/");
 	static const std::string LOGGER_OUTPUT_FILE_NAME(DEFAULT_FILE_PATH + "nova_log.txt");
 	static const std::string CONFIGURATION_FILE_NAME(DEFAULT_FILE_PATH + "configuration.ini");

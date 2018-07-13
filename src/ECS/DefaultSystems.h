@@ -9,7 +9,9 @@ common enough to be necessary in any game*/
 #include "ECS/System.h"
 #include "ECS/Entity.h"
 #include "Init.h"
-#ifdef NOVA_LINUX_PLATFORM
+#ifdef NOVA_WINDOWS_PLATFORM
+	#include "windows/InputSystem.h"
+#elif defined  NOVA_LINUX_PLATFORM
 	#include "linux/InputSystem.h"
 #endif
 #ifdef NOVA_OPENGL

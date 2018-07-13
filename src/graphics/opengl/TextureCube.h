@@ -4,10 +4,8 @@
 #include "PreInit.h"
 #ifdef NOVA_WINDOWS_PLATFORM
 	#include "windows/FileSystem.h"
-#else
-	//#ifdef NOVA_LINUX_PLATFORM
-		#include "linux/FileSystem.h"
-	//#endif
+#elif defined  NOVA_LINUX_PLATFORM
+	#include "linux/FileSystem.h"
 #endif
 //#include "Texture.h"
 

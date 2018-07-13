@@ -28,50 +28,34 @@ else()
     #add_compile_options(-Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14)    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")    
-    #add_compile_options(-j8)    
-    if(LINUX)
-        set(GLAD_LIBRARIES dl)
-    endif()
+    #if(LINUX)
+        #set(GLAD_LIBRARIES dl)
+    #endif()
 endif()
 
-#target_include_directories(${PROJECT_NAME} src/
 include_directories(src/
                     ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/assimp/include/
                     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/assimp/include/
-                    #${CMAKE_HOME_DIRECTORY}/Dependencies/assimp/include/
                     Dependencies/bullet/src/
                     Dependencies/
                     Dependencies/glad/include/
                     Dependencies/glfw/include/
                     Dependencies/stb/)
 
-# file(GLOB PROJECT_SOURCES 
-#                           src/Error.cpp
-#                           src/graphics/ImageDecoder.cpp
-#                           src/linux/FileSystem.cpp  #fix this for windows!!
-#                           src/Timer.cpp
-#                           src/logger/Logger.cpp
-#                           src/Settings.cpp
-#                           src/linux/Window.cpp  #fix this for windows!!
-#                           src/linux/InputSystem.cpp
-#                           src/graphics/opengl/RendererInit.cpp
-#                           src/graphics/opengl/GraphicsSystem.cpp
-#                           src/resource_manager/ResourceManager.cpp
-#                           src/math/Quaternion.cpp
-#                           src/math/Matrix.cpp
-#                           src/math/Vector.cpp
-#                           src/Main.cpp)
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c)
 # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
-# set (EXCLUDE_DIR "/windows/")
-# file (GLOB_RECURSE PROJECT_SOURCES "*.cpp" "*.c")
-# foreach (TMP_PATH ${SOURCE_FILES})
-#     string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
-#     if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
-#         list (REMOVE_ITEM ${SOURCE_FILES} ${TMP_PATH})
-#     endif ()
-# endforeach(TMP_PATH)
+
+if(WIN32)
+    list(REMOVE_ITEM PROJECT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Window.cpp
+                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/FileSystem.cpp
+                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/InputSystem.cpp)
+else()
+    list(REMOVE_ITEM PROJECT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Window.cpp
+                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/FileSystem.cpp
+                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/InputSystem.cpp)
+endif()
+
 # file(GLOB PROJECT_SHADERS Resources/Shaders/glsl/*.glsl
 #                           Resources/Shaders/glsl/*.frag
 #                           Resources/Shaders/glsl/*.geom
@@ -89,31 +73,14 @@ source_group("Dependencies" FILES ${DEPENDENCIES_SOURCES})
 
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
-#link_directories(/home/david/src/project_nova/engine/Dependencies/glfw
-#                 /home/david/src/project_nova/engine/Dependencies/assimp)
-
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${DEPENDENCIES_SOURCES})
                                
-target_link_libraries(${PROJECT_NAME} glfw assimp #dl
+target_link_libraries(${PROJECT_NAME} glfw assimp
                                ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
 #                      BulletDynamics BulletCollision LinearMath)
                                
-
-#find_library(GLFW3_LOCATION /home/david/src/project_nova/engine/Dependencies/glfw)
-#target_link_libraries(${PROJECT_NAME} glfw3 ${GLFW3_LOCATION})
-
-#target_link_libraries(${PROJECT_NAME} assimp glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
-
-#target_link_libraries(${PROJECT_NAME} glfw3 ${CMAKE_SOURCE_DIR}/Dependencies/glfw/libglfw3.a)
-#target_link_libraries(${PROJECT_NAME} assimp ${CMAKE_SOURCE_DIR}/Dependencies/assimp/libassimp.a)
-
-#ADD_LIBRARY(glfw3 STATIC IMPORTED)
-#SET_TARGET_PROPERTIES(glfw3 PROPERTIES
-#    IMPORTED_LOCATION /home/david/src/project_nova/engine/Dependencies/glfw/libglfw3.a)
-#TARGET_LINK_LIBRARIES(${PROJECT_NAME} glfw3)
-
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

@@ -51,7 +51,7 @@ namespace Nova {
 		}
 		
 		setTitle(NOVA_DESCRIPTION_STRING);
-		hideCursor();
+		//hideCursor();
 		glfwSetWindowCloseCallback(mGLFWindow, window_close_callback);		
 		glfwSetWindowPos(mGLFWindow, 50, 50);
 		//glfwSetCursorPosCallback(mGLFWindow, handleMouse);	

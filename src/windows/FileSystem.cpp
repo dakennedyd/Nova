@@ -2,13 +2,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "PreInit.h"
-#ifdef NOVA_WINDOWS_PLATFORM
-	#include "windows/FileSystem.h"
-#elif defined  NOVA_LINUX_PLATFORM
-	#include <dirent.h>
-	#include "linux/FileSystem.h"
-#endif
+#include "windows/FileSystem.h"
 #include "Error.h"
 #include "logger/Logger.h"
 #include "graphics/ImageDecoder.h"

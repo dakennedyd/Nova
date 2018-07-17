@@ -1,8 +1,6 @@
 #pragma once
-
 #include <cstdint>
 #include <random>
-#include <cstdint>
 
 namespace Nova {
 	class Random

@@ -1,7 +1,7 @@
 #pragma once
 #include <typeindex>
 #include <unordered_map>
-#include "ECS/Component.h"
+#include "ECS/IComponent.h"
 
 namespace Nova {
 	class Entity;

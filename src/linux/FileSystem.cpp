@@ -1,6 +1,9 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "PreInit.h"
 #include "Init.h"
 #ifdef NOVA_LINUX_PLATFORM 

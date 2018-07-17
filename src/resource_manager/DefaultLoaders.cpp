@@ -2,13 +2,15 @@
 #include <vector>
 #include <string>
 #include "DefaultLoaders.h"
+#include "PreInit.h"
 #ifdef NOVA_WINDOWS_PLATFORM
 	#include "windows/FileSystem.h"
 #else
 	#include "linux/FileSystem.h"
 #endif
 #include "ModelLoader.h"
-#include "Init.h"
+//#include "Init.h"
+#include "math/miscellaneous.h"
 #include "graphics/ITexture.h"
 #include "graphics/opengl/Texture.h"
 #include "graphics/opengl/TextureCube.h"

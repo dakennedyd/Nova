@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "tinyxml2.h"
 
 namespace Nova {

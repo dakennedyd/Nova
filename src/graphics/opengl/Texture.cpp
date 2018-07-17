@@ -6,6 +6,7 @@
 #include "Error.h"
 #include "logger/Logger.h"
 #include "graphics/opengl/GraphicsSystem.h"
+#include "PreInit.h"
 #ifdef NOVA_WINDOWS_PLATFORM
 	#include "windows/FileSystem.h"
 #else
@@ -185,8 +186,8 @@ namespace Nova {
 	}
 	Texture::Texture(Texture && other)
 		:mTextureID(std::move(other.mTextureID)), mWidth(std::move(other.mWidth)),
-		mHeight(std::move(other.mHeight)), mHasMipmaps(std::move(other.mHasMipmaps)),
-		mType(std::move(other.mType)), mTextureBuffer(std::move(other.mTextureBuffer))
+		mHeight(std::move(other.mHeight)), mType(std::move(other.mType)),
+		mHasMipmaps(std::move(other.mHasMipmaps)), mTextureBuffer(std::move(other.mTextureBuffer))
 	{
 		mBorderColor[0] = std::move(other.mBorderColor[0]);
 		mBorderColor[1] = std::move(other.mBorderColor[1]);

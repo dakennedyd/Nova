@@ -5,7 +5,7 @@
 
 namespace Nova {
 	GPUProgramParameterMat4::GPUProgramParameterMat4(const GLuint location, const float * parameter)
-		:mLocation(location), mData(parameter)
+		:mData(parameter), mLocation(location)
 	{
 	}
 	void GPUProgramParameterMat4::update() //warning: program has to be already binded!
@@ -14,7 +14,7 @@ namespace Nova {
 	}
 
 	GPUProgramParameterVec3::GPUProgramParameterVec3(const GLuint location, const float * parameter)
-		:mLocation(location), mData(parameter)
+		:mData(parameter), mLocation(location)
 	{
 	}	
 	void GPUProgramParameterVec3::update() //warning: program has to be already binded!
@@ -23,7 +23,7 @@ namespace Nova {
 	}
 
 	GPUProgramParameterVec4::GPUProgramParameterVec4(const GLuint location, const float * parameter)
-		:mLocation(location), mData(parameter)
+		:mData(parameter), mLocation(location)
 	{
 	}
 	void GPUProgramParameterVec4::update() //warning: program has to be already binded!
@@ -31,7 +31,7 @@ namespace Nova {
 		glUniform4fv(mLocation, 1, mData);
 	}
 	GPUProgramParameterFloat::GPUProgramParameterFloat(const GLuint location, const float parameter)
-		:mLocation(location), mData(parameter)
+		:mData(parameter), mLocation(location)
 	{
 	}
 	void GPUProgramParameterFloat::update()
@@ -39,7 +39,7 @@ namespace Nova {
 		glUniform1f(mLocation, mData);
 	}
 	GPUProgramParameterInt::GPUProgramParameterInt(const GLuint location, const int parameter)
-		: mLocation(location), mData(parameter)
+		:mData(parameter), mLocation(location)
 	{
 	}
 	void GPUProgramParameterInt::update()

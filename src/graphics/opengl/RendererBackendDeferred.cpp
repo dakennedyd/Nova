@@ -14,11 +14,15 @@
 #include "graphics/opengl/TextureCube.h"
 
 namespace Nova {
-	RendererBackendDeferred::RendererBackendDeferred()
-		:mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
-		mLightPassFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth, mHeight)),
-		mIBL(ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->irradiance,
+	RendererBackendDeferred::RendererBackendDeferred()		
+		:mIBL(ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->irradiance,
 			ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->radiance),
+			
+		mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
+		mLightPassFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth, mHeight)),
+		mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth/4 , mHeight/4)),
+		mVBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth/4 , mHeight/4)),
+
 		mLightPassRenderPacket(mScreenQuad,
 			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("light_pass_PBR"),
 				std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
@@ -29,23 +33,26 @@ namespace Nova {
 					{mIBL.irradiance, "irradianceMap" },
 					{mIBL.radiance, "radianceMap" },
 					{ResourceManager::getInstance().get<Texture>("brdf_LUT"), "brdfLUT" }})),
-		mCurrentSkyBox(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
-			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),
-				std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
-					{ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"), "skyboxTexture"} })),
-		mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth/4 , mHeight/4)),
-		mVBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth/4 , mHeight/4)),
-		mHBloomPacket(mScreenQuad, std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("hbloom_shader"),
-			std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
-				{mLightPassFrameBuffer.getColorTexture(0), "albedo"} })),
-		mVBloomPacket(mScreenQuad, std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("vbloom_shader"),
-			std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
-				{mHBloomFrameBuffer.getColorTexture(0), "albedo"} })),
+
 		mFinalPacket(mScreenQuad,
 		std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("tonemap_shader"),
 			std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
 				{mVBloomFrameBuffer.getColorTexture(0), "blurredImage"},
-				{mLightPassFrameBuffer.getColorTexture(0), "renderedImage" }, }))
+				{mLightPassFrameBuffer.getColorTexture(0), "renderedImage" }, })),
+
+		mHBloomPacket(mScreenQuad, std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("hbloom_shader"),
+			std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
+				{mLightPassFrameBuffer.getColorTexture(0), "albedo"} })),
+				
+		mVBloomPacket(mScreenQuad, std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("vbloom_shader"),
+			std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
+				{mHBloomFrameBuffer.getColorTexture(0), "albedo"} })),
+
+		mCurrentSkyBox(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
+			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),
+				std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
+					{ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"), "skyboxTexture"} }))
+
 	{
 		/*auto skybox = std::make_shared<RenderPacket>(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
 			std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),

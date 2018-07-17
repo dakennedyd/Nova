@@ -1,6 +1,7 @@
 #include <memory>
-//#include <assimp/Importer.hpp>
+#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "ModelLoader.h"
 #include "PreInit.h"
 #ifdef NOVA_OPENGL
@@ -25,8 +26,8 @@ namespace Nova {
 		std::vector<float> texturesCoodinates;
 		//Texture* diffuse;
 		//Material* basicMaterial;
-		FileSystem& fs = FileSystem::getInstance();
-		auto &rm = ResourceManager::getInstance();		
+		//FileSystem& fs = FileSystem::getInstance();
+		//auto &rm = ResourceManager::getInstance();		
 		//GPUProgram *program;
 		//Mesh* novaMesh;
 						

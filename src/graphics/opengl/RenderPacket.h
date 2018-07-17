@@ -32,9 +32,9 @@ namespace Nova {
 
 		//const std::uint64_t getID() const { return mID; };
 	private:
+		std::shared_ptr<Mesh> mMesh = nullptr;
 		std::shared_ptr<Material> mMaterial = nullptr;
 		//RenderPacket() {mID = mIDCounter; mIDCounter++; };
-		std::shared_ptr<Mesh> mMesh = nullptr;
 		const Transform * mTransform = nullptr;
 		//const Mesh& mMesh;
 		//const Material& mMaterial;

@@ -4,7 +4,7 @@
 #include "math/Vector.h"
 #include "math/Matrix.h"
 #include "math/Quaternion.h"
-#include "ECS/Component.h"
+#include "ECS/IComponent.h"
 
 namespace Nova {
 	enum PropagationType {POSITION_ONLY, POSITION_ROTATION, POSITION_ROTATION_SCALING};

@@ -1,15 +1,16 @@
 #pragma once
-#include <glad/glad.h>
+//#include <glad/glad.h>
 #include "graphics/ITexture.h"
-#include "PreInit.h"
-#ifdef NOVA_WINDOWS_PLATFORM
-	#include "windows/FileSystem.h"
-#elif defined  NOVA_LINUX_PLATFORM
-	#include "linux/FileSystem.h"
-#endif
+// #include "PreInit.h"
+// #ifdef NOVA_WINDOWS_PLATFORM
+// 	#include "windows/FileSystem.h"
+// #elif defined  NOVA_LINUX_PLATFORM
+// 	#include "linux/FileSystem.h"
+// #endif
 //#include "Texture.h"
 
 namespace Nova {
+	struct TextureInfo;
 	class TextureCube : public ITexture
 	{
 	public:
@@ -28,7 +29,7 @@ namespace Nova {
 		void bind() const override;
 		void unBind() const override;		
 	private:
-		GLuint mTextureID = 0;
+		unsigned mTextureID = 0;
 		int mWidth;
 		int mHeight;
 		bool mHasMipmaps = false;

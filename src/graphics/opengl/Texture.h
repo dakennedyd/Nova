@@ -48,8 +48,8 @@ namespace Nova {
 		//TextureState mState;		
 		int mWidth;
 		int mHeight;
-		bool mHasMipmaps = false;
 		TextureType mType;
+		bool mHasMipmaps = false;
 		unsigned char * mTextureBuffer;
 
 	};

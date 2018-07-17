@@ -55,7 +55,7 @@ namespace Nova {
 		{
 			int maxColorAttachments = getMaxColorAttachments();
 			//glGetIntegerv(getMaxColorAttachments(), &maxColorAttachments);			
-			if (mColorTextures.size()+1 > maxColorAttachments) LOG_ERROR("too many color buffers on framebuffer");
+			if (static_cast<int>(mColorTextures.size())+1 > maxColorAttachments) LOG_ERROR("too many color buffers on framebuffer");
 
 			mColorTextures.push_back(texture);
 
@@ -212,7 +212,7 @@ namespace Nova {
 		/*return std::shared_ptr<Texture>(&(mTextures[0]), [](Texture *) {});*/
 		//return std::shared_ptr<Texture>(&mTexture, [](Texture *) {});
 		//LOG_DEBUG("fb color tex array size:" << mColorTextures.size());
-		if (textureNumber > mColorTextures.size() - 1) LOG_ERROR("tried to get invalid color texture on framebuffer");
+		if (textureNumber > static_cast<int>(mColorTextures.size()) - 1) LOG_ERROR("tried to get invalid color texture on framebuffer");
 		return mColorTextures[textureNumber];
 	}
 	FrameBuffer FrameBuffer::makeDefaultFrameBuffer(const int width, const int height)

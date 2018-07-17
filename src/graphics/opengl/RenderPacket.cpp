@@ -34,7 +34,7 @@ namespace Nova {
 		addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"), gs.getCurrentCamera().viewMatrix->getDataPtr()));
 		addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "proj"), gs.getCurrentCamera().projectionMatrix->getDataPtr()));
 
-		int i = 0;
+		std::size_t i = 0;
 		//for (int i = 0; i < MAX_LIGHTS && i < lightsList.size(); i++)
 		for(auto &light : lightsList)
 		{
@@ -80,7 +80,7 @@ namespace Nova {
 
 		addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"), gs.getCurrentCamera().viewMatrix->getDataPtr()));
 		addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "proj"), gs.getCurrentCamera().projectionMatrix->getDataPtr()));
-		int i = 0;
+		std::size_t i = 0;
 		auto& lightsList = GraphicsSystem::getInstance().getLights();
 		for (auto &light : lightsList)
 		{
@@ -132,8 +132,8 @@ namespace Nova {
 	}
 
 	RenderPacket::RenderPacket(RenderPacket && other)
-		:mMesh(std::move(other.mMesh)), mMaterial(std::move(other.mMaterial)), mParameters(std::move(other.mParameters)),
-		/*mID(other.mID),*/ mTransform(other.mTransform)
+		:mMesh(std::move(other.mMesh)), mMaterial(std::move(other.mMaterial)), mTransform(other.mTransform),
+		mParameters(std::move(other.mParameters)) /*mID(other.mID),*/ 
 	{
 		other.mParameters = std::vector<IGPUProgramParameter*>{};
 	}

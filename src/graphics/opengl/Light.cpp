@@ -5,14 +5,14 @@
 namespace Nova {
 	//std::uint64_t Light::mIDCounter = 0;	
 	Light::Light(int type, Vec3 *pos, Vec3 *color)//, Vec3 * amb, Vec3 * diff, Vec3 * spec)
-		:mType(type), mPosition(pos), mColor(color)//, mAmbient(amb), mDiffuse(diff), mSpecular(spec)
+		:mPosition(pos), mColor(color), mType(type)
 	{
 		//mID = mIDCounter;
 		//mIDCounter++;
 
 	}
 	Light::Light(Light && other)
-		: mType(std::move(other.mType)), mPosition(std::move(other.mPosition)), mColor(std::move(other.mColor))
+		: mPosition(std::move(other.mPosition)), mColor(std::move(other.mColor)), mType(std::move(other.mType))
 			/*mAmbient(std::move(other.mAmbient)),
 		mDiffuse(std::move(other.mDiffuse)), mSpecular(std::move(other.mSpecular)), mConstant(std::move(other.mConstant)),
 		mLinear(std::move(other.mLinear)), mQuadratic(std::move(other.mQuadratic))*/

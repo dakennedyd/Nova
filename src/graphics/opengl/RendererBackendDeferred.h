@@ -19,9 +19,9 @@ namespace Nova {
 			const std::shared_ptr<TextureCube> radiance)
 			:radiance(radiance), irradiance(irradiance) {};
 
+		std::shared_ptr<TextureCube> radiance;
 		std::shared_ptr<TextureCube> irradiance;
 		//std::vector<std::shared_ptr<TextureCube>> radiance;
-		std::shared_ptr<TextureCube> radiance;
 	};
 	struct Skybox
 	{

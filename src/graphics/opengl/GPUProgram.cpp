@@ -30,7 +30,7 @@ namespace Nova {
 			secondLinePosition = srcFile.find_first_of(std::string("\n"));
 			if (secondLinePosition == std::string::npos) error("Malformed shader source file");
 		} else error("Malformed shader source file");
-		secondLinePosition++; //I don't think this will work on linux!!
+		secondLinePosition++; //ugly
 		std::string vs(srcFile); vs.insert(secondLinePosition, "#define NOVA_VERTEX_SHADER\n");
 		std::string ps(srcFile); ps.insert(secondLinePosition, "#define NOVA_FRAGMENT_SHADER\n");
 		ps.insert(secondLinePosition+29, "#define MAX_LIGHTS " + std::to_string(MAX_LIGHTS) + "\n"); //this is ugly!!!

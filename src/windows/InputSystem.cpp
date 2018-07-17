@@ -4,7 +4,7 @@
 #include "windows/InputSystem.h"
 #include "Crc.h"
 #include "logger/Logger.h"
-#include "Window.h"
+#include "windows/Window.h"
 
 namespace Nova {
 	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

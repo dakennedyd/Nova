@@ -1,14 +1,15 @@
 #pragma once
 #include <memory>
 #include "graphics/opengl/RendererInit.h"
-#include "graphics/opengl/FrameBuffer.h"
-#include "Component.h"
+//#include "graphics/opengl/FrameBuffer.h"
+#include "IComponent.h"
 #include "math/Vector.h"
 #include "math/Matrix.h"
 
 namespace Nova {
 	class Mesh;
 	class Material;
+	class FrameBuffer;
 	/*struct TransformComponent final :public IComponent
 	{
 	Vec3 mScale;

@@ -3,8 +3,9 @@
 #include <cmath>
 #include <string>
 #include "TextureCube.h"
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include "Error.h"
+#include "PreInit.h"
 #ifdef NOVA_WINDOWS_PLATFORM
 	#include "windows/FileSystem.h"
 #else
@@ -108,7 +109,8 @@ namespace Nova {
 		GLuint texFormat = 0;
 		if (isHDR) {
 			int mipLevel = 0;
-			for (auto data : textureData) {
+			for (auto it = textureData.begin(); it != textureData.end(); ++it)
+			{
 				double texWidth = width * std::pow(0.5, mipLevel), texHeight = height* std::pow(0.5, mipLevel);
 				for (int i = 0; i < 6; i++)
 				{
@@ -120,7 +122,7 @@ namespace Nova {
 						0,
 						GL_RGB,
 						GL_FLOAT,
-						(const float *)textureData[mipLevel] + static_cast<int>(texWidth*(texHeight / 6)*bpp*i));
+						static_cast<const float *>(textureData[mipLevel]) + static_cast<int>(texWidth*(texHeight / 6)*bpp*i));
 				}
 				mipLevel++;
 			}

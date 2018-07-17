@@ -1,7 +1,101 @@
 #pragma once
+#include <algorithm>
+#include <vector>
 
-namespace Nova {
-	float toDegrees(const float value);
-	float toRadians(const float value);
-	bool isEqual(float valueA, float valueB);
+namespace Nova
+{
+float toDegrees(const float value);
+float toRadians(const float value);
+bool isEqual(float valueA, float valueB);
+
+/*takes an std::vector<string> and converts it to a std::vector<float>*/
+static inline std::vector<float> vectorStringToFloat(const std::vector<std::string> &stringVector)
+{
+    std::vector<float> floatVector(stringVector.size());
+    std::transform(stringVector.begin(), stringVector.end(), floatVector.begin(),
+                   [](const std::string &val) { return stof(val); });
+    return floatVector;
 }
+
+/** replace all ocurrences of string2 in string1 with string3 */
+void inline replaceAllInPlace(std::string &string1, const std::string &string2,
+                              const std::string &string3);
+
+/** parse tokens in a string and return them as a vector */
+std::vector<std::string> split(const std::string &str, const std::string &delimiter = " ");
+
+/**
+trim string from start (in place)
+*/
+static inline void ltrim(std::string &s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
+}
+
+/**
+trim string from end (in place)
+*/
+static inline void rtrim(std::string &s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) { return !std::isspace(ch); }).base(),
+            s.end());
+}
+
+/**
+trim string from both ends (in place)
+*/
+static inline void trim(std::string &s)
+{
+    ltrim(s);
+    rtrim(s);
+}
+
+/*template <bool>
+struct if_constexpr;
+
+template <>
+struct if_constexpr<true>
+{
+        struct elser
+        {
+                template <class F, class... Args>
+                void _else(F&&, Args&&...) {}
+
+                template <bool C, class F, class... Args>
+                auto _else_if(F&&, Args&&...) { return elser(); }
+        };
+
+        template <class F, class... Args>
+        auto operator()(F&& callback, Args&&... args)
+        {
+                callback(std::forward<Args>(args)...);
+                return elser();
+        }
+};
+
+template <>
+struct if_constexpr<false>
+{
+        struct elser
+        {
+                template <bool C, class F, class... Args>
+                auto _else_if(F&& callback, Args&&... args)
+                {
+                        return if_constexpr<C>()(std::forward<F>(callback),
+std::forward<Args>(args)...);
+                }
+
+                template <class F, class... Args>
+                void _else(F&& callback, Args&&... args)
+                {
+                        callback(std::forward<Args>(args)...);
+                }
+        };
+
+        template <class F, class... Args>
+        auto operator()(F&& callback, Args&&... args)
+        {
+                return elser();
+        }
+};*/
+} // namespace Nova

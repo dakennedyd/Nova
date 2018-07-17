@@ -1,11 +1,13 @@
 #pragma once
+#include <vector>
 //#include <glad/glad.h>
-#include <memory>
+//#include <memory>
 #include "graphics/IFrameBuffer.h"
-#include "graphics/opengl/Texture.h"
+//#include "graphics/opengl/Texture.h"
 #include "RendererInit.h"
 
 namespace Nova {
+	class Texture;
 	class FrameBuffer :public IFrameBuffer
 	{
 	public:

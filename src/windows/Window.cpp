@@ -27,8 +27,7 @@ namespace Nova {
 		}
 		//this hints have to be set after glfwInit for some reason
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);		
-		glfwWindowHint(GLFW_SAMPLES, 0);
-		glEnable(GL_MULTISAMPLE);
+		glfwWindowHint(GLFW_SAMPLES, 0);		
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 		GLFWmonitor* mon = glfwGetPrimaryMonitor();
 		const GLFWvidmode* vmode = glfwGetVideoMode(mon);
@@ -51,16 +50,12 @@ namespace Nova {
 		}
 		
 		setTitle(NOVA_DESCRIPTION_STRING);
-		hideCursor();
+		//hideCursor();
 		glfwSetWindowCloseCallback(mGLFWindow, window_close_callback);		
 		glfwSetWindowPos(mGLFWindow, 50, 50);
 		//glfwSetCursorPosCallback(mGLFWindow, handleMouse);	
 		glfwSwapInterval(0);
 		glfwMakeContextCurrent(mGLFWindow);
-
-		int width, height;
-		glfwGetFramebufferSize(mGLFWindow, &width, &height);
-		glViewport(0, 0, width, height); //create a a viewport as big as the framebuffer
 	}
 
 	void Window::shutDown()

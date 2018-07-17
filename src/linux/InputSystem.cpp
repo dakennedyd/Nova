@@ -179,7 +179,7 @@ namespace Nova {
 
 	void InputSystem::Keyboard::removeObserver(IKeyboardObserver * observer)
 	{
-		for (int i = 0; i < mObservers.size(); i++)
+		for (std::size_t i = 0; i < mObservers.size(); i++)
 		{
 			if (mObservers[i] == observer)
 			{

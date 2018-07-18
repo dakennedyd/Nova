@@ -14,8 +14,10 @@
 #include "Init.h"
 #include "Settings.h"
 #include "graphics/RendererFrontend.h"
-#include "graphics/opengl/GraphicsSystem.h"
-#include "graphics/opengl/RendererBackendDeferred.h"
+#ifdef NOVA_OPENGL
+#    include "graphics/opengl/GraphicsSystem.h"
+#    include "graphics/opengl/RendererBackendDeferred.h"
+#endif
 #include "resource_manager/ResourceManager.h"
 #include <thread>
 
@@ -174,20 +176,20 @@ void Application::startUp()
         mWorld.registerSystem<CameraSystem>();
         mWorld.registerSystem<LightSystem>();
 
-        // LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart()
-        // << "ms.");
-        mIsInitialized = true;
+        LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
+        this->mIsInitialized = true;
         setKeyCallback([]() {
             if (InputSystem::getInstance().getKeyboard().getKeyState(Keys::KEY_ESC))
             {
-                Application::getInstance().shutDown();
+                // Application::getInstance().shutDown(); //need to fix: shutdown launches exception
+                std::exit(EXIT_SUCCESS);
             }
         });
     }
 }
 void Application::startMainLoop()
 {
-    if (mIsInitialized)
+    if (this->mIsInitialized)
     {
         // sets the current renderer
         GraphicsSystem::getInstance().setRendererFrontend(std::make_shared<RendererFrontend>());
@@ -238,7 +240,7 @@ void Application::startMainLoop()
 }
 void Application::shutDown()
 {
-    if (mIsInitialized)
+    if (this->mIsInitialized)
     {
         this->mIsClosing = true;
         ResourceManager::getInstance().shutDown();

@@ -18,8 +18,7 @@ bool isEqual(float valueA, float valueB)
     return false;
 }
 
-void replaceAllInPlace(std::string &string1, const std::string &string2,
-                       const std::string &string3)
+void replaceAllInPlace(std::string &string1, const std::string &string2, const std::string &string3)
 {
     size_t pos = 0;
     while ((pos = string1.find(string2, pos)) != std::string::npos)
@@ -28,8 +27,7 @@ void replaceAllInPlace(std::string &string1, const std::string &string2,
         pos += string3.length();
     }
 }
-std::vector<std::string> split(const std::string &str,
-                               const std::string &delimiter)
+std::vector<std::string> split(const std::string &str, const std::string &delimiter)
 {
     std::vector<std::string> result;
     std::string s(str);

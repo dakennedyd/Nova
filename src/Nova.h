@@ -2,10 +2,10 @@
 
 #include "PreInit.h"
 #ifdef NOVA_WINDOWS_PLATFORM
-#    include <windows.h>
-#    include <tchar.h>
-#    include <cstdio>
 #    include <Shlwapi.h>
+#    include <cstdio>
+#    include <tchar.h>
+#    include <windows.h>
 #    pragma comment(lib, "shlwapi.lib") // unicode support
 #endif
 

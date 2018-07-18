@@ -8,6 +8,7 @@
 #endif
 #include "ECS/Entity.h"
 #include "ECS/System.h"
+#include <functional>
 
 namespace Nova
 {
@@ -81,7 +82,11 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
     bool isClosing() { return mIsClosing; };
     // Window mWindow;
     World &getWorld() { return mWorld; };
-    void setKeyCallback(void (*callback)()) { mCallback = callback; };
+
+    // https://stackoverflow.com/questions/32840369/no-matching-function-
+    // error-when-passing-lambda-function-as-argument#32840595
+    template <typename F> void setKeyCallback(F callback) { mCallback = callback; }
+    // void setKeyCallback(void (*callback)()) { mCallback = callback; };
     void onKeyPress() override
     {
         if (mCallback) mCallback();
@@ -92,7 +97,8 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
     // Timer mTimer;
     bool mIsClosing = false;
     bool mIsInitialized = false;
-    void (*mCallback)() = nullptr;
+    std::function<void()> mCallback;
+    // void (*mCallback)() = nullptr;
 };
 
 } // namespace Nova

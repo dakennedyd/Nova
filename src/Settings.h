@@ -18,18 +18,13 @@ class Settings
   public:
     Settings() : mFileName(CONFIGURATION_FILE_NAME){};
     /*defines the configuration file*/
-    Settings(const std::string &fileName)
-        : mFileName(DEFAULT_FILE_PATH + fileName){};
+    Settings(const std::string &fileName) : mFileName(DEFAULT_FILE_PATH + fileName){};
     virtual ~Settings() = default;
 
-    void add(const std::string &section, const std::string &property,
-             const std::string &value);
-    const std::string &getString(const std::string &section,
-                                 const std::string &property);
-    const int getInteger(const std::string &section,
-                         const std::string &property);
-    const bool getBoolean(const std::string &section,
-                          const std::string &property);
+    void add(const std::string &section, const std::string &property, const std::string &value);
+    const std::string &getString(const std::string &section, const std::string &property);
+    const int getInteger(const std::string &section, const std::string &property);
+    const bool getBoolean(const std::string &section, const std::string &property);
     // void remove(const std::string & section, const std::string & property);
 
     // loads a configuration file if it doesn't exist it creates a new one
@@ -37,8 +32,7 @@ class Settings
     void saveConfFile();
 
     // function to check the limits of values loaded from config file
-    virtual bool checkLimits(const std::string &section,
-                             const std::string &property,
+    virtual bool checkLimits(const std::string &section, const std::string &property,
                              const std::string &value)
     {
         return true;
@@ -56,9 +50,7 @@ class Settings
     const std::string mNoDataStr = "NO DATA";
 };
 
-class EngineSettings : public Settings,
-                       public ISingleton<EngineSettings>,
-                       public ISubSystem
+class EngineSettings : public Settings, public ISingleton<EngineSettings>, public ISubSystem
 {
   public:
     EngineSettings() = default;

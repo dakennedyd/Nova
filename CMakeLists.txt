@@ -79,7 +79,7 @@ else()
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -std=c++14")    
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -std=c++14")    
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -Wpedantic -Wfatal-errors")
     
     if(NOT WIN32)
         set(GLAD_LIBRARIES dl)
@@ -92,10 +92,13 @@ include_directories(src/
                     Dependencies/bullet/src/
                     Dependencies/
                     Dependencies/glad/include/
-                    Dependencies/glfw/include/
-                    Dependencies/stb/)
+                    Dependencies/glfw/include/)
+                    #Dependencies/stb/
+                    #Dependencies/tinyxml2/)
 
-file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c)
+file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
+                               Dependencies/stb/stb_image.h
+                               Dependencies/tinyxml2/tinyxml2.cpp)
 # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
 
@@ -131,7 +134,8 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${DEPENDENCIES_SOURCES})
                                
 target_link_libraries(${PROJECT_NAME} glfw assimp
-                               ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
+#                               ${GLFW_LIBRARIES}
+                               ${GLAD_LIBRARIES})
 #                      BulletDynamics BulletCollision LinearMath)
                                
 

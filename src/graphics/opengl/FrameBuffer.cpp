@@ -1,3 +1,26 @@
+
+// The MIT License (MIT)
+
+// Copyright (c) 2018 David Kennedy
+
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+
 #include "FrameBuffer.h"
 #include "Error.h"
 #include "graphics/opengl/Texture.h"
@@ -128,7 +151,7 @@ void FrameBuffer::unBindAllTextures()
 //	for (int i = 0; i < colorBuffers; i++)
 //	{
 //		mColorTextures.emplace_back(std::make_shared<Texture>(width, height, nullptr,
-//TextureType::COLOR, 			Filtering::NEAREST));
+// TextureType::COLOR, 			Filtering::NEAREST));
 
 //		//attach color texture(s) to the framebuffer
 //		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D,
@@ -149,7 +172,7 @@ void FrameBuffer::unBindAllTextures()
 //	else if (hasDepth && !hasStencil && colorBuffers == 0) //shadow map?
 //	{
 //		mColorTextures.emplace_back(std::make_shared<Texture>(Texture::makeShadowMap(width,
-//height)));
+// height)));
 //		//attach shadowmap to the framebuffer
 //		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
 //			mColorTextures[0]->mTextureID, 0);
@@ -161,8 +184,8 @@ void FrameBuffer::unBindAllTextures()
 //		//for some reason opengl doesn't let me create a fb without a color attachment
 //		// even with glDrawBuffer(GL_NONE);
 //		mColorTextures.emplace_back(std::make_shared<Texture>(1, 1, nullptr,
-//TextureType::COLOR, Filtering::NEAREST)); 		glFramebufferTexture2D(GL_FRAMEBUFFER,
-//GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mColorTextures[1]->mTextureID, 0);
+// TextureType::COLOR, Filtering::NEAREST)); 		glFramebufferTexture2D(GL_FRAMEBUFFER,
+// GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mColorTextures[1]->mTextureID, 0);
 //	}
 //	else if (hasDepth && hasStencil)
 //	{

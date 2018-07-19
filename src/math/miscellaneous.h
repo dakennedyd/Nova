@@ -1,12 +1,50 @@
+
+// The MIT License (MIT)
+
+// Copyright (c) 2018 David Kennedy
+
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+
 #pragma once
+#include "Constants.h"
+#include "PreInit.h"
+#ifdef NOVA_WINDOWS_PLATFORM
+#    include <cctype>
+#endif
 #include <algorithm>
+#include <cmath>
+#include <string>
 #include <vector>
 
 namespace Nova
 {
-float toDegrees(const float value);
-float toRadians(const float value);
-bool isEqual(float valueA, float valueB);
+static inline float toDegrees(const float value) { return value * (180.0f / NOVA_PI); }
+static inline float toRadians(const float value) { return value * (NOVA_PI / 180.0f); }
+static inline bool isEqual(float valueA, float valueB)
+{
+    // if ((abs(valueA) - abs(valueB)) <= NOVA_LAMBDA)
+    if ((std::abs(valueA - valueB)) <= NOVA_LAMBDA)
+    {
+        return true;
+    }
+    return false;
+}
 
 /*takes an std::vector<string> and converts it to a std::vector<float>*/
 static inline std::vector<float> vectorStringToFloat(const std::vector<std::string> &stringVector)
@@ -18,11 +56,36 @@ static inline std::vector<float> vectorStringToFloat(const std::vector<std::stri
 }
 
 /** replace all ocurrences of string2 in string1 with string3 */
-void inline replaceAllInPlace(std::string &string1, const std::string &string2,
-                              const std::string &string3);
+static inline void replaceAllInPlace(std::string &string1, const std::string &string2,
+                                     const std::string &string3)
+{
+    size_t pos = 0;
+    while ((pos = string1.find(string2, pos)) != std::string::npos)
+    {
+        string1.replace(pos, string2.length(), string3);
+        pos += string3.length();
+    }
+}
 
 /** parse tokens in a string and return them as a vector */
-std::vector<std::string> split(const std::string &str, const std::string &delimiter = " ");
+static inline std::vector<std::string> split(const std::string &str,
+                                             const std::string &delimiter = " ")
+{
+    std::vector<std::string> result;
+    std::string s(str);
+    size_t pos = 0;
+    std::string token;
+    while ((pos = s.find(delimiter)) != std::string::npos)
+    {
+        token = s.substr(0, pos);
+        result.push_back(token);
+        // LOG_DEBUG(token);
+        s.erase(0, pos + delimiter.length());
+    }
+    result.push_back(s);
+    // LOG_DEBUG(s);
+    return result;
+}
 
 /**
 trim string from start (in place)

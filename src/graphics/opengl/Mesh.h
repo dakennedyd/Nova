@@ -1,3 +1,26 @@
+
+// The MIT License (MIT)
+
+// Copyright (c) 2018 David Kennedy
+
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+
 #pragma once
 #include "PreInit.h"
 #include "graphics/IMesh.h"
@@ -77,9 +100,9 @@ class Mesh : public IMesh
     // static Mesh init(const std::string &name, Params&&... parameters)
     //{
     //	//if constexpr(std::is_same<Tag, Box>::value) return
-    //makeBox(std::forward<Params>(parameters)...);
+    // makeBox(std::forward<Params>(parameters)...);
     //	//else if constexpr(std::is_same<Tag, Sphere>::value) return
-    //makeSphere(std::forward<Params>(parameters)...);
+    // makeSphere(std::forward<Params>(parameters)...);
     //	//std::unordered_map<std::string, Mesh(*) (Params...)> map;
     //	//map.emplace("box", Mesh::makeBox(std::forward<Params>(parameters)...));
     //	//map["box"] = &Mesh::makeBox(std::forward<Params>(parameters)...);
@@ -89,9 +112,9 @@ class Mesh : public IMesh
     //	//LOG_DEBUG("n of params:" << paramsLength);
     //	//return (str == "box") ? Mesh::makeBox(std::forward<Params>(parameters)...):(str ==
     //"sphere" /*&& paramsLength < 3*/) ?
-    //Mesh::makeIcoSphere(std::forward<Params>(parameters)...):Mesh::makeBox(.5f, .5f, .5f);
+    // Mesh::makeIcoSphere(std::forward<Params>(parameters)...):Mesh::makeBox(.5f, .5f, .5f);
     //	//return ((str == "box") ? Mesh::makeBox(std::forward<Params>(parameters)...) :
-    //Mesh::makeIcoSphere(0.5f, 0));
+    // Mesh::makeIcoSphere(0.5f, 0));
     //	//std::tuple<Params...> paramTuple;
     //	//int p[] = { 0, ((void)(std::forward<Params>(parameters)), 0) ... };
     //	//int p[] = { 0, ((void)(std::get<parameters>(paramTuple)), 0)... };

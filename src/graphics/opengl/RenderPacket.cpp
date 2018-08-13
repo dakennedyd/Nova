@@ -31,6 +31,7 @@
 #ifdef NOVA_OPENGL
 #    include "graphics/opengl/RendererInit.h"
 #endif
+#include "ECS/DefaultComponents.h"
 #include <memory>
 #include <vector>
 
@@ -40,118 +41,63 @@ void RenderPacket::draw() const
 {
     glDrawElements(GL_TRIANGLES, mMesh->getNumIndices(), GL_UNSIGNED_INT, 0);
 }
-// std::uint64_t RenderPacket::mIDCounter = 0;
-RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
-                           const std::shared_ptr<Material> &material, const Transform *transform)
-    //:mMesh(std::move(mesh)), mMaterial(std::move(material)), mTransform(transform)
-    : mMesh(mesh), mMaterial(material), mTransform(transform)
+
+void inline updateLights(GLuint id)
 {
-    // mMesh = std::move(mesh); mMaterial = std::move(material); mTransform = std::move(transform);
-    // temporary, probably need a custom memory allocator
-    GLuint id = mMaterial->getGPUProgram()->getProgramID();
-    auto &gs = GraphicsSystem::getInstance();
     auto &lightsList = GraphicsSystem::getInstance().getLights();
-
-    // addParameter(new GPUProgramParameterVec3(glGetUniformLocation(id, "cameraPos"),
-    // transform->forward.getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "model"),
-                                             transform->finalTransform.getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "normalMat"),
-                                             transform->normalMatrix.getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"),
-                                             gs.getCurrentCamera().viewMatrix->getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "proj"),
-                                             gs.getCurrentCamera().projectionMatrix->getDataPtr()));
-
     std::size_t i = 0;
-    // for (int i = 0; i < MAX_LIGHTS && i < lightsList.size(); i++)
     for (auto &light : lightsList)
     {
         if (i >= MAX_LIGHTS) break;
-        // const int a = it.getTypeCode();
-        addParameter(new GPUProgramParameterVec3(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].position").c_str()),
-            light.getPosition()->getDataPtr()));
-        addParameter(new GPUProgramParameterVec3(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].color").c_str()),
-            light.getColor()->getDataPtr()));
-        addParameter(new GPUProgramParameterInt(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].type").c_str()),
-            light.getTypeCode()));
-        /*addParameter(new GPUProgramParameterVec3(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].diffuse").c_str()),
-                light.getDiffuseColor()->getDataPtr()));
-        addParameter(new GPUProgramParameterVec3(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].specular").c_str()),
-                light.getSpecularColor()->getDataPtr()));
-        addParameter(new GPUProgramParameterFloat(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].constant").c_str()),
-                light.mConstant));
-        addParameter(new GPUProgramParameterFloat(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].linear").c_str()),
-                light.mLinear));
-        addParameter(new GPUProgramParameterFloat(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].quadratic").c_str()),
-                light.mQuadratic));*/
+        glUniform3fv(
+            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].position").c_str()), 1,
+            light.getPosition()->getDataPtr());
+        glUniform3fv(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].color").c_str()),
+                     1, light.getColor()->getDataPtr());
+        glUniform1i(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].type").c_str()),
+                    light.getTypeCode());
         i++;
     }
-    /*addParameter(new GPUProgramParameterVec3(glGetUniformLocation(id, "materialAmbient"),
-    mMaterial->getAmbientColor().getDataPtr())); addParameter(new
-    GPUProgramParameterVec3(glGetUniformLocation(id, "materialDiffuse"),
-    mMaterial->getDiffuseColor().getDataPtr())); addParameter(new
-    GPUProgramParameterVec4(glGetUniformLocation(id, "materialSpecular"),
-    mMaterial->getSpecularColor().getDataPtr()));*/
+}
+
+void inline updateCamera(GLuint id)
+{
+    auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
+    glUniformMatrix4fv(glGetUniformLocation(id, "view"), 1, GL_FALSE, camera.view->getDataPtr());
+    glUniformMatrix4fv(glGetUniformLocation(id, "proj"), 1, GL_FALSE,
+                       camera.projection->getDataPtr());
+    glUniform3fv(glGetUniformLocation(id, "cameraPos"), 1, camera.position->getDataPtr());
+}
+
+RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
+                           const std::shared_ptr<Material> &material, const Transform &transform)
+    : mMesh(mesh), mMaterial(material)
+{
+    // temporary, probably need a custom memory allocator
+    GLuint id = mMaterial->getGPUProgram()->getProgramID();
+    // auto &gs = GraphicsSystem::getInstance();
+
+    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "model"),
+                                             transform.finalTransform.getDataPtr()));
+    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "normalMat"),
+                                             transform.normalMatrix.getDataPtr()));
+    // addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"),
+    //                                          gs.getCurrentCamera().view->getDataPtr()));
+    // addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "proj"),
+    //                                          gs.getCurrentCamera().projection->getDataPtr()));
 }
 
 RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
                            const std::shared_ptr<Material> &material)
     : mMesh(std::move(mesh)), mMaterial(std::move(material))
-//:RenderPacket()
 {
-    auto &gs = GraphicsSystem::getInstance();
-    GLuint id = mMaterial->getGPUProgram()->getProgramID();
-
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"),
-                                             gs.getCurrentCamera().viewMatrix->getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "proj"),
-                                             gs.getCurrentCamera().projectionMatrix->getDataPtr()));
-    std::size_t i = 0;
-    auto &lightsList = GraphicsSystem::getInstance().getLights();
-    for (auto &light : lightsList)
-    {
-        if (i >= MAX_LIGHTS) break;
-
-        addParameter(new GPUProgramParameterVec3(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].position").c_str()),
-            light.getPosition()->getDataPtr()));
-        addParameter(new GPUProgramParameterVec3(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].color").c_str()),
-            light.getColor()->getDataPtr()));
-        addParameter(new GPUProgramParameterInt(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].type").c_str()),
-            light.getTypeCode()));
-        /*addParameter(new GPUProgramParameterVec3(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].diffuse").c_str()),
-                light.getDiffuseColor()->getDataPtr()));
-        addParameter(new GPUProgramParameterVec3(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].specular").c_str()),
-                light.getSpecularColor()->getDataPtr()));
-        addParameter(new GPUProgramParameterFloat(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].constant").c_str()),
-                light.mConstant));
-        addParameter(new GPUProgramParameterFloat(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].linear").c_str()),
-                light.mLinear));
-        addParameter(new GPUProgramParameterFloat(
-                glGetUniformLocation(id, ("light[" + std::to_string(i) + "].quadratic").c_str()),
-                light.mQuadratic));*/
-        i++;
-    }
 }
 
 /*todo: this function should be replaced by the ECSystem*/
 void RenderPacket::updateAllUniforms() const
 {
+    updateCamera(mMaterial->getGPUProgram()->getProgramID());
+    updateLights(mMaterial->getGPUProgram()->getProgramID());
     for (IGPUProgramParameter *parameter : mParameters)
     {
         parameter->update();
@@ -168,7 +114,8 @@ RenderPacket::~RenderPacket()
 
 RenderPacket::RenderPacket(RenderPacket &&other)
     : mMesh(std::move(other.mMesh)), mMaterial(std::move(other.mMaterial)),
-      mTransform(other.mTransform), mParameters(std::move(other.mParameters)) /*mID(other.mID),*/
+      /*mTransform(other.mTransform),*/ mParameters(
+          std::move(other.mParameters)) /*mID(other.mID),*/
 {
     other.mParameters = std::vector<IGPUProgramParameter *>{};
 }
@@ -184,7 +131,7 @@ RenderPacket &RenderPacket::operator=(RenderPacket &&other)
         mParameters = std::move(other.mParameters);
         // otherGP.mParameters = std::vector<IGPUProgramParameter*>{};
         // mID = other.mID;
-        mTransform = std::move(other.mTransform);
+        // mTransform = std::move(other.mTransform);
     }
     return *this;
 }

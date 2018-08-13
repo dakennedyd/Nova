@@ -31,6 +31,7 @@ class IRendererBackend
   public:
     IRendererBackend() = default;
     virtual ~IRendererBackend() = default;
+    virtual void init() = 0;
     virtual void render() = 0;
     virtual void setSkyBox(const Skybox &skyBox) = 0;
     // virtual void setSkyBox(std::shared_ptr<TextureCube> skyBox) = 0;

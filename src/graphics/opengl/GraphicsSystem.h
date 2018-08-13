@@ -23,6 +23,7 @@
 
 #pragma once
 //#include <GL/glew.h> // GL extension handler library
+#include "ECS/DefaultComponents.h"
 #include "ISingleton.h"
 #include "ISubSystem.h"
 #include "graphics/IGraphicsSystem.h"
@@ -37,16 +38,9 @@
 
 namespace Nova
 {
-struct CameraInfo
-{
-    Mat4 *viewMatrix;
-    Mat4 *projectionMatrix;
-    Vec3 *position;
-    Vec3 *forwardVector;
-};
-
 class RenderPacket;
 class RendererBackend;
+
 class GraphicsSystem final : public ISingleton<GraphicsSystem>,
                              public IGraphicsSystem,
                              public ISubSystem
@@ -56,14 +50,6 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     ~GraphicsSystem() = default;
     void startUp() override;
     void shutDown() override;
-    /*void setCurrentViewMatrix(Mat4& view) { mCurrentCamera.viewMatrix = &view; };
-    void setCurrentProjMatrix(Mat4& projection) { mCurrentCamera.projectionMatrix = &projection; };
-    void setCurrentCameraPosition(Vec3& position) { mCurrentCamera.position = &position; };
-    void setCurrentCameraForward
-    Mat4& getCurrentViewMatrix() const { return *mCurrentCamera.viewMatrix; };
-    Mat4& getCurrentProjMatrix() const { return *mCurrentCamera.projectionMatrix; };*/
-    void setCurrentCamera(CameraInfo camera) { mCurrentCamera = camera; };
-    CameraInfo &getCurrentCamera() { return mCurrentCamera; };
     void checkExtensionsSupport();
     GLfloat getMaxAnisotropy();
     void setWireframeMode(bool state);
@@ -110,12 +96,16 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     {
         mRendererFrontend = frontend;
     };
+    void setCurrentCamera(Entity *camera) override
+    {
+        // mCurrentCamera = camera;
+        mCamera.projection = &camera->GetComponent<CameraComponent>().projection;
+        mCamera.view = &camera->GetComponent<CameraComponent>().view;
+        mCamera.position = &camera->getNonConstTransformStruct().finalTranslation;
+    };
+    Camera &getCurrentCamera() override { return mCamera; };
 
   private:
-    // Camera* mCurrentCamera;	/*this should be replaced with a layer
-    // stack each one with its own camera*/
-    CameraInfo mCurrentCamera;
-
     // std::unordered_map<uint64_t, RenderPacket> mRenderPackets;
     // std::unordered_map<uint64_t, Light> mLights;
     std::vector<RenderPacket> mRenderPackets;
@@ -124,5 +114,7 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     std::shared_ptr<IRendererBackend> mRendererBackend;
     std::shared_ptr<IRendererFrontend> mRendererFrontend;
     GLfloat mMaxAnisotropyLevel = 1.0f; // max anisotropic filtering level supported
+    // Entity *mCurrentCamera;
+    Camera mCamera;
 };
 } // namespace Nova

@@ -25,13 +25,21 @@
 
 namespace Nova
 {
-class RenderPacket;
-
+// class RenderPacket;
+class Entity;
+struct Camera
+{
+    Mat4 *view;
+    Mat4 *projection;
+    Vec3 *position;
+};
 class IGraphicsSystem
 {
   public:
     IGraphicsSystem() = default;
     virtual ~IGraphicsSystem() = default;
+    virtual void setCurrentCamera(Entity *camera) = 0;
+    virtual Camera &getCurrentCamera() = 0;
     // virtual void render() = 0;
     // virtual void addPacket(RenderPacket *primitive) = 0;
     // virtual Camera* getCurrentCamera() = 0;				//needed by opengl

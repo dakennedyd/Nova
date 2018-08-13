@@ -116,7 +116,7 @@
 #include "ECS/DefaultSystems.h"
 
 #include "Application.h"
-//#include "graphics/RendererFrontend.h"
+#include "graphics/RendererFrontend.h"
 
 #ifdef COMPILE_TEST_FUNCTIONS
 //	#include "tests/test.h"

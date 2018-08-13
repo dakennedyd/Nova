@@ -24,6 +24,7 @@
 #include "GraphicsSystem.h"
 #include "Error.h"
 #include "RendererInit.h"
+#include "Settings.h"
 #include "linux/Window.h"
 #include "logger/Logger.h"
 #include <GLFW/glfw3.h>
@@ -75,7 +76,7 @@ void GraphicsSystem::startUp()
 
     // glViewport(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
 
-#ifndef NDEBUG
+#ifndef NDEBUG // if debug build
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback((GLDEBUGPROC)openglErrorCallback, 0);
 #else
@@ -85,18 +86,6 @@ void GraphicsSystem::startUp()
 
 void GraphicsSystem::shutDown() {}
 
-/*void GraphicsSystem::setSkyBox(RenderPacket * skyBox)
-{
-        mCurrentSkyBox = skyBox;
-}*/
-/*Camera * GraphicsSystem::getCurrentCamera()
-{
-        return mCurrentCamera;
-}
-void GraphicsSystem::setCurrentCamera(Camera * newCamera)
-{
-        mCurrentCamera = newCamera;
-}*/
 void GraphicsSystem::checkExtensionsSupport()
 {
     GLint num = 0;

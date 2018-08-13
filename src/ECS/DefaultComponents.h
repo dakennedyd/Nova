@@ -69,23 +69,18 @@ struct CameraComponent final : public IComponent
     CameraComponent(const Mat4 &projMatrix) : projection(projMatrix){};
     Mat4 projection;
     Mat4 view;
-    // Vec3 position;
-    // Vec3 forwardVector;
 };
 
 struct LightComponent final : public IComponent
 {
     LightComponent() = delete;
     LightComponent(const LightType &lightType, const Vec3 &color, const bool castsShadows = false)
-        : type(lightType), color(color) //, diffuseColor(diff), specularColor(spec)
+        : type(lightType), color(color)
     {
     }
     std::shared_ptr<FrameBuffer> shadowFramebuffer;
     bool castsShadow;
     LightType type;
     Vec3 color;
-    // Vec3 diffuseColor;
-    // Vec3 specularColor;
-    // std::uint64_t lightID;
 };
 } // namespace Nova

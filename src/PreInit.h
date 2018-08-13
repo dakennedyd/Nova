@@ -49,9 +49,6 @@ namespace Nova
 #define DEBUG_LOG_LEVEL_ACTIVE
 #define ERROR_LOG_LEVEL_ACTIVE
 
-//#define STBI_ONLY_JPEG
-//#define STBI_ONLY_PNG
-
 #define RIGHT_HAND_COORDS
 //#define COMPILE_TEST_FUNCTIONS
 

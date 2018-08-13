@@ -199,27 +199,46 @@ void Application::startUp()
         mWorld.registerSystem<CameraSystem>();
         mWorld.registerSystem<LightSystem>();
 
-        LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
-        this->mIsInitialized = true;
+        /* this is just a basic key callback it is meant to be replaced with your own function
+        when you press the ESC key it exits the program */
         setKeyCallback([]() {
             if (InputSystem::getInstance().getKeyboard().getKeyState(Keys::KEY_ESC))
             {
-                // Application::getInstance().shutDown(); //need to fix: shutdown launches exception
+                // Application::getInstance().shutDown(); //need to fix: shutdown launches and
+                // exception for some reason
                 std::exit(EXIT_SUCCESS);
             }
         });
+
+        // creates a camera entity and set it as the default camera entity
+        Entity &defaultCamera = getWorld().createEntity("Default Camera");
+        defaultCamera.setPosition(Vec3(0.0f, 0.0f, 2.0f));
+        defaultCamera.addComponent<CameraComponent>(Mat4::makePerspectiveMatrix(
+            toRadians(60.0f),
+            static_cast<float>(EngineSettings::getInstance().getInteger("Video", "width")) /
+                EngineSettings::getInstance().getInteger("Video", "height"),
+            0.01f, 100.0f));
+        getWorld().GetSystem<CameraSystem>()->registerEntity(defaultCamera);
+        GraphicsSystem::getInstance().setCurrentCamera(&defaultCamera);
+
+        // sets the current renderer
+        auto &gs = GraphicsSystem::getInstance();
+        gs.setRendererFrontend(std::make_shared<RendererFrontend>());
+        gs.setRendererBackend(std::make_shared<RendererBackendDeferred>());
+        // gs.getRendererBackend().init();
+
+        LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
+        this->mIsInitialized = true;
     }
 }
 void Application::startMainLoop()
 {
     if (this->mIsInitialized)
     {
-        // sets the current renderer
-        GraphicsSystem::getInstance().setRendererFrontend(std::make_shared<RendererFrontend>());
-        GraphicsSystem::getInstance().setRendererBackend(
-            std::make_shared<RendererBackendDeferred>());
         auto &rendererBackend = GraphicsSystem::getInstance().getRendererBackend();
         auto &rendererFrontend = GraphicsSystem::getInstance().getRendererFrontend();
+        rendererFrontend.createRenderPackets();
+        // rendererBackend.init();
 
         long targetFPS = EngineSettings::getInstance().getInteger("Video", "fps");
         long targetFrameTime = 1000000 / (targetFPS * 1000);
@@ -231,7 +250,6 @@ void Application::startMainLoop()
         long frameTime = 0, fps = 0;
         // Timer reloj;
         window.show();
-        rendererFrontend.createRenderPackets();
         Timer clock;
         while (!this->isClosing() && !window.isClosing())
         {

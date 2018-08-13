@@ -31,7 +31,10 @@
 #else
 #    include "linux/Window.h"
 #endif
+//#include "ECS/DefaultComponents.h"
+#include "ECS/Entity.h"
 #include "Mesh.h"
+#include <memory>
 
 namespace Nova
 {
@@ -65,12 +68,13 @@ class RendererBackendDeferred : public IRendererBackend
     RendererBackendDeferred();
     ~RendererBackendDeferred() = default;
 
+    void init() override;
     void render() override;
     void setSkyBox(const Skybox &skyBox) override;
-    // void setSkyBox(std::shared_ptr<TextureCube> skyBox) override;
     void setIBLData(std::shared_ptr<IBL_Data> data);
 
   private:
+    // bool mIsInitialized = false;
     int mWidth = Window::getInstance().getWidth();
     int mHeight = Window::getInstance().getHeight();
     std::shared_ptr<Mesh> mScreenQuad = std::make_shared<Mesh>(Mesh::makeQuad(2.0f, 2.0f));

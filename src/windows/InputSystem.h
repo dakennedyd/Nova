@@ -96,7 +96,7 @@ const int KEY_LEFT_ALT = GLFW_KEY_LEFT_ALT;
 const int MOUSE_LEFT = GLFW_MOUSE_BUTTON_LEFT;
 const int MOUSE_MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE;
 const int MOUSE_RIGHT = GLFW_MOUSE_BUTTON_RIGHT;
-}; // namespace Keys
+} // namespace Keys
 // enum KeyState {pressed, released};
 // void handleKeys(void* window);
 // void handleMouse(void* window);

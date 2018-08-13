@@ -44,6 +44,13 @@ common enough to be necessary in any game*/
 
 namespace Nova
 {
+// struct CameraInfo
+// {
+//     Mat4 *viewMatrix;
+//     Mat4 *projectionMatrix;
+//     Vec3 *position;
+//     Vec3 *forwardVector;
+// };
 class VisualSystem final : public System
 {
     void processEntity(Entity *entity) override {}
@@ -197,32 +204,23 @@ class CameraSystem final : public System
 {
     void processEntity(Entity *entity) override
     {
-        CameraComponent &camera = entity->GetComponent<CameraComponent>();
-        auto &ts = entity->getTransformStruct();
+        CameraComponent &cc = entity->GetComponent<CameraComponent>();
+        auto &ts = entity->getNonConstTransformStruct();
         Vec3 pos{ts.finalTransform.getTranslation()};
         pos = pos * -1.0f;
         Mat3 rot{ts.finalTransform.toMat3()};
         rot = rot.transpose();
         // auto& parentTransform = entity->getParent().getTransformStruct();
 
-        camera.view = Mat4::makeLookAtMatrix(pos, pos - rot * ts.forward, rot * ts.up);
+        cc.view = Mat4::makeLookAtMatrix(pos, pos - rot * ts.forward, rot * ts.up);
         // camera.view = Mat4::makeLookAtMatrix(ts.translation, ts.translation - ts.forward, ts.up);
         // camera.view = Mat4::makeLookAtMatrix(ts.translation, ts.translation + ts.forward, ts.up);
     }
 
     void onRegister(Entity *entity) override
     {
-        CameraComponent &camera = entity->GetComponent<CameraComponent>();
 
-        CameraInfo cameraInfo;
-        cameraInfo.projectionMatrix = &(camera.projection);
-        cameraInfo.viewMatrix = &(camera.view);
-        // entity->getFinalTransform().getTranslation()
-        cameraInfo.position = &(entity->getNonConstTransformStruct().finalTranslation);
-        cameraInfo.forwardVector = &(entity->getNonConstTransformStruct().forward);
-
-        // passes camera information(position view matrix etc. so the renderer can see it)
-        GraphicsSystem::getInstance().setCurrentCamera(cameraInfo);
+        // GraphicsSystem::getInstance().getRendererBackend().setCurrentCamera(entity);
     }
 
     void onUnregister(Entity *entity) override {}

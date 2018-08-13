@@ -31,7 +31,6 @@
 #include "graphics/opengl/Texture.h"
 #include "graphics/opengl/TextureCube.h"
 #include "resource_manager/ResourceManager.h"
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -43,8 +42,11 @@ RendererBackendDeferred::RendererBackendDeferred()
            ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->radiance),
 
       mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
+
       mLightPassFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth, mHeight)),
+
       mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),
+
       mVBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),
 
       mLightPassRenderPacket(
@@ -88,31 +90,13 @@ RendererBackendDeferred::RendererBackendDeferred()
                          std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
                              {ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"),
                               "skyboxTexture"}}))
-
 {
-    /*auto skybox = std::make_shared<RenderPacket>(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
-            std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),
-                    std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
-                            {ResourceManager::getInstance().get<TextureCube>("city_night01_skybox"),
-    "albedoMap"} })); setSkyBox(skybox);*/
-    // sets the cameraPos uniform for mLightPassRenderPacket
-    auto id = ResourceManager::getInstance().get<GPUProgram>("light_pass_PBR")->getProgramID();
-    auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
-    mLightPassRenderPacket.addParameter(new GPUProgramParameterVec3(
-        glGetUniformLocation(id, "cameraPos"), camera.position->getDataPtr()));
-
-    // setSkyBox(ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"));
-    // mCurrentSkyBox->setMaterial(ResourceManager::getInstance().get<Material>("skybox_material"));
 }
+
+void RendererBackendDeferred::init() {}
+
 void RendererBackendDeferred::render()
 {
-    auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
-    // auto &lights = GraphicsSystem::getInstance().getLights();
-    // auto& rm = ResourceManager::getInstance();
-
-    /*auto &rm = ResourceManager::getInstance();
-    auto GeometryPassShader = rm.get<GPUProgram>("geometry_pass");*/
-
     // glEnable(GL_SCISSOR_TEST);
     // glViewport(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
     // glScissor(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
@@ -124,6 +108,8 @@ void RendererBackendDeferred::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
     /*glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);*/
+
+    auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
     for (const auto &packet : renderPackets) // for all drawable objects in the world
     {
         packet.bind();
@@ -136,9 +122,7 @@ void RendererBackendDeferred::render()
     mCurrentSkyBox.bind();
     mCurrentSkyBox.updateAllUniforms();
     mCurrentSkyBox.draw();
-
     // mGBuffer.unBind();
-    // GraphicsSystem::getInstance().setWireframeMode(false);
 
     // lighting pass
     glDisable(GL_DEPTH_TEST);
@@ -149,26 +133,26 @@ void RendererBackendDeferred::render()
 
     mLightPassFrameBuffer.bind();
     {
-        mLightPassFrameBuffer.getColorTexture(0)->bind();
-        glGenerateMipmap(GL_TEXTURE_2D);
-        mLightPassFrameBuffer.getColorTexture(0)->unBind();
         mLightPassRenderPacket.bind();
         mLightPassRenderPacket.updateAllUniforms();
         mLightPassRenderPacket.draw();
+        mLightPassFrameBuffer.getColorTexture(0)->bind();
+        glGenerateMipmap(GL_TEXTURE_2D);
+        // mLightPassFrameBuffer.getColorTexture(0)->unBind();
     }
     // mLightPassFrameBuffer.unBind();
 
     glViewport(0, 0, mWidth / 4, mHeight / 4);
-    mHBloomFrameBuffer.getColorTexture(0)->bind();
-    glGenerateMipmap(GL_TEXTURE_2D);
-    mHBloomFrameBuffer.getColorTexture(0)->unBind();
     mHBloomFrameBuffer.bind();
     mHBloomPacket.bind();
     mHBloomPacket.draw();
-
-    /*mVBloomFrameBuffer.getColorTexture(0)->bind();
+    mHBloomFrameBuffer.getColorTexture(0)->bind();
     glGenerateMipmap(GL_TEXTURE_2D);
-    mVBloomFrameBuffer.getColorTexture(0)->unBind();*/
+    // mHBloomFrameBuffer.getColorTexture(0)->unBind();
+
+    mVBloomFrameBuffer.getColorTexture(0)->bind();
+    glGenerateMipmap(GL_TEXTURE_2D);
+    // mVBloomFrameBuffer.getColorTexture(0)->unBind();
     mVBloomFrameBuffer.bind();
     mVBloomPacket.bind();
     mVBloomPacket.draw();
@@ -184,6 +168,7 @@ void RendererBackendDeferred::render()
     // renderPackets.clear();
     // lights.clear();
 }
+
 void RendererBackendDeferred::setSkyBox(const Skybox &skybox)
 {
     // ResourceManager::getInstance().get<Material>("skybox_material")->ge
@@ -199,6 +184,7 @@ void RendererBackendDeferred::setSkyBox(const Skybox &skybox)
     // mCurrentSkyBox = skybox;
     setIBLData(skybox.iblData);
 }
+
 void RendererBackendDeferred::setIBLData(std::shared_ptr<IBL_Data> data)
 {
     mIBL.radiance = data->radiance;
@@ -214,4 +200,5 @@ void RendererBackendDeferred::setIBLData(std::shared_ptr<IBL_Data> data)
         {ResourceManager::getInstance().get<Texture>("brdf_LUT"), "brdfLUT"}};
     mLightPassRenderPacket.getMaterial()->setTextures(texturesVector);
 }
+
 } // namespace Nova

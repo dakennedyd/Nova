@@ -11,12 +11,13 @@ Get rid of exceptions!(maybe switch to EASTL?)
 support compressed textures
 implement a rendering culler that fills the actual render list
 implement a memory allocator for the render packets
+need a new OBJ parser to get rid of assimp
 
 ---------------IMPLEMENTED-----------------
 add options to transform propagation to ignore scaling and or rotation
 
 -------------NEED TO FIX-------------------
-add the includes only on the files that need them not globaly
+playerInput doesn't work in first person camera
 Comment the code!
 coordinates sometimes are reversed why???
 dark outline when moving camera??
@@ -48,6 +49,9 @@ entity transform propagation does not work
 makeRotationMatrix is wrong!
 camera api is wrong fix it - fixed for now
 integrate stb_image into the engine better
+
+--------------DONE--------------------------
+add the includes only on the files that need them not globaly
 
 ----------NOTE-------------
 the reason for all the basically empty interfaces is to define a contract for all the

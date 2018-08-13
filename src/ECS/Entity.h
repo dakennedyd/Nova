@@ -37,6 +37,7 @@ enum PropagationType
     POSITION_ROTATION,
     POSITION_ROTATION_SCALING
 };
+
 struct Transform
 {
     Transform()

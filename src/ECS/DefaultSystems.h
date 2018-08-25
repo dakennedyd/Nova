@@ -44,29 +44,21 @@ common enough to be necessary in any game*/
 
 namespace Nova
 {
-// struct CameraInfo
-// {
-//     Mat4 *viewMatrix;
-//     Mat4 *projectionMatrix;
-//     Vec3 *position;
-//     Vec3 *forwardVector;
-// };
 class VisualSystem final : public System
 {
     void processEntity(Entity *entity) override {}
 
     void onRegister(Entity *entity) override
     {
-        // VisualComponent& vc = entity->GetComponent<VisualComponent>();
-        // vc.renderPacketID =
-        // GraphicsSystem::getInstance().getRendererBackend().addPacket(RenderPacket{ vc.mesh,
-        // vc.material, &entity->getTransformStruct() });
+        // creates a RenderPacket based on this component data and adds it to the renderer list
+        auto &vc = entity->GetComponent<VisualComponent>();
+        GraphicsSystem::getInstance().addPacket(
+            RenderPacket{vc.mesh, vc.material, entity->getTransformStruct()});
     }
 
     void onUnregister(Entity *entity) override
     {
-        // VisualComponent& vc = entity->GetComponent<VisualComponent>();
-        // GraphicsSystem::getInstance().getRendererBackend().removePacket(vc.renderPacketID);
+        GraphicsSystem::getInstance().removePacket(0); // this is just a placeholder
     }
 };
 
@@ -76,7 +68,11 @@ class LightSystem final : public System
 
     void onRegister(Entity *entity) override
     {
+        // creates a light object and adds it to the renderer list
         LightComponent &lc = entity->GetComponent<LightComponent>();
+        GraphicsSystem::getInstance().addLight(
+            Light{lc.type, &(entity->getNonConstTransformStruct().finalTranslation), &(lc.color)});
+
         if (lc.castsShadow)
         {
             lc.shadowFramebuffer =
@@ -86,6 +82,9 @@ class LightSystem final : public System
 
     void onUnregister(Entity *entity) override
     {
+        GraphicsSystem::getInstance().removeLight(0); // this is just a placeholder
+
+        // FIX: there should be a remove light method in GraphicSystem
         LightComponent &lc = entity->GetComponent<LightComponent>();
         if (lc.castsShadow)
         {
@@ -99,15 +98,8 @@ class RotationSystem final : public System
     void processEntity(Entity *entity) override
     {
         RotationComponent &rotComponent = entity->GetComponent<RotationComponent>();
-        Vec4 v4{rotComponent.axis.getX(), rotComponent.axis.getY(), rotComponent.axis.getZ(), 0.0f};
-        // v4.normalizeSelf();
-        v4 = entity->getFinalTransform() * v4;
-        Vec3 v3(v4.getX(), v4.getY(), v4.getZ());
-        v3.normalize();
-        float t = 1.0f / (1.0f / SIMULATION_TIME_STEP * 1000.0f);
-        // float rotationsPerSeconds = rotComponent.speed / 60.0f;
-        entity->rotate(v3, toRadians(rotComponent.speed * 6 * t)); // RPM to degrees
-        // entity->rotate(rotComponent.axis, toRadians(rotComponent.speed));
+        float t = SIMULATION_TIME_STEP * 0.001f; // 1 RPM
+        entity->rotate(rotComponent.axis, toRadians(rotComponent.speed * t * 6));
     }
 
     void onRegister(Entity *entity) override
@@ -136,63 +128,26 @@ class PlayerInputSystem final : public System
         UnitQuat pitch(-mouseVector.getY() * mouse.getSensitivity(), 0.0f, 0.0f);
         UnitQuat yaw(0.0f, mouseVector.getX() * mouse.getSensitivity(), 0.0f);
 
-        // entity->rotate(UnitQuat(-mouseVector.y* mouse.getSensitivity(), mouseVector.x*
-        // mouse.getSensitivity(), 0.0f)); entity->rotate(dir, toRadians(mouseVector2.getMagnitud()
         // * mouse.getSensitivity()));
 
         /*camera orientation is separated in pitch and yaw and multiplied
         in this specific order(yaw*orientation*pitch) to prevent camera tilt*/
         entity->setRotation(yaw * entity->getRotation() * pitch);
         // entity->rotate(pitch*yaw);
-        float t = 1.0f / (1.0f / SIMULATION_TIME_STEP * 1000.0f);
-        if (is.getActionStatus(SID("move_forward")))
-        {
-            entity->move(ts.forward * m.speed * t);
-        }
-        if (is.getActionStatus(SID("move_backward")))
-        {
-            entity->move(ts.forward * -m.speed * t);
-        }
-        if (is.getActionStatus(SID("strafe_right")))
-        {
-            entity->move(ts.right * -m.speed * t);
-        }
-        if (is.getActionStatus(SID("strafe_left")))
-        {
-            entity->move(ts.right * m.speed * t);
-        }
-        if (is.getActionStatus(SID("move_up")))
-        {
-            entity->move(ts.up * m.speed * t);
-        }
-        if (is.getActionStatus(SID("move_down")))
-        {
-            entity->move(ts.up * -m.speed * t);
-        }
-        if (is.getActionStatus(SID("turn_left")))
-        {
-            entity->rotate(ts.up, -m.speed * t);
-        }
-        if (is.getActionStatus(SID("turn_right")))
-        {
-            entity->rotate(ts.up, m.speed * t);
-        }
-        if (is.getActionStatus(SID("turn_up")))
-        {
-            entity->rotate(ts.right, m.speed * t);
-        }
-        if (is.getActionStatus(SID("turn_down")))
-        {
+        float t = SIMULATION_TIME_STEP * 0.001f; // 1 RPM
+        if (is.getActionStatus(SID("move_forward"))) entity->move(ts.forward * m.speed * t);
+        if (is.getActionStatus(SID("move_backward"))) entity->move(ts.forward * -m.speed * t);
+        if (is.getActionStatus(SID("strafe_right"))) entity->move(ts.right * -m.speed * t);
+        if (is.getActionStatus(SID("strafe_left"))) entity->move(ts.right * m.speed * t);
+        if (is.getActionStatus(SID("move_up"))) entity->move(ts.up * m.speed * t);
+        if (is.getActionStatus(SID("move_down"))) entity->move(ts.up * -m.speed * t);
+        if (is.getActionStatus(SID("turn_left"))) entity->rotate(ts.up, -m.speed * t);
+        if (is.getActionStatus(SID("turn_right"))) entity->rotate(ts.up, m.speed * t);
+        if (is.getActionStatus(SID("turn_up"))) entity->rotate(ts.right, m.speed * t);
+        if (is.getActionStatus(SID("turn_down" /*for what??*/)))
             entity->rotate(ts.right, -m.speed * t);
-        }
-        if (is.getActionStatus(SID("tilt_left")))
-        {
-            entity->rotate(ts.forward, m.speed * t);
-        }
-        if (is.getActionStatus(SID("tilt_right")))
-        {
-            entity->rotate(ts.forward, -m.speed * t);
-        }
+        if (is.getActionStatus(SID("tilt_left"))) entity->rotate(ts.forward, m.speed * t);
+        if (is.getActionStatus(SID("tilt_right"))) entity->rotate(ts.forward, -m.speed * t);
     }
 
     void onRegister(Entity *entity) override {}
@@ -204,24 +159,25 @@ class CameraSystem final : public System
 {
     void processEntity(Entity *entity) override
     {
-        CameraComponent &cc = entity->GetComponent<CameraComponent>();
+        // updates the view matrix
+        CameraComponent &camera = entity->GetComponent<CameraComponent>();
         auto &ts = entity->getNonConstTransformStruct();
-        Vec3 pos{ts.finalTransform.getTranslation()};
+        // Vec3 pos{ts.finalTransform.getTranslation()};
+        Vec3 pos{ts.finalTranslation};
         pos = pos * -1.0f;
         Mat3 rot{ts.finalTransform.toMat3()};
         rot = rot.transpose();
-        // auto& parentTransform = entity->getParent().getTransformStruct();
 
-        cc.view = Mat4::makeLookAtMatrix(pos, pos - rot * ts.forward, rot * ts.up);
-        // camera.view = Mat4::makeLookAtMatrix(ts.translation, ts.translation - ts.forward, ts.up);
+        camera.view = Mat4::makeLookAtMatrix(pos, pos - (rot * ts.forward), rot * ts.up);
         // camera.view = Mat4::makeLookAtMatrix(ts.translation, ts.translation + ts.forward, ts.up);
+        // camera.view = Mat4::makeLookAtMatrix(ts.finalTranslation,
+        //                                      ts.finalTranslation + rot * ts.forward, rot *
+        //                                      ts.up);
+        // camera.view = ts.finalTransform *
+        //               Mat4::makeLookAtMatrix(ts.translation, ts.translation + ts.forward, ts.up);
     }
 
-    void onRegister(Entity *entity) override
-    {
-
-        // GraphicsSystem::getInstance().getRendererBackend().setCurrentCamera(entity);
-    }
+    void onRegister(Entity *entity) override {}
 
     void onUnregister(Entity *entity) override {}
 };

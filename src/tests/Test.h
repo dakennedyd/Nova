@@ -22,18 +22,19 @@
 //  DEALINGS IN THE SOFTWARE.
 
 #pragma once
+#include <string>
 
 namespace Nova
 {
 namespace tests
 {
-/*void testVec3(const int iterations);
+void testVec3(const int iterations);
 void testMat3(const int iterations);
 void testMat4(const int iterations);
 void testQuat(const int iterations);
 void testMatLibrary();
-void error(const std::string &failedFunctionName, const float calculatedValue, const float
-correctValue);
-*/
-}
+void error(const std::string &failedFunctionName, const float calculatedValue,
+           const float correctValue);
+
+} // namespace tests
 } // namespace Nova

@@ -29,7 +29,13 @@ int main()
 {
     auto &engine = Application::getInstance();
     engine.startUp();
-    // tests::testMatLibrary(); /*engine.shutDown();*/ return 0;
+    {
+        tests::testMatLibrary();
+        /*engine.shutDown();*/
+        int a;
+        std::cin >> a;
+        return 0;
+    }
     // auto& fs = FileSystem::getInstance();
     auto &rm = ResourceManager::getInstance();
 
@@ -186,7 +192,7 @@ int main()
     });
 
     Entity &fpsCamera = engine.getWorld().createEntity("fpsCamera");
-    fpsCamera.setPosition(Vec3(0.0f, 0.0f, 2.0f));
+    fpsCamera.setPosition(Vec3(0.0f, 0.0f, 0.0f));
     fpsCamera.addComponent<CameraComponent>(Mat4::makePerspectiveMatrix(
         toRadians(60.0f),
         static_cast<float>(EngineSettings::getInstance().getInteger("Video", "width")) /
@@ -196,7 +202,8 @@ int main()
         engine.getWorld().getEntity("fpsCamera"));
     fpsCamera.addComponent<MovementComponent>();
     fpsCamera.GetComponent<MovementComponent>().speed = 2.0f;
-    engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(fpsCamera);
+    // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(fpsCamera);
+
     // GraphicsSystem::getInstance().setCurrentCamera(&fpsCamera);
 
     Entity &floor = engine.getWorld().createEntity("floor");
@@ -210,6 +217,29 @@ int main()
     star.setPosition(Vec3{0.0f, -1.0f, 0.0f});
     star.addComponent<VisualComponent>(rm.get<Mesh>("ball"), rm.get<Material>("PBR_aluminium"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(star);
+
+    Entity &ship = engine.getWorld().createEntity("ship");
+    ship.setPosition(Vec3{0.0f, 0.0f, 0.0f});
+    ship.setScale(0.25f);
+    ship.addComponent<VisualComponent>(rm.get<Mesh>("box1"), rm.get<Material>("PBR_aluminium"));
+    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship);
+    ship.addComponent<MovementComponent>();
+    ship.GetComponent<MovementComponent>().speed = 2.0f;
+    engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(ship);
+    Entity &ship2 = engine.getWorld().createEntity("ship2");
+    engine.getWorld().attachEntities(ship, engine.getWorld().getEntity("ship2"),
+                                     PropagationType::POSITION_ROTATION);
+
+    ship2.setPosition(Vec3{0.0f, 0.0f, 2.0f});
+    ship2.setScale(0.25f);
+    ship2.addComponent<VisualComponent>(rm.get<Mesh>("box1"), rm.get<Material>("PBR_aluminium"));
+    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship2);
+    ship2.addComponent<MovementComponent>();
+    ship2.GetComponent<MovementComponent>().speed = 2.0f;
+    engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(ship2);
+    engine.getWorld().attachEntities(ship2, engine.getWorld().getEntity("fpsCamera"),
+                                     PropagationType::POSITION_ROTATION);
+
     // star.addComponent<RotationComponent>();
     // star.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
     // star.GetComponent<RotationComponent>().speed = 1.0f;
@@ -240,15 +270,15 @@ int main()
             anchor.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
             anchor.GetComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
             engine.getWorld().GetSystem<RotationSystem>()->registerEntity(anchor);
+            anchor.addComponent<VisualComponent>(rm.get<Mesh>("box1"),
+                                                 rm.get<Material>("PBR_aluminium"));
+            engine.getWorld().GetSystem<VisualSystem>()->registerEntity(anchor);
 
             Entity &light = engine.getWorld().createEntity("light" + std::to_string(count));
-
-            // anchor.addComponent<VisualComponent>(rm.get<Mesh>("box1"),
-            //                                      rm.get<Material>("PBR_woodframe"));
-            // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(anchor);
-
             light.setPosition(Vec3(2.0f, 0.0f, 0.0f));
             light.setScale(Vec3(0.1f));
+            light.addComponent<VisualComponent>(rm.get<Mesh>("box1"),
+                                                rm.get<Material>("PBR_plastic"));
             light.addComponent<LightComponent>(LightType::POINT_LIGHT,
                                                Vec3{(float)rnd.nextDouble(0.1, 1.0),
                                                     (float)rnd.nextDouble(0.1, 1.0),
@@ -257,8 +287,10 @@ int main()
             // light.addComponent<LightComponent>(LightType::POINT_LIGHT, Vec3{ 1.0,1.0,1.0 },
             // false);
             engine.getWorld().GetSystem<LightSystem>()->registerEntity(light);
+            engine.getWorld().GetSystem<VisualSystem>()->registerEntity(light);
 
-            engine.getWorld().attachEntities(anchor, light, PropagationType::POSITION_ROTATION);
+            engine.getWorld().attachEntities(anchor, light,
+                                             PropagationType::POSITION_ROTATION_SCALING);
         }
     }
 

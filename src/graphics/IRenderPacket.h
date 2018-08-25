@@ -36,5 +36,6 @@ class IRenderPacket : public Bindable
     virtual void addParameter(IGPUProgramParameter *parameter) = 0;
     virtual void updateAllUniforms() const = 0;
     virtual void draw() const = 0;
+    virtual uint64_t getID() const = 0;
 };
 } // namespace Nova

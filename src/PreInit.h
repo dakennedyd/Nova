@@ -36,7 +36,7 @@ namespace Nova
 #    define NOVA_PLATFORM_UNKOWN
 #endif
 
-#define GLFW_DLL
+//#define GLFW_DLL
 #define GLFW_INCLUDE_NONE // lets you include gl extension header in any order
                           // not just before glfw
 
@@ -50,7 +50,7 @@ namespace Nova
 #define ERROR_LOG_LEVEL_ACTIVE
 
 #define RIGHT_HAND_COORDS
-//#define COMPILE_TEST_FUNCTIONS
+#define COMPILE_TEST_FUNCTIONS
 
 #define NOVA_OPENGL // just opengl for now
 

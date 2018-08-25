@@ -100,9 +100,9 @@ void RendererBackendDeferred::render()
     // glEnable(GL_SCISSOR_TEST);
     // glViewport(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
     // glScissor(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
-
     // GraphicsSystem::getInstance().setWireframeMode(true);
-    // geometry pass
+
+    // GEOMETRY PASS
     mGBuffer.bind();
     // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
@@ -124,7 +124,7 @@ void RendererBackendDeferred::render()
     mCurrentSkyBox.draw();
     // mGBuffer.unBind();
 
-    // lighting pass
+    // LIGHTING PASS
     glDisable(GL_DEPTH_TEST);
     // glDepthMask(0x00);
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -142,6 +142,7 @@ void RendererBackendDeferred::render()
     }
     // mLightPassFrameBuffer.unBind();
 
+    // POST-PROCESS
     glViewport(0, 0, mWidth / 4, mHeight / 4);
     mHBloomFrameBuffer.bind();
     mHBloomPacket.bind();
@@ -158,6 +159,7 @@ void RendererBackendDeferred::render()
     mVBloomPacket.draw();
     mVBloomFrameBuffer.unBind();
 
+    // WRITES TO BACKBUFFER
     glViewport(0, 0, mWidth, mHeight);
     mFinalPacket.bind();
     mFinalPacket.draw();

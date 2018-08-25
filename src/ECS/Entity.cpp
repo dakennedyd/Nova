@@ -23,6 +23,7 @@
 
 #include "ECS/Entity.h"
 #include "Crc.h"
+#include "logger/Logger.h"
 #include "math/Matrix.h"
 #include "math/Quaternion.h"
 #include "math/Vector.h"
@@ -75,9 +76,9 @@ void Entity::rotate(const UnitQuat &rotation)
     Vec3 up{0.0f, 1.0f, 0.0f};
 
     mTransform.rotation = mTransform.rotation * rotation;
-    mTransform.forward = forward.rotate(mTransform.rotation * rotation);
-    mTransform.right = right.rotate(mTransform.rotation * rotation);
-    mTransform.up = up.rotate(mTransform.rotation * rotation);
+    mTransform.forward = forward.rotate(mTransform.rotation);
+    mTransform.right = right.rotate(mTransform.rotation);
+    mTransform.up = up.rotate(mTransform.rotation);
 }
 
 void Entity::setRotation(const UnitQuat &rotation)
@@ -107,41 +108,33 @@ void Entity::move(const Vec3 &vector) { mTransform.translation = mTransform.tran
 
 void Entity::setFinalTransformAndPropagate(const Mat4 &propagatedTransform)
 {
-    Mat4 transform; // (Mat4::makeIdentityMatrix());
     if (mTransform.propagationType == PropagationType::POSITION_ONLY)
     {
-        transform = Mat4::makeTranslationMatrix(mTransform.translation);
-        mTransform.finalTransform = Mat4::makeScalingMatrix(mTransform.scale) *
-                                    mTransform.rotation.toRotationMatrix4() * transform *
-                                    propagatedTransform;
+        mTransform.finalTransform =
+            Mat4::makeTranslationMatrix(mTransform.translation) * propagatedTransform;
     }
     else if (mTransform.propagationType == PropagationType::POSITION_ROTATION)
     {
-        transform = mTransform.rotation.toRotationMatrix4() *
-                    Mat4::makeTranslationMatrix(mTransform.translation);
-        mTransform.finalTransform =
-            Mat4::makeScalingMatrix(mTransform.scale) * transform * propagatedTransform;
+        mTransform.finalTransform = mTransform.rotation.toRotationMatrix4() *
+                                    Mat4::makeTranslationMatrix(mTransform.translation) *
+                                    propagatedTransform;
     }
     else if (mTransform.propagationType == PropagationType::POSITION_ROTATION_SCALING)
     {
-        transform = mTransform.rotation.toRotationMatrix4() *
-                    Mat4::makeTranslationMatrix(mTransform.translation) *
-                    Mat4::makeScalingMatrix(mTransform.scale);
-        mTransform.finalTransform = transform * propagatedTransform;
+        mTransform.finalTransform =
+            Mat4::makeScalingMatrix(mTransform.scale) * mTransform.rotation.toRotationMatrix4() *
+            Mat4::makeTranslationMatrix(mTransform.translation) * propagatedTransform;
     }
-    Mat3 pt = propagatedTransform.toMat3();
-    // mTransform.translation = pt * mTransform.translation;
-    /*mTransform.forward = pt * mTransform.forward;
-    mTransform.right = pt * mTransform.right;
-    mTransform.up = pt * mTransform.up;*/
-
+    else
+    {
+        LOG_ERROR("unrecognized propagation type for entity:" << mName);
+    }
     mTransform.finalTranslation = mTransform.finalTransform.getTranslation();
-    Mat4 finalPropagatedTransform{transform * propagatedTransform};
     // TODO: should not calculate normal for transform that don't need them
     mTransform.normalMatrix = mTransform.finalTransform.calcNormalMatrix();
     for (auto &keyEntityPair : mChildren)
     {
-        keyEntityPair.second->setFinalTransformAndPropagate(finalPropagatedTransform);
+        keyEntityPair.second->setFinalTransformAndPropagate(mTransform.finalTransform);
     }
 }
 

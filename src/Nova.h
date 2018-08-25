@@ -119,5 +119,5 @@
 #include "graphics/RendererFrontend.h"
 
 #ifdef COMPILE_TEST_FUNCTIONS
-//	#include "tests/test.h"
+#    include "tests/Test.h"
 #endif

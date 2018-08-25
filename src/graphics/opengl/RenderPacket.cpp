@@ -114,8 +114,7 @@ RenderPacket::~RenderPacket()
 
 RenderPacket::RenderPacket(RenderPacket &&other)
     : mMesh(std::move(other.mMesh)), mMaterial(std::move(other.mMaterial)),
-      /*mTransform(other.mTransform),*/ mParameters(
-          std::move(other.mParameters)) /*mID(other.mID),*/
+      /*mTransform(other.mTransform),*/ mParameters(std::move(other.mParameters)), mID(other.mID)
 {
     other.mParameters = std::vector<IGPUProgramParameter *>{};
 }
@@ -130,7 +129,7 @@ RenderPacket &RenderPacket::operator=(RenderPacket &&other)
         mMaterial = std::move(other.mMaterial);
         mParameters = std::move(other.mParameters);
         // otherGP.mParameters = std::vector<IGPUProgramParameter*>{};
-        // mID = other.mID;
+        mID = other.mID;
         // mTransform = std::move(other.mTransform);
     }
     return *this;

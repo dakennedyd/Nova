@@ -34,15 +34,7 @@ namespace Nova
 class Mesh;
 class Material;
 class FrameBuffer;
-/*struct TransformComponent final :public IComponent
-{
-Vec3 mScale;
-UnitQuat mRotation;
-Vec3 mTranslation;
 
-Mat4 mTransform;
-Mat4 mNormal;
-};*/
 struct VisualComponent final : public IComponent
 {
     VisualComponent() = delete;
@@ -50,6 +42,7 @@ struct VisualComponent final : public IComponent
         : mesh(mesh), material(material){};
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Material> material;
+    int packetID;
 };
 
 struct RotationComponent final : public IComponent

@@ -134,8 +134,8 @@ class Logger : public ISingleton<Logger>, public ISubSystem
                 {                                                                                  \
                     Logger::getInstance().openFile();                                              \
                     Logger::getInstance()                                                          \
-                        << "\033[1;96m[DEBUG]" << Logger::getInstance().showTime() << msg          \
-                        << "\033[0m\n";                                                            \
+                        << /*"\033[1;96m[DEBUG]" <<*/ "[DEBUG]"                                    \
+                        << Logger::getInstance().showTime() << msg /*<< "\033[0m\n"*/ << "\n";     \
                     Logger::getInstance().closeFile();                                             \
                 };
 #        else

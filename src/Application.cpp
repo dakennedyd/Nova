@@ -136,14 +136,14 @@ void Application::World::detachEntity(Entity &child)
 
 void Application::World::update()
 {
+    // calculate the final transform for all root entities in the world and propagate that transform
+    // to their children
     for (auto &keyEntityPair : mWorldTree)
     {
         keyEntityPair.second->setFinalTransformAndPropagate(Mat4::makeIdentityMatrix());
     }
-    /*processing the entities comes afterwards because camera gets its
-    parameters from the final transform - this needs to be fixed because
-    rendering comes one frame after
-    inputs are detected (need to think of a nice way of fixing this) */
+
+    // do processEntities for each entity registered with a system
     for (auto &typeSystemPair : mSystems)
     {
         typeSystemPair.second->processEntities();
@@ -236,9 +236,7 @@ void Application::startMainLoop()
     if (this->mIsInitialized)
     {
         auto &rendererBackend = GraphicsSystem::getInstance().getRendererBackend();
-        auto &rendererFrontend = GraphicsSystem::getInstance().getRendererFrontend();
-        rendererFrontend.createRenderPackets();
-        // rendererBackend.init();
+        // auto &rendererFrontend = GraphicsSystem::getInstance().getRendererFrontend();
 
         long targetFPS = EngineSettings::getInstance().getInteger("Video", "fps");
         long targetFrameTime = 1000000 / (targetFPS * 1000);
@@ -248,7 +246,7 @@ void Application::startMainLoop()
         auto &input = InputSystem::getInstance();
         auto &mouse = input.getMouse();
         long frameTime = 0, fps = 0;
-        // Timer reloj;
+
         window.show();
         Timer clock;
         while (!this->isClosing() && !window.isClosing())

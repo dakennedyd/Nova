@@ -94,13 +94,15 @@ include_directories(src/
                     Dependencies/bullet/src/
                     Dependencies/
                     Dependencies/glad/include/
-                    Dependencies/glfw/include/)
+                    Dependencies/glfw/include/
+                    Dependencies/glm/)
                     #Dependencies/stb/
                     #Dependencies/tinyxml2/)
 
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
                                Dependencies/stb/stb_image.h
-                               Dependencies/tinyxml2/tinyxml2.cpp)
+                               Dependencies/tinyxml2/tinyxml2.cpp
+                               Dependencies/glm/glm/glm.hpp)
 # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
 

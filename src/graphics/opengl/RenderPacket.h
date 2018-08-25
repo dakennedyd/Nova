@@ -57,9 +57,12 @@ class RenderPacket : public IRenderPacket
     void bind() const override;
     void unBind() const override;
 
+    uint64_t getID() const override { return mID; };
+
   private:
     std::shared_ptr<Mesh> mMesh = nullptr;
     std::shared_ptr<Material> mMaterial = nullptr;
     std::vector<IGPUProgramParameter *> mParameters;
+    uint64_t mID;
 };
 } // namespace Nova

@@ -59,23 +59,20 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     /*adds a render packet to the renderer's list so the renderer can see it*/
     inline void addPacket(RenderPacket packet)
     {
-        // uint64_t returnValue = packet.getID();
-        // mRenderPackets.emplace(std::make_pair(returnValue, std::move(packet)));
-        // return returnValue;
+        // mRenderPackets.emplace(std::make_pair(idCount++, std::move(packet)));
         mRenderPackets.push_back(std::move(packet));
     };
-
-    // void removePacket(std::uint64_t id) { mRenderPackets.erase(id); };
-
+    void removePacket(std::uint64_t id){
+        // mRenderPackets.erase(id);
+    };
     inline void addLight(Light light)
     {
-        // uint64_t returnValue = light.getID();
-        // mLights.emplace(std::make_pair(returnValue, std::move(light)));
-        // return returnValue;
+        // mLights.emplace(std::make_pair(idCount++, std::move(light)));
         mLights.push_back(std::move(light));
     }
-
-    // void removeLight(std::uint64_t id) { mLights.erase(id); };
+    void removeLight(std::uint64_t id){
+        // mLights.erase(id);
+    };
     auto &getRenderPackets() { return mRenderPackets; };
     auto &getLights() { return mLights; }
     IRendererBackend &getRendererBackend()
@@ -99,9 +96,9 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     void setCurrentCamera(Entity *camera) override
     {
         // mCurrentCamera = camera;
-        mCamera.projection = &camera->GetComponent<CameraComponent>().projection;
-        mCamera.view = &camera->GetComponent<CameraComponent>().view;
-        mCamera.position = &camera->getNonConstTransformStruct().finalTranslation;
+        mCamera.projection = &(camera->GetComponent<CameraComponent>().projection);
+        mCamera.view = &(camera->GetComponent<CameraComponent>().view);
+        mCamera.position = &(camera->getNonConstTransformStruct().finalTranslation);
     };
     Camera &getCurrentCamera() override { return mCamera; };
 

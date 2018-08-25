@@ -59,7 +59,7 @@ struct Transform
     Mat4 finalTransform;
     Vec3 finalTranslation; // useful for the lights
     Mat4 normalMatrix;
-    enum PropagationType propagationType = PropagationType::POSITION_ROTATION;
+    enum PropagationType propagationType = PropagationType::POSITION_ROTATION_SCALING;
 };
 
 class System;
@@ -71,6 +71,10 @@ class Entity
 
   public:
     ~Entity();
+    Entity(const Entity &) = delete;             // copy ctor
+    Entity(Entity &&other) = default;            // move ctor
+    Entity &operator=(Entity const &) = delete;  // copy assignment op
+    Entity &operator=(Entity &&other) = default; // move assignment op
 
     /*Adds a new component to an entity, if a component of the same type already exist
     then it does nothing*/

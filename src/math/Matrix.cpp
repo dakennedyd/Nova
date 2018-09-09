@@ -297,9 +297,9 @@ Mat4 Mat4::makeLookAtMatrix(const Vec3 &positionVector, const Vec3 &targetVector
     result.mData[6] = forwardVector.getY();
     result.mData[10] = forwardVector.getZ();
 
-    result.mData[12] = (positionVector * leftVector);
-    result.mData[13] = (positionVector * newUpVector);
-    result.mData[14] = (positionVector * forwardVector);
+    result.mData[12] = (positionVector * leftVector * -1.0f);
+    result.mData[13] = (positionVector * newUpVector * -1.0f);
+    result.mData[14] = (positionVector * forwardVector * -1.0f);
 
     result.mData[15] = 1.0f;
     return result;

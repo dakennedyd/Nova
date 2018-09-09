@@ -245,17 +245,19 @@ void Application::startMainLoop()
         auto &window = Window::getInstance();
         auto &input = InputSystem::getInstance();
         auto &mouse = input.getMouse();
-        long frameTime = 0, fps = 0;
+        long frameTime = 0, fps = 0, entityUpdateTime, renderTime;
 
         window.show();
-        Timer clock;
+        Timer frameTimeClock, renderClock, entityUpdateClock;
         while (!this->isClosing() && !window.isClosing())
         {
-            clock.reset();
+            frameTimeClock.reset();
             input.processInputs();
             while (timeDelta >= SIMULATION_TIME_STEP)
             {
+                entityUpdateClock.reset();
                 mWorld.update(); // updates all entities in the world
+                entityUpdateTime = entityUpdateClock.getMicro();
                 timeDelta -= SIMULATION_TIME_STEP;
 
                 mouse.mPreviousX = mouse.mX;
@@ -263,16 +265,20 @@ void Application::startMainLoop()
                 mouse.wheel = 0;
             }
 
+            renderClock.reset();
             rendererBackend.render();
+            renderTime = renderClock.getMicro();
             window.swapFrameBuffers();
             // glFinish();
-            frameTime = static_cast<long>(clock.getMillis());
+            frameTime = frameTimeClock.getMillis();
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(targetFrameTime - frameTime)); // UUUUUGGGGGLLLYYYYYY!!!
-            fps = static_cast<long>(1000.0 / clock.getMillis());
-            window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +
-                            " Frame time:" + std::to_string(frameTime) + "ms.");
-            timeDelta += clock.getMillis();
+            fps = 1000.0 / frameTimeClock.getMillis();
+            // window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +
+            //                 " frametime:" + std::to_string(frameTime) +
+            //                 "ms. render:" + std::to_string(renderTime) +
+            //                 " us. logic:" + std::to_string(entityUpdateTime) + " us.");
+            timeDelta += frameTimeClock.getMillis();
         }
         // this->shutDown();
     }

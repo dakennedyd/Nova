@@ -64,5 +64,6 @@ class RenderPacket : public IRenderPacket
     std::shared_ptr<Material> mMaterial = nullptr;
     std::vector<IGPUProgramParameter *> mParameters;
     uint64_t mID;
+    static uint64_t count;
 };
 } // namespace Nova

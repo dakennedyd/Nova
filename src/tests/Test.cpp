@@ -25,6 +25,7 @@
 
 #include "tests/Test.h"
 
+#include "glm/ext.hpp"
 #include "glm/glm.hpp"                  // vec3, vec4, ivec4, mat4
 #include "glm/gtc/matrix_transform.hpp" // translate, rotateSelf, scale, perspective
 #include "glm/gtc/quaternion.hpp"
@@ -363,7 +364,7 @@ mat4lookat:;
         Vec3 v2(glmB.x, glmB.y, glmB.z);
         Vec3 v3(glmC.x, glmC.y, glmC.z);
 
-        glm::mat4 glmMat = glm::lookAtRH(glmA, glmB, glmC);
+        glm::mat4 glmMat = glm::lookAtLH(glmA, glmB, glmC);
         const float *glmMatPtr = glm::value_ptr(glmMat);
 
         Mat4 novaMat = Mat4::makeLookAtMatrix(v1, v2, v3);
@@ -374,6 +375,16 @@ mat4lookat:;
             if (!isEqual(novaMatPtr[i], glmMatPtr[i]))
             {
                 error("Mat4 lookAt function", novaMatPtr[i], glmMatPtr[i]);
+                novaMat.debugPrint();
+
+                double dArray[16] = {0.0};
+                const float *pSource = (const float *)glm::value_ptr(glmMat);
+                for (int i = 0; i < 16; ++i)
+                {
+                    dArray[i] = pSource[i];
+                    std::cout << dArray[i] << " ";
+                }
+
                 goto mat4end;
             }
         }

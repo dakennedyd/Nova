@@ -79,7 +79,7 @@ else()
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -std=c++14")    
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14 -Wpedantic -Wfatal-errors")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14 -Wpedantic -Wfatal-errors -msse2")
     
     if(NOT WIN32)
         set(GLAD_LIBRARIES dl)
@@ -100,9 +100,9 @@ include_directories(src/
                     #Dependencies/tinyxml2/)
 
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
-                               Dependencies/stb/stb_image.h
-                               Dependencies/tinyxml2/tinyxml2.cpp
-                               Dependencies/glm/glm/glm.hpp)
+                               #Dependencies/stb/stb_image.h
+                               Dependencies/tinyxml2/tinyxml2.cpp)
+                               #Dependencies/glm/glm/glm.hpp)
 # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
 

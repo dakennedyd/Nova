@@ -37,42 +37,12 @@
 
 namespace Nova
 {
-void RenderPacket::draw() const
-{
-    glDrawElements(GL_TRIANGLES, mMesh->getNumIndices(), GL_UNSIGNED_INT, 0);
-}
-
-void inline updateLights(GLuint id)
-{
-    auto &lightsList = GraphicsSystem::getInstance().getLights();
-    std::size_t i = 0;
-    for (auto &light : lightsList)
-    {
-        if (i >= MAX_LIGHTS) break;
-        glUniform3fv(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].position").c_str()), 1,
-            light.getPosition()->getDataPtr());
-        glUniform3fv(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].color").c_str()),
-                     1, light.getColor()->getDataPtr());
-        glUniform1i(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].type").c_str()),
-                    light.getTypeCode());
-        i++;
-    }
-}
-
-void inline updateCamera(GLuint id)
-{
-    auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
-    glUniformMatrix4fv(glGetUniformLocation(id, "view"), 1, GL_FALSE, camera.view->getDataPtr());
-    glUniformMatrix4fv(glGetUniformLocation(id, "proj"), 1, GL_FALSE,
-                       camera.projection->getDataPtr());
-    glUniform3fv(glGetUniformLocation(id, "cameraPos"), 1, camera.position->getDataPtr());
-}
-
+uint64_t RenderPacket::count = 0;
 RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
                            const std::shared_ptr<Material> &material, const Transform &transform)
     : mMesh(mesh), mMaterial(material)
 {
+    mID = count++;
     // temporary, probably need a custom memory allocator
     GLuint id = mMaterial->getGPUProgram()->getProgramID();
     // auto &gs = GraphicsSystem::getInstance();
@@ -91,6 +61,47 @@ RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
                            const std::shared_ptr<Material> &material)
     : mMesh(std::move(mesh)), mMaterial(std::move(material))
 {
+    mID = count++;
+}
+void RenderPacket::draw() const
+{
+    glDrawElements(GL_TRIANGLES, mMesh->getNumIndices(), GL_UNSIGNED_INT, 0);
+}
+
+RenderPacket::~RenderPacket()
+{
+    for (IGPUProgramParameter *parameter : mParameters)
+    {
+        delete parameter;
+    }
+    mID = count--;
+}
+
+void inline updateLights(GLuint id)
+{
+    auto &lightsList = GraphicsSystem::getInstance().getLights();
+    std::size_t i = 0;
+    for (auto &light : lightsList)
+    {
+        if (i >= MAX_LIGHTS) break;
+        glUniform3fv(
+            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].position").c_str()), 1,
+            light.second.getPosition()->getDataPtr());
+        glUniform3fv(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].color").c_str()),
+                     1, light.second.getColor()->getDataPtr());
+        glUniform1i(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].type").c_str()),
+                    light.second.getTypeCode());
+        i++;
+    }
+}
+
+void inline updateCamera(GLuint id)
+{
+    auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
+    glUniformMatrix4fv(glGetUniformLocation(id, "view"), 1, GL_FALSE, camera.view->getDataPtr());
+    glUniformMatrix4fv(glGetUniformLocation(id, "proj"), 1, GL_FALSE,
+                       camera.projection->getDataPtr());
+    glUniform3fv(glGetUniformLocation(id, "cameraPos"), 1, camera.position->getDataPtr());
 }
 
 /*todo: this function should be replaced by the ECSystem*/
@@ -101,14 +112,6 @@ void RenderPacket::updateAllUniforms() const
     for (IGPUProgramParameter *parameter : mParameters)
     {
         parameter->update();
-    }
-}
-
-RenderPacket::~RenderPacket()
-{
-    for (IGPUProgramParameter *parameter : mParameters)
-    {
-        delete parameter;
     }
 }
 

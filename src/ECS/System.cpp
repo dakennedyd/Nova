@@ -23,6 +23,7 @@
 
 #include "ECS/System.h"
 #include "ECS/Entity.h"
+#include "logger/Logger.h"
 #include <utility>
 
 namespace Nova
@@ -40,6 +41,8 @@ void System::registerEntity(Entity &entity)
     {
         onRegister(&entity);
     }
+    else
+        LOG_WARNING("failed to register entity " << entity.getName());
 }
 void System::unregisterEntity(Entity &entity)
 {
@@ -51,6 +54,8 @@ void System::unregisterEntity(Entity &entity)
         // entity.mSubscribedSystems.erase(this);
         mRegisteredEntities.erase(it);
     }
+    else
+        LOG_WARNING("failed to unregister entity " << entity.getName());
 }
 void System::processEntities()
 {

@@ -42,7 +42,7 @@ struct VisualComponent final : public IComponent
         : mesh(mesh), material(material){};
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Material> material;
-    int packetID;
+    uint64_t packetID;
 };
 
 struct RotationComponent final : public IComponent
@@ -75,5 +75,6 @@ struct LightComponent final : public IComponent
     bool castsShadow;
     LightType type;
     Vec3 color;
+    uint64_t lightID;
 };
 } // namespace Nova

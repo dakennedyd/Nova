@@ -50,15 +50,17 @@ class VisualSystem final : public System
 
     void onRegister(Entity *entity) override
     {
-        // creates a RenderPacket based on this component data and adds it to the renderer list
+        // creates a RenderPacket based on this component data and adds it to the renderer's list
         auto &vc = entity->GetComponent<VisualComponent>();
-        GraphicsSystem::getInstance().addPacket(
-            RenderPacket{vc.mesh, vc.material, entity->getTransformStruct()});
+        RenderPacket packet{vc.mesh, vc.material, entity->getTransformStruct()};
+        vc.packetID = packet.getID();
+        GraphicsSystem::getInstance().addPacket(std::move(packet));
     }
 
     void onUnregister(Entity *entity) override
     {
-        GraphicsSystem::getInstance().removePacket(0); // this is just a placeholder
+        auto &vc = entity->GetComponent<VisualComponent>();
+        GraphicsSystem::getInstance().removePacket(vc.packetID);
     }
 };
 
@@ -70,8 +72,9 @@ class LightSystem final : public System
     {
         // creates a light object and adds it to the renderer list
         LightComponent &lc = entity->GetComponent<LightComponent>();
-        GraphicsSystem::getInstance().addLight(
-            Light{lc.type, &(entity->getNonConstTransformStruct().finalTranslation), &(lc.color)});
+        Light light{lc.type, &(entity->getNonConstTransformStruct().finalTranslation), &(lc.color)};
+        lc.lightID = light.getID();
+        GraphicsSystem::getInstance().addLight(std::move(light));
 
         if (lc.castsShadow)
         {
@@ -82,10 +85,10 @@ class LightSystem final : public System
 
     void onUnregister(Entity *entity) override
     {
-        GraphicsSystem::getInstance().removeLight(0); // this is just a placeholder
-
-        // FIX: there should be a remove light method in GraphicSystem
         LightComponent &lc = entity->GetComponent<LightComponent>();
+        // lc.color = Vec3(0.0f);
+        GraphicsSystem::getInstance().removeLight(lc.lightID);
+
         if (lc.castsShadow)
         {
             lc.shadowFramebuffer = nullptr;
@@ -164,15 +167,17 @@ class CameraSystem final : public System
         auto &ts = entity->getNonConstTransformStruct();
         // Vec3 pos{ts.finalTransform.getTranslation()};
         Vec3 pos{ts.finalTranslation};
-        pos = pos * -1.0f;
+        // pos = pos * -1.0f;
         Mat3 rot{ts.finalTransform.toMat3()};
         rot = rot.transpose();
 
-        camera.view = Mat4::makeLookAtMatrix(pos, pos - (rot * ts.forward), rot * ts.up);
+        // camera.view = Mat4::makeLookAtMatrix(pos, pos - (rot * ts.forward), rot * ts.up);
         // camera.view = Mat4::makeLookAtMatrix(ts.translation, ts.translation + ts.forward, ts.up);
-        // camera.view = Mat4::makeLookAtMatrix(ts.finalTranslation,
-        //                                      ts.finalTranslation + rot * ts.forward, rot *
-        //                                      ts.up);
+        // camera.view =
+        //     Mat4::makeLookAtMatrix(ts.finalTranslation, ts.finalTranslation - ts.forward, ts.up);
+        camera.view = Mat4::makeLookAtMatrix(ts.finalTranslation,
+                                             ts.finalTranslation + rot * Vec3(0.0f, 0.0f, 1.0f),
+                                             rot * Vec3(0.0f, 1.0f, 0.0f));
         // camera.view = ts.finalTransform *
         //               Mat4::makeLookAtMatrix(ts.translation, ts.translation + ts.forward, ts.up);
     }

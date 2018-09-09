@@ -106,35 +106,42 @@ void Entity::setScale(float scale) { mTransform.scale = scale; }
 
 void Entity::move(const Vec3 &vector) { mTransform.translation = mTransform.translation + vector; }
 
-void Entity::setFinalTransformAndPropagate(const Mat4 &propagatedTransform)
+void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
 {
+    Mat4 transformToPropagate;
     if (mTransform.propagationType == PropagationType::POSITION_ONLY)
     {
-        mTransform.finalTransform =
-            Mat4::makeTranslationMatrix(mTransform.translation) * propagatedTransform;
+        transformToPropagate = Mat4::makeTranslationMatrix(mTransform.translation);
+        mTransform.finalTransform = Mat4::makeScalingMatrix(mTransform.scale) *
+                                    mTransform.rotation.toRotationMatrix4() * transformToPropagate;
     }
     else if (mTransform.propagationType == PropagationType::POSITION_ROTATION)
     {
-        mTransform.finalTransform = mTransform.rotation.toRotationMatrix4() *
-                                    Mat4::makeTranslationMatrix(mTransform.translation) *
-                                    propagatedTransform;
+        transformToPropagate = mTransform.rotation.toRotationMatrix4() *
+                               Mat4::makeTranslationMatrix(mTransform.translation);
+        mTransform.finalTransform =
+            Mat4::makeScalingMatrix(mTransform.scale) * transformToPropagate;
     }
     else if (mTransform.propagationType == PropagationType::POSITION_ROTATION_SCALING)
     {
-        mTransform.finalTransform =
-            Mat4::makeScalingMatrix(mTransform.scale) * mTransform.rotation.toRotationMatrix4() *
-            Mat4::makeTranslationMatrix(mTransform.translation) * propagatedTransform;
+        transformToPropagate = Mat4::makeScalingMatrix(mTransform.scale) *
+                               mTransform.rotation.toRotationMatrix4() *
+                               Mat4::makeTranslationMatrix(mTransform.translation);
+        mTransform.finalTransform = transformToPropagate;
     }
     else
     {
         LOG_ERROR("unrecognized propagation type for entity:" << mName);
     }
+    transformToPropagate = transformToPropagate * fatherTransform;
+    mTransform.finalTransform = mTransform.finalTransform * fatherTransform;
+
     mTransform.finalTranslation = mTransform.finalTransform.getTranslation();
     // TODO: should not calculate normal for transform that don't need them
     mTransform.normalMatrix = mTransform.finalTransform.calcNormalMatrix();
     for (auto &keyEntityPair : mChildren)
     {
-        keyEntityPair.second->setFinalTransformAndPropagate(mTransform.finalTransform);
+        keyEntityPair.second->setFinalTransformAndPropagate(transformToPropagate);
     }
 }
 

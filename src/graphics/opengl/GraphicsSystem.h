@@ -34,7 +34,9 @@
 #include "math/Matrix.h"
 #include "math/Vector.h"
 #include <cassert>
+#include <map>
 #include <memory>
+//#include <unordered_map>
 
 namespace Nova
 {
@@ -59,19 +61,21 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     /*adds a render packet to the renderer's list so the renderer can see it*/
     inline void addPacket(RenderPacket packet)
     {
-        // mRenderPackets.emplace(std::make_pair(idCount++, std::move(packet)));
-        mRenderPackets.push_back(std::move(packet));
+        mRenderPackets.emplace(std::make_pair(packet.getID(), std::move(packet)));
+        // mRenderPackets.push_back(std::move(packet));
     };
-    void removePacket(std::uint64_t id){
-        // mRenderPackets.erase(id);
-    };
+    void removePacket(std::uint64_t id) { mRenderPackets.erase(id); };
     inline void addLight(Light light)
     {
-        // mLights.emplace(std::make_pair(idCount++, std::move(light)));
-        mLights.push_back(std::move(light));
+        currentNumLights++;
+        mLights.emplace(std::make_pair(light.getID(), std::move(light)));
+        // mLights.push_back(std::make_pair(light.getID(), std::move(light)));
     }
-    void removeLight(std::uint64_t id){
-        // mLights.erase(id);
+    void removeLight(std::uint64_t id)
+    {
+        int r = mLights.erase(id);
+        currentNumLights--;
+        assert(r);
     };
     auto &getRenderPackets() { return mRenderPackets; };
     auto &getLights() { return mLights; }
@@ -101,12 +105,14 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
         mCamera.position = &(camera->getNonConstTransformStruct().finalTranslation);
     };
     Camera &getCurrentCamera() override { return mCamera; };
+    std::size_t currentNumLights = 0;
 
   private:
-    // std::unordered_map<uint64_t, RenderPacket> mRenderPackets;
-    // std::unordered_map<uint64_t, Light> mLights;
-    std::vector<RenderPacket> mRenderPackets;
-    std::vector<Light> mLights;
+    std::map<uint64_t, RenderPacket> mRenderPackets;
+    std::map<uint64_t, Light> mLights;
+    // std::vector<std::pair<uint64_t, Light>> mLights;
+    // std::vector<RenderPacket> mRenderPackets;
+    // std::vector<Light> mLights;
 
     std::shared_ptr<IRendererBackend> mRendererBackend;
     std::shared_ptr<IRendererFrontend> mRendererFrontend;

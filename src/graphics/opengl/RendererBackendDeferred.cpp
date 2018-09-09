@@ -22,6 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 
 #include "RendererBackendDeferred.h"
+#include "Timer.h"
 #include "graphics/ITexture.h"
 #include "graphics/opengl/FrameBuffer.h"
 #include "graphics/opengl/GPUProgram.h"
@@ -38,8 +39,8 @@
 namespace Nova
 {
 RendererBackendDeferred::RendererBackendDeferred()
-    : mIBL(ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->irradiance,
-           ResourceManager::getInstance().get<IBL_Data>("fireSky_IBL")->radiance),
+    : mIBL(ResourceManager::getInstance().get<IBL_Data>("textures/skyboxes/fireSky_IBL")->irradiance,
+           ResourceManager::getInstance().get<IBL_Data>("textures/skyboxes/fireSky_IBL")->radiance),
 
       mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
 
@@ -52,7 +53,7 @@ RendererBackendDeferred::RendererBackendDeferred()
       mLightPassRenderPacket(
           mScreenQuad,
           std::make_shared<Material>(
-              ResourceManager::getInstance().get<GPUProgram>("light_pass_PBR"),
+              ResourceManager::getInstance().get<GPUProgram>("shaders/light_pass_PBR"),
               std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
                   {mGBuffer.getColorTexture(0),
                    "gPosMetal"}, // gBuffer position and metallic channel
@@ -62,11 +63,11 @@ RendererBackendDeferred::RendererBackendDeferred()
                   {mGBuffer.getColorTexture(3), "gNormalMapAO"},
                   {mIBL.irradiance, "irradianceMap"},
                   {mIBL.radiance, "radianceMap"},
-                  {ResourceManager::getInstance().get<Texture>("brdf_LUT"), "brdfLUT"}})),
+                  {ResourceManager::getInstance().get<Texture>("textures/brdf_LUT"), "brdfLUT"}})),
 
       mFinalPacket(mScreenQuad,
                    std::make_shared<Material>(
-                       ResourceManager::getInstance().get<GPUProgram>("tonemap_shader"),
+                       ResourceManager::getInstance().get<GPUProgram>("shaders/tonemap"),
                        std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
                            {mVBloomFrameBuffer.getColorTexture(0), "blurredImage"},
                            {mLightPassFrameBuffer.getColorTexture(0), "renderedImage"},
@@ -74,21 +75,21 @@ RendererBackendDeferred::RendererBackendDeferred()
 
       mHBloomPacket(mScreenQuad,
                     std::make_shared<Material>(
-                        ResourceManager::getInstance().get<GPUProgram>("hbloom_shader"),
+                        ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
                         std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
                             {mLightPassFrameBuffer.getColorTexture(0), "albedo"}})),
 
       mVBloomPacket(mScreenQuad,
                     std::make_shared<Material>(
-                        ResourceManager::getInstance().get<GPUProgram>("vbloom_shader"),
+                        ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
                         std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
                             {mHBloomFrameBuffer.getColorTexture(0), "albedo"}})),
 
       mCurrentSkyBox(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
                      std::make_shared<Material>(
-                         ResourceManager::getInstance().get<GPUProgram>("skybox"),
+                         ResourceManager::getInstance().get<GPUProgram>("shaders/skybox"),
                          std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                             {ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"),
+                             {ResourceManager::getInstance().get<TextureCube>("textures/skyboxes/fireSky"),
                               "skyboxTexture"}}))
 {
 }
@@ -101,7 +102,8 @@ void RendererBackendDeferred::render()
     // glViewport(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
     // glScissor(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
     // GraphicsSystem::getInstance().setWireframeMode(true);
-
+    long gpassTime, lightpassTime, postprocessTime;
+    Timer timer;
     // GEOMETRY PASS
     mGBuffer.bind();
     // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -112,9 +114,9 @@ void RendererBackendDeferred::render()
     auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
     for (const auto &packet : renderPackets) // for all drawable objects in the world
     {
-        packet.bind();
-        packet.updateAllUniforms();
-        packet.draw();
+        packet.second.bind();
+        packet.second.updateAllUniforms();
+        packet.second.draw();
         // packet.unBind();
     }
     /*glStencilMask(0x00);*/
@@ -123,6 +125,9 @@ void RendererBackendDeferred::render()
     mCurrentSkyBox.updateAllUniforms();
     mCurrentSkyBox.draw();
     // mGBuffer.unBind();
+
+    gpassTime = timer.getMicro();
+    timer.reset();
 
     // LIGHTING PASS
     glDisable(GL_DEPTH_TEST);
@@ -134,6 +139,10 @@ void RendererBackendDeferred::render()
     mLightPassFrameBuffer.bind();
     {
         mLightPassRenderPacket.bind();
+        glUniform1i(glGetUniformLocation(
+                        mLightPassRenderPacket.getMaterial()->getGPUProgram()->getProgramID(),
+                        "currentMaxLights"),
+                    GraphicsSystem::getInstance().currentNumLights);
         mLightPassRenderPacket.updateAllUniforms();
         mLightPassRenderPacket.draw();
         mLightPassFrameBuffer.getColorTexture(0)->bind();
@@ -141,6 +150,8 @@ void RendererBackendDeferred::render()
         // mLightPassFrameBuffer.getColorTexture(0)->unBind();
     }
     // mLightPassFrameBuffer.unBind();
+    lightpassTime = timer.getMicro();
+    timer.reset();
 
     // POST-PROCESS
     glViewport(0, 0, mWidth / 4, mHeight / 4);
@@ -169,6 +180,12 @@ void RendererBackendDeferred::render()
     // glDepthMask(0xFF);
     // renderPackets.clear();
     // lights.clear();
+    postprocessTime = timer.getMicro();
+    timer.reset();
+
+    Window::getInstance().setTitle("geometry pass:" + std::to_string(gpassTime) +
+                                   " us. | light pass:" + std::to_string(lightpassTime) +
+                                   " us. | postprocess pass:" + std::to_string(postprocessTime));
 }
 
 void RendererBackendDeferred::setSkyBox(const Skybox &skybox)
@@ -199,7 +216,7 @@ void RendererBackendDeferred::setIBLData(std::shared_ptr<IBL_Data> data)
         {mGBuffer.getColorTexture(3), "gNormalMapAO"},
         {mIBL.irradiance, "irradianceMap"},
         {mIBL.radiance, "prefilterMap"},
-        {ResourceManager::getInstance().get<Texture>("brdf_LUT"), "brdfLUT"}};
+        {ResourceManager::getInstance().get<Texture>("textures/brdf_LUT"), "brdfLUT"}};
     mLightPassRenderPacket.getMaterial()->setTextures(texturesVector);
 }
 

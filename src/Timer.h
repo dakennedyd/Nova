@@ -37,20 +37,20 @@ class Timer
     Timer() { reset(); };
     ~Timer() = default;
     inline void reset() { mEpoch = std::chrono::high_resolution_clock::now(); }
-    inline std::int64_t getMicro()
+    inline long getMicro()
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> now =
             std::chrono::high_resolution_clock::now();
         return std::chrono::duration_cast<std::chrono::microseconds>(now - mEpoch).count();
     }
-    inline std::int64_t getMillis()
+    inline long getMillis()
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> now =
             std::chrono::high_resolution_clock::now();
         // std::chrono::duration<int, std::milli> r = now - mEpoch;
         return std::chrono::duration_cast<std::chrono::milliseconds>(now - mEpoch).count();
     }
-    inline std::int64_t getSecs()
+    inline long getSecs()
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> now =
             std::chrono::high_resolution_clock::now();
@@ -58,7 +58,7 @@ class Timer
     }
 
     /*gets the time since the engine started in milliseconds*/
-    static std::int64_t getTimeSinceEngineStart()
+    static long getTimeSinceEngineStart()
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> now =
             std::chrono::high_resolution_clock::now();

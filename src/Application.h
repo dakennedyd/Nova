@@ -116,12 +116,15 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
     };
     World mWorld;
 
+    auto &getProfileTimes() { return mProfileTimes; };
+
   protected:
     // Timer mTimer;
     bool mIsClosing = false;
     bool mIsInitialized = false;
     std::function<void()> mCallback;
     // void (*mCallback)() = nullptr;
+    std::vector<std::pair<std::string, long>> mProfileTimes;
 };
 
 } // namespace Nova

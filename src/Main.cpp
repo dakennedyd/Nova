@@ -22,7 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 
 #include "Nova.h"
-//#include <string>
+#include <string>
 using namespace Nova;
 
 int main()
@@ -122,6 +122,8 @@ int main()
                 changeCamera = false;
                 engine.getWorld().GetSystem<CameraSystem>()->unregisterEntity(
                     engine.getWorld().getEntity("fpsCamera"));
+                engine.getWorld().GetSystem<PlayerInputSystem>()->unregisterEntity(
+                    engine.getWorld().getEntity("fpsCamera"));
                 engine.getWorld().GetSystem<CameraSystem>()->registerEntity(
                     engine.getWorld().getEntity("Default Camera"));
 
@@ -137,6 +139,8 @@ int main()
             {
                 changeCamera = true;
                 engine.getWorld().GetSystem<CameraSystem>()->registerEntity(
+                    engine.getWorld().getEntity("fpsCamera"));
+                engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(
                     engine.getWorld().getEntity("fpsCamera"));
                 engine.getWorld().GetSystem<CameraSystem>()->unregisterEntity(
                     engine.getWorld().getEntity("Default Camera"));
@@ -162,8 +166,8 @@ int main()
             thing.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
             thing.GetComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
             engine.getWorld().GetSystem<RotationSystem>()->registerEntity(thing);
-            thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/sphere"),
-                                                rm.get<Material>("materials/checkerboard"));
+            thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
+                                                rm.get<Material>("materials/yellow_plastic"));
             engine.getWorld().GetSystem<VisualSystem>()->registerEntity(thing);
 
             thing.addComponent<LightComponent>(LightType::POINT_LIGHT,
@@ -233,21 +237,21 @@ int main()
     Entity &floor = engine.getWorld().createEntity("floor");
     floor.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(90.0f)));
     floor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
-                                        rm.get<Material>("materials/greasy_metal"));
+                                        rm.get<Material>("materials/orange_plastic"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(floor);
     floor.setPosition(Vec3(0.0f, -1.0f, 0.0f));
 
     Entity &star = engine.getWorld().createEntity("star");
-    star.setPosition(Vec3{0.0f, -1.0f, 0.0f});
+    star.setPosition(Vec3{0.0f, 0.0f, 0.0f});
     star.addComponent<VisualComponent>(rm.get<Mesh>("meshes/sphere"),
-                                       rm.get<Material>("materials/orange_plastic"));
+                                       rm.get<Material>("materials/yellow_plastic"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(star);
 
     Entity &ship = engine.getWorld().createEntity("ship");
     ship.setPosition(Vec3{-1.0f, 0.0f, 2.0f});
     ship.setScale(0.25f);
     ship.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
-                                       rm.get<Material>("materials/aluminium"));
+                                       rm.get<Material>("materials/worn_cement"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship);
     ship.addComponent<MovementComponent>();
     ship.GetComponent<MovementComponent>().speed = 2.0f;
@@ -259,7 +263,7 @@ int main()
     ship2.setPosition(Vec3{1.0f, 0.0f, 2.0f});
     // ship2.setScale(0.25f);
     ship2.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
-                                        rm.get<Material>("materials/aluminium"));
+                                        rm.get<Material>("materials/worn_cement"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship2);
     ship2.addComponent<MovementComponent>();
     ship2.GetComponent<MovementComponent>().speed = 2.0f;
@@ -273,7 +277,7 @@ int main()
     // engine.getWorld().GetSystem<RotationSystem>()->registerEntity(star);
 
     Entity &rotationAnchor = engine.getWorld().createEntity("rotation_anchor");
-    rotationAnchor.setPosition(Vec3(0.0f, -0.5f, 0.0f));
+    rotationAnchor.setPosition(Vec3(0.0f, 0.0f, 0.0f));
     rotationAnchor.addComponent<RotationComponent>();
     rotationAnchor.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
     rotationAnchor.GetComponent<RotationComponent>().speed = 2.0f;
@@ -284,7 +288,7 @@ int main()
     // creates some random colored lights
     Random rnd;
     int count = 0;
-    int x = 2, y = 2;
+    int x = 0, y = 0;
     for (int i = 0; i < x; i++)
     {
         for (int j = 0; j < y; j++)
@@ -298,7 +302,7 @@ int main()
             anchor.GetComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
             engine.getWorld().GetSystem<RotationSystem>()->registerEntity(anchor);
             anchor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
-                                                 rm.get<Material>("materials/worn_cement"));
+                                                 rm.get<Material>("materials/aluminium"));
             engine.getWorld().GetSystem<VisualSystem>()->registerEntity(anchor);
 
             Entity &light = engine.getWorld().createEntity("light" + std::to_string(count));

@@ -95,12 +95,21 @@ include_directories(src/
                     Dependencies/
                     Dependencies/glad/include/
                     Dependencies/glfw/include/
+
+                    Dependencies/imgui/
+                    Dependencies/imgui/examples/
+
                     Dependencies/glm/)
                     #Dependencies/stb/
                     #Dependencies/tinyxml2/)
 
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
                                #Dependencies/stb/stb_image.h
+
+                               Dependencies/imgui/*.cpp                               
+                               Dependencies/imgui/examples/imgui_impl_glfw.cpp
+                               Dependencies/imgui/examples/imgui_impl_opengl3.cpp
+
                                Dependencies/tinyxml2/tinyxml2.cpp)
                                #Dependencies/glm/glm/glm.hpp)
 # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)

@@ -41,6 +41,7 @@
 #    include "graphics/opengl/GraphicsSystem.h"
 #    include "graphics/opengl/RendererBackendDeferred.h"
 #endif
+#include "graphics/DebugUI.h"
 #include "resource_manager/ResourceManager.h"
 #include <thread>
 
@@ -187,6 +188,7 @@ void Application::startUp()
         Window::getInstance().startUp();
         InputSystem::getInstance().startUp();
         GraphicsSystem::getInstance().startUp();
+        DebugUI::getInstance().startUp();
         ResourceManager::getInstance().startUp();
 
         // registers application to get keyboard events
@@ -229,6 +231,9 @@ void Application::startUp()
 
         LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
         this->mIsInitialized = true;
+
+        mProfileTimes.push_back(std::make_pair("Entity Update time", 0));
+        mProfileTimes.push_back(std::make_pair("Render time", 0));
     }
 }
 void Application::startMainLoop()
@@ -245,7 +250,7 @@ void Application::startMainLoop()
         auto &window = Window::getInstance();
         auto &input = InputSystem::getInstance();
         auto &mouse = input.getMouse();
-        long frameTime = 0, fps = 0, entityUpdateTime, renderTime;
+        long frameTime = 0, fps = 0; //, entityUpdateTime, renderTime;
 
         window.show();
         Timer frameTimeClock, renderClock, entityUpdateClock;
@@ -257,7 +262,7 @@ void Application::startMainLoop()
             {
                 entityUpdateClock.reset();
                 mWorld.update(); // updates all entities in the world
-                entityUpdateTime = entityUpdateClock.getMicro();
+                mProfileTimes[0].second = entityUpdateClock.getMicro();
                 timeDelta -= SIMULATION_TIME_STEP;
 
                 mouse.mPreviousX = mouse.mX;
@@ -267,7 +272,8 @@ void Application::startMainLoop()
 
             renderClock.reset();
             rendererBackend.render();
-            renderTime = renderClock.getMicro();
+            mProfileTimes[1].second = renderClock.getMicro();
+            DebugUI::getInstance().drawGUI();
             window.swapFrameBuffers();
             // glFinish();
             frameTime = frameTimeClock.getMillis();
@@ -289,6 +295,7 @@ void Application::shutDown()
     {
         this->mIsClosing = true;
         ResourceManager::getInstance().shutDown();
+        DebugUI::getInstance().shutDown();
         GraphicsSystem::getInstance().shutDown();
         InputSystem::getInstance().shutDown();
         Window::getInstance().shutDown();

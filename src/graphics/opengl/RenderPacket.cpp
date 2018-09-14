@@ -47,9 +47,9 @@ RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
     GLuint id = mMaterial->getGPUProgram()->getProgramID();
     // auto &gs = GraphicsSystem::getInstance();
 
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "model"),
+    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "uModel"),
                                              transform.finalTransform.getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "normalMat"),
+    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "uNormalMat"),
                                              transform.normalMatrix.getDataPtr()));
     // addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"),
     //                                          gs.getCurrentCamera().view->getDataPtr()));
@@ -85,11 +85,11 @@ void inline updateLights(GLuint id)
     {
         if (i >= MAX_LIGHTS) break;
         glUniform3fv(
-            glGetUniformLocation(id, ("light[" + std::to_string(i) + "].position").c_str()), 1,
+            glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].position").c_str()), 1,
             light.second.getPosition()->getDataPtr());
-        glUniform3fv(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].color").c_str()),
+        glUniform3fv(glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].color").c_str()),
                      1, light.second.getColor()->getDataPtr());
-        glUniform1i(glGetUniformLocation(id, ("light[" + std::to_string(i) + "].type").c_str()),
+        glUniform1i(glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].type").c_str()),
                     light.second.getTypeCode());
         i++;
     }
@@ -98,10 +98,10 @@ void inline updateLights(GLuint id)
 void inline updateCamera(GLuint id)
 {
     auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
-    glUniformMatrix4fv(glGetUniformLocation(id, "view"), 1, GL_FALSE, camera.view->getDataPtr());
-    glUniformMatrix4fv(glGetUniformLocation(id, "proj"), 1, GL_FALSE,
+    glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE, camera.view->getDataPtr());
+    glUniformMatrix4fv(glGetUniformLocation(id, "uProj"), 1, GL_FALSE,
                        camera.projection->getDataPtr());
-    glUniform3fv(glGetUniformLocation(id, "cameraPos"), 1, camera.position->getDataPtr());
+    glUniform3fv(glGetUniformLocation(id, "uCameraPos"), 1, camera.position->getDataPtr());
 }
 
 /*todo: this function should be replaced by the ECSystem*/

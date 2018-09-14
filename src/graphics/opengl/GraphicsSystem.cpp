@@ -45,6 +45,7 @@ void GraphicsSystem::startUp()
     // start GLEW extension handler
     // glewExperimental = GL_TRUE;
     // glewInit();
+    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     if (!gladLoadGL())
     {
         error("could not start GLAD");

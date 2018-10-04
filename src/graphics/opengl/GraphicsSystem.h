@@ -78,7 +78,8 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
         assert(r);
     };
     auto &getRenderPackets() { return mRenderPackets; };
-    auto &getLights() { return mLights; }
+    auto &getLights() { return mLights; };
+    int getNumLights() { return mLights.size(); };
     IRendererBackend &getRendererBackend()
     {
         assert(mRendererBackend);

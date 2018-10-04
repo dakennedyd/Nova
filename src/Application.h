@@ -32,6 +32,7 @@
 #include "ECS/Entity.h"
 #include "ECS/System.h"
 #include <functional>
+//#include <unordered_map>
 
 namespace Nova
 {
@@ -84,6 +85,7 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
             return (static_cast<T *>(mSystems.at(std::type_index(typeid(T)))));
         }
         void update();
+        int getNumEntities() { return mEntities.size(); }
 
       private:
         Entity mNoEntity{"NOVA_INVALID_ENTITY"};
@@ -124,7 +126,7 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
     bool mIsInitialized = false;
     std::function<void()> mCallback;
     // void (*mCallback)() = nullptr;
-    std::vector<std::pair<std::string, long>> mProfileTimes;
+    std::unordered_map<std::string, long> mProfileTimes;
 };
 
 } // namespace Nova

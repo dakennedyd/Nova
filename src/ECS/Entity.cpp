@@ -138,7 +138,7 @@ void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
 
     mTransform.finalTranslation = mTransform.finalTransform.getTranslation();
     // TODO: should not calculate normal for transform that don't need them
-    mTransform.normalMatrix = mTransform.finalTransform.calcNormalMatrix();
+    // mTransform.normalMatrix = mTransform.finalTransform.calcNormalMatrix();
     for (auto &keyEntityPair : mChildren)
     {
         keyEntityPair.second->setFinalTransformAndPropagate(transformToPropagate);

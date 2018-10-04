@@ -41,6 +41,8 @@ common enough to be necessary in any game*/
 #    include "graphics/opengl/FrameBuffer.h"
 #    include "graphics/opengl/GraphicsSystem.h"
 #endif
+#include "Physics.h"
+#include "logger/Logger.h"
 
 namespace Nova
 {
@@ -72,7 +74,8 @@ class LightSystem final : public System
     {
         // creates a light object and adds it to the renderer list
         LightComponent &lc = entity->GetComponent<LightComponent>();
-        Light light{lc.type, &(entity->getNonConstTransformStruct().finalTranslation), &(lc.color)};
+        Light light{entity->getID(), lc.type,
+                    &(entity->getNonConstTransformStruct().finalTranslation), &(lc.color)};
         lc.lightID = light.getID();
         GraphicsSystem::getInstance().addLight(std::move(light));
 
@@ -185,5 +188,42 @@ class CameraSystem final : public System
     void onRegister(Entity *entity) override {}
 
     void onUnregister(Entity *entity) override {}
+};
+
+class PhysicalSystem final : public System
+{
+    void processEntity(Entity *entity) override
+    {
+        auto t = Physics::getInstance().getObjectTransform(entity->getID());
+        entity->setPosition(t.translation);
+        entity->setRotation(t.rotation);
+
+        // float *object = Physics::getInstance().getObjectTransform(entity->getID());
+        // entity->getNonConstTransformStruct().finalTransform.setDataPtr(object);
+
+        // entity->getNonConstTransformStruct().finalTransform.debugPrint();
+        // std::cout << "\n";
+        // std::cout << object[0] << object[1] << object[2] << object[3] << "\n";
+        // std::cout << object[4] << object[5] << object[6] << object[7] << "\n";
+        // std::cout << object[8] << object[9] << object[10] << object[11] << "\n";
+        // std::cout << object[12] << object[13] << object[14] << object[15] << "\n";
+        // std::cout << "\n";
+        // delete object;
+    }
+    void onRegister(Entity *entity) override
+    {
+        auto &pc = entity->GetComponent<PhysicalComponent>();
+
+        // Physics::getInstance().addObject(entity->getID(), pc.shape, Vec3(1.0f),
+        //                                  entity->getFinalTransform().getDataPtr(), pc.mass);
+        Physics::getInstance().addObject(
+            entity->getID(), pc.shape, pc.dimensions, entity->getTransformStruct().scale,
+            entity->getTransformStruct().translation, entity->getRotation(), pc.mass);
+    }
+
+    void onUnregister(Entity *entity) override
+    {
+        Physics::getInstance().removeObject(entity->getID());
+    }
 };
 } // namespace Nova

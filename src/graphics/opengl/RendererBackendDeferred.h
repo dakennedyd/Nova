@@ -73,7 +73,7 @@ class RendererBackendDeferred : public IRendererBackend
     void setSkyBox(const Skybox &skyBox) override;
     void setIBLData(std::shared_ptr<IBL_Data> data);
 
-    std::vector<std::pair<std::string, long>> &getProfileTimes() override { return mProfileTimes; };
+    std::unordered_map<std::string, long> &getProfileTimes() override { return mProfileTimes; };
 
   private:
     // bool mIsInitialized = false;
@@ -93,7 +93,7 @@ class RendererBackendDeferred : public IRendererBackend
     RenderPacket mCurrentSkyBox;
 
     // long mGPassTime, mLightPassTime, mPostprocessTime;
-    std::vector<std::pair<std::string, long>> mProfileTimes;
+    std::unordered_map<std::string, long> mProfileTimes;
 
     // std::vector<std::pair<FrameBuffer, GPUProgram>> mFrameBuffers;
 };

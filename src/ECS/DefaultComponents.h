@@ -26,6 +26,7 @@
 #include <memory>
 //#include "graphics/opengl/FrameBuffer.h"
 #include "IComponent.h"
+#include "Physics.h"
 #include "math/Matrix.h"
 #include "math/Vector.h"
 
@@ -76,5 +77,22 @@ struct LightComponent final : public IComponent
     LightType type;
     Vec3 color;
     uint64_t lightID;
+};
+
+struct PhysicalComponent final : public IComponent
+{
+    PhysicalComponent() = delete;
+    PhysicalComponent(float mass, PhysicalShape shape, Vec3 dimensions,
+                      Vec3 localInertia = Vec3(0.0f))
+        : mass(mass), shape(shape),
+          dimensions(dimensions.getX(), dimensions.getY(), dimensions.getZ()),
+          localInertia(localInertia.getX(), localInertia.getY(), localInertia.getZ())
+    {
+    }
+    float mass;
+    PhysicalShape shape;
+    Vec3 dimensions;
+    Vec3 localInertia;
+    // friction coeficient?
 };
 } // namespace Nova

@@ -29,10 +29,11 @@
 namespace Nova
 {
 // std::uint64_t Light::mIDCounter = 0;
-Light::Light(int type, Vec3 *pos, Vec3 *color) //, Vec3 * amb, Vec3 * diff, Vec3 * spec)
-    : mPosition(pos), mColor(color), mType(type)
+Light::Light(uint64_t id, int type, Vec3 *pos,
+             Vec3 *color) //, Vec3 * amb, Vec3 * diff, Vec3 * spec)
+    : mID(id), mPosition(pos), mColor(color), mType(type)
 {
-    mID = GraphicsSystem::getInstance().currentNumLights;
+    // mID = GraphicsSystem::getInstance().currentNumLights;
     // mID = mIDCounter;
     // mIDCounter++;
 }

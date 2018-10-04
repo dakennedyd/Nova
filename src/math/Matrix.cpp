@@ -130,6 +130,14 @@ Mat4 Mat4::calcNormalMatrix() const
 
 const float *Mat4::getDataPtr() const { return mData; }
 
+void Mat4::setDataPtr(float *data)
+{
+    for (int i = 0; i < 16; ++i)
+    {
+        mData[i] = data[i];
+    }
+}
+
 void Mat4::debugPrint() const
 {
     LOG_DEBUG("Mat4:");

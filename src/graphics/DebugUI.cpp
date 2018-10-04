@@ -72,9 +72,13 @@ void DebugUI::startUp()
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to
     // write a double backslash \\ !
     // io.Fonts->AddFontDefault();
-    // io.Fonts->AddFontFromFileTTF("./Dependencies/imgui/misc/fonts/Roboto-Medium.ttf", 16.0f);
+    // io.Fonts->AddFontFromFileTTF("./Dependencies/imgui/misc/fonts/Roboto-Medium.ttf", 13.0f);
+    // io.Fonts->AddFontFromFileTTF("./Resources/fonts/Nexa Bold.otf", 130.0f);
+    // io.Fonts->AddFontFromFileTTF("./Resources/fonts/Kontanter-Bold.otf", 16.0f);
     // io.Fonts->AddFontFromFileTTF("./Dependencies/imgui/misc/fonts/Cousine-Regular.ttf", 15.0f);
-    // io.Fonts->AddFontFromFileTTF("./Dependencies/imgui/misc/fonts/DroidSans.ttf", 16.0f);
+    // io.Fonts->AddFontFromFileTTF("./Dependencies/imgui/misc/fonts/DroidSans.ttf", 13.0f);
+    // io.Fonts->AddFontFromFileTTF("/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf",
+    //                              13.0f);
     // io.Fonts->AddFontFromFileTTF("./Dependencies/imgui/misc/fonts/ProggyTiny.ttf", 10.0f);
     // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL,
     // io.Fonts->GetGlyphRangesJapanese()); IM_ASSERT(font != NULL);
@@ -86,6 +90,8 @@ void DebugUI::shutDown()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
+static float profileTimes[6][20];
+static int profileTimesOffset[6] = {0};
 
 void DebugUI::drawGUI()
 {
@@ -106,40 +112,13 @@ void DebugUI::drawGUI()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    {
-        // static float f = 0.0f;
-        // static int counter = 0;
-
-        // ImGui::Begin("Nova"); // Create a window called "Hello, world!" and append into it.
-
-        // ImGui::Text("This is some useful text."); // Display some text (you can use a format
-        //                                           // strings too)
-        // // ImGui::Checkbox("Demo Window",
-        // //                 &show_demo_window); // Edit bools storing our window open/close state
-        // // ImGui::Checkbox("Another Window", &show_another_window);
-
-        // ImGui::SliderFloat("float", &f, 0.0f,
-        //                    1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        // // ImGui::ColorEdit3("clear color",
-        // //                   (float *)&clear_color); // Edit 3 floats representing a color
-
-        // if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return
-        //                              // true when edited/activated)
-        //     counter++;
-        // ImGui::SameLine();
-        // ImGui::Text("counter = %d", counter);
-
-        // ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-        //             1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        // ImGui::End();
-    } // Demonstrate creating a simple static window with no decoration + a context-menu to choose
-      // which corner of the screen to use.
+    // Demonstrate creating a simple static window with no decoration + a context-menu to choose
+    // which corner of the screen to use.
     // static void ShowExampleAppSimpleOverlay(bool* p_open)
     {
         const float DISTANCE = 10.0f;
         static int corner = 2;
-        bool b = true;
-        bool *p_open = &b;
+        bool yes = true;
         ImVec2 window_pos =
             ImVec2((corner & 1) ? ImGui::GetIO().DisplaySize.x - DISTANCE : DISTANCE,
                    (corner & 2) ? ImGui::GetIO().DisplaySize.y - DISTANCE : DISTANCE);
@@ -150,31 +129,57 @@ void DebugUI::drawGUI()
         // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);`
         ImGuiStyle &style = ImGui::GetStyle();
         style.WindowBorderSize = 0.0f;
+        style.WindowRounding = 0.0f;
+        style.AntiAliasedLines = false;
 
         if (ImGui::Begin(
-                "Example: Simple Overlay", p_open,
+                "", &yes,
                 (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar |
                     ImGuiWindowFlags_NoResize |
                     /*ImGuiWindowFlags_AlwaysAutoResize |*/ ImGuiWindowFlags_NoSavedSettings |
                     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
         {
+            // ImGui::ShowDemoWindow(&yes);
             // ImGui::Text("Nova");
             // ImGui::Separator();
             auto &rpt = GraphicsSystem::getInstance().getRendererBackend().getProfileTimes();
-            ImGui::Text((rpt[0].first + ":%d us.").c_str(), rpt[0].second);
-            ImGui::Text((rpt[1].first + ":%d us.").c_str(), rpt[1].second);
-            ImGui::Text((rpt[2].first + ":%d us.").c_str(), rpt[2].second);
+            ImGui::Text("geometry pass:%ld us.", rpt["Geometry pass"]); // geometry pass
+            profileTimes[0][profileTimesOffset[0]] = rpt["Geometry pass"];
+            profileTimesOffset[0] = (profileTimesOffset[0] + 1) % IM_ARRAYSIZE(profileTimes[0]);
+            ImGui::PlotLines("", profileTimes[0], IM_ARRAYSIZE(profileTimes[0]),
+                             profileTimesOffset[0], "", 0.0f, 5000.0f, ImVec2(0, 40));
+
+            ImGui::Text("light pass:%ld us.", rpt["Light pass"]); // light pass
+            profileTimes[1][profileTimesOffset[1]] = rpt["Light pass"];
+            profileTimesOffset[1] = (profileTimesOffset[1] + 1) % IM_ARRAYSIZE(profileTimes[1]);
+            ImGui::PlotLines("", profileTimes[1], IM_ARRAYSIZE(profileTimes[1]),
+                             profileTimesOffset[1], "", 0.0f, 1000.0f, ImVec2(0, 40));
+
+            ImGui::Text("post process:%ld us.", rpt["Post-process"]); // post process
 
             auto &apt = Application::getInstance().getProfileTimes();
-            ImGui::Text((apt[0].first + ":%d us.").c_str(), apt[0].second);
-            ImGui::Text((apt[1].first + ":%d us.").c_str(), apt[1].second);
-            ImGui::Text("Frametime:%.3f ms. (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-                        ImGui::GetIO().Framerate);
-            // if (ImGui::IsMousePosValid())
-            //     ImGui::Text("Mouse Position: (%.1f,%.1f)", ImGui::GetIO().MousePos.x,
-            //                 ImGui::GetIO().MousePos.y);
-            // else
-            //     ImGui::Text("Mouse Position: <invalid>");
+            ImGui::Text("entities update:%ld us.", apt["Entities update"]); // entity update
+            profileTimes[3][profileTimesOffset[3]] = apt["Entities update"];
+            profileTimesOffset[3] = (profileTimesOffset[3] + 1) % IM_ARRAYSIZE(profileTimes[3]);
+            ImGui::PlotLines("", profileTimes[3], IM_ARRAYSIZE(profileTimes[3]),
+                             profileTimesOffset[3], "", 0.0f, 1000.0f, ImVec2(0, 40));
+
+            // profileTimes[2][profileTimesOffset[2]] = rpt[2].second;
+            // profileTimesOffset[2] = (profileTimesOffset[2] + 1) % IM_ARRAYSIZE(profileTimes[2]);
+            // ImGui::PlotLines("", profileTimes[2], IM_ARRAYSIZE(profileTimes[2]),
+            //                  profileTimesOffset[2], "post process", 0.0f, 5000.0f, ImVec2(0,
+            //                  40));
+
+            ImGui::Text("render time:%.1f ms.",
+                        apt["Render time"] / 1000.0f); // render time
+            // ImGui::Text("Frametime:%.2f ms. (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+            //             ImGui::GetIO().Framerate); // frametime
+            ImGui::Text("Frametime:%.2f ms.", 1000.0f / ImGui::GetIO().Framerate); // frametime
+
+            ImGui::Text("Entities total:%d",
+                        Application::getInstance().getWorld().getNumEntities());
+            ImGui::Text("Lights total:%d", GraphicsSystem::getInstance().getNumLights());
+
             if (ImGui::BeginPopupContextWindow())
             {
                 if (ImGui::MenuItem("Custom", NULL, corner == -1)) corner = -1;
@@ -182,7 +187,7 @@ void DebugUI::drawGUI()
                 if (ImGui::MenuItem("Top-right", NULL, corner == 1)) corner = 1;
                 if (ImGui::MenuItem("Bottom-left", NULL, corner == 2)) corner = 2;
                 if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
-                if (p_open && ImGui::MenuItem("Close")) *p_open = false;
+                // if (&yes && ImGui::MenuItem("Close")) yes = false;
                 ImGui::EndPopup();
             }
         }
@@ -190,13 +195,6 @@ void DebugUI::drawGUI()
     }
 
     ImGui::Render();
-    // int display_w, display_h;
-    // glfwMakeContextCurrent(window);
-    // glfwGetFramebufferSize(window, &display_w, &display_h);
-    // glViewport(0, 0, display_w, display_h);
-    // glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    // glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    // glfwMakeContextCurrent(Window::getInstance().mGLFWindow);
 }
 } // namespace Nova

@@ -41,6 +41,7 @@
 #    include "graphics/opengl/GraphicsSystem.h"
 #    include "graphics/opengl/RendererBackendDeferred.h"
 #endif
+#include "Physics.h"
 #include "graphics/DebugUI.h"
 #include "resource_manager/ResourceManager.h"
 #include <thread>
@@ -185,6 +186,7 @@ void Application::startUp()
         Logger::getInstance().startUp();
 #endif
         EngineSettings::getInstance().startUp();
+        Physics::getInstance().startUp();
         Window::getInstance().startUp();
         InputSystem::getInstance().startUp();
         GraphicsSystem::getInstance().startUp();
@@ -200,6 +202,7 @@ void Application::startUp()
         mWorld.registerSystem<PlayerInputSystem>();
         mWorld.registerSystem<CameraSystem>();
         mWorld.registerSystem<LightSystem>();
+        mWorld.registerSystem<PhysicalSystem>();
 
         /* this is just a basic key callback it is meant to be replaced with your own function
         when you press the ESC key it exits the program */
@@ -231,10 +234,7 @@ void Application::startUp()
 
         LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
         this->mIsInitialized = true;
-
-        mProfileTimes.push_back(std::make_pair("Entity Update time", 0));
-        mProfileTimes.push_back(std::make_pair("Render time", 0));
-    }
+        }
 }
 void Application::startMainLoop()
 {
@@ -245,12 +245,12 @@ void Application::startMainLoop()
 
         long targetFPS = EngineSettings::getInstance().getInteger("Video", "fps");
         long targetFrameTime = 1000000 / (targetFPS * 1000);
-        int64_t timeDelta = SIMULATION_TIME_STEP + 1;
+        int64_t timeDelta = SIMULATION_TIME_STEP + 1; // in milliseconds
 
         auto &window = Window::getInstance();
         auto &input = InputSystem::getInstance();
         auto &mouse = input.getMouse();
-        long frameTime = 0, fps = 0; //, entityUpdateTime, renderTime;
+        long frameTime = 0; //, fps = 0; //, entityUpdateTime, renderTime;
 
         window.show();
         Timer frameTimeClock, renderClock, entityUpdateClock;
@@ -262,24 +262,26 @@ void Application::startMainLoop()
             {
                 entityUpdateClock.reset();
                 mWorld.update(); // updates all entities in the world
-                mProfileTimes[0].second = entityUpdateClock.getMicro();
+                Physics::getInstance().simulate(1.0f / timeDelta);
+                mProfileTimes["Entities update"] = entityUpdateClock.getMicro();
                 timeDelta -= SIMULATION_TIME_STEP;
 
                 mouse.mPreviousX = mouse.mX;
                 mouse.mPreviousY = mouse.mY; // needed so that mouse.getMotionVector() can work
                 mouse.wheel = 0;
             }
+            // Physics::getInstance().simulate(1.0f / 30.0f);
 
             renderClock.reset();
             rendererBackend.render();
-            mProfileTimes[1].second = renderClock.getMicro();
+            mProfileTimes["Render time"] = renderClock.getMicro();
             DebugUI::getInstance().drawGUI();
             window.swapFrameBuffers();
             // glFinish();
             frameTime = frameTimeClock.getMillis();
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(targetFrameTime - frameTime)); // UUUUUGGGGGLLLYYYYYY!!!
-            fps = 1000.0 / frameTimeClock.getMillis();
+            // fps = 1000.0 / frameTimeClock.getMillis();
             // window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +
             //                 " frametime:" + std::to_string(frameTime) +
             //                 "ms. render:" + std::to_string(renderTime) +
@@ -299,6 +301,7 @@ void Application::shutDown()
         GraphicsSystem::getInstance().shutDown();
         InputSystem::getInstance().shutDown();
         Window::getInstance().shutDown();
+        Physics::getInstance().shutDown();
         EngineSettings::getInstance().shutDown();
 #ifdef LOG_ACTIVE
         Logger::getInstance().shutDown();

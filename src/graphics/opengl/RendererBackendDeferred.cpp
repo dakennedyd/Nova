@@ -95,9 +95,6 @@ RendererBackendDeferred::RendererBackendDeferred()
                   {ResourceManager::getInstance().get<TextureCube>("textures/skyboxes/fireSky"),
                    "skyboxTexture"}}))
 {
-    mProfileTimes.push_back(std::make_pair("Geometry pass", 0));
-    mProfileTimes.push_back(std::make_pair("Light pass", 0));
-    mProfileTimes.push_back(std::make_pair("Post-process", 0));
 }
 
 void RendererBackendDeferred::init() {}
@@ -130,7 +127,7 @@ void RendererBackendDeferred::render()
     mCurrentSkyBox.updateAllUniforms();
     mCurrentSkyBox.draw();
     // mGBuffer.unBind();
-    mProfileTimes[0].second = timer.getMicro();
+    mProfileTimes["Geometry pass"] = timer.getMicro();
     timer.reset();
 
     // LIGHTING PASS
@@ -154,7 +151,7 @@ void RendererBackendDeferred::render()
         // mLightPassFrameBuffer.getColorTexture(0)->unBind();
     }
     // mLightPassFrameBuffer.unBind();
-    mProfileTimes[1].second = timer.getMicro();
+    mProfileTimes["Light pass"] = timer.getMicro();
     timer.reset();
 
     // POST-PROCESS
@@ -184,7 +181,7 @@ void RendererBackendDeferred::render()
     // glDepthMask(0xFF);
     // renderPackets.clear();
     // lights.clear();
-    mProfileTimes[2].second = timer.getMicro();
+    mProfileTimes["Post-process"] = timer.getMicro();
     timer.reset();
 
     // Window::getInstance().setTitle("geometry pass:" + std::to_string(mGPassTime) +

@@ -66,7 +66,7 @@ option(BUILD_CPU_DEMOS OFF)
 option(BUILD_EXTRAS OFF)
 option(BUILD_OPENGL3_DEMOS OFF)
 option(BUILD_UNIT_TESTS OFF)
-#add_subdirectory(Dependencies/bullet)
+add_subdirectory(Dependencies/bullet3)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -91,7 +91,7 @@ endif()
 include_directories(src/
                     ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/assimp/include/
                     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/assimp/include/
-                    Dependencies/bullet/src/
+                    Dependencies/bullet3/src/
                     Dependencies/
                     Dependencies/glad/include/
                     Dependencies/glfw/include/
@@ -148,8 +148,8 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                
 target_link_libraries(${PROJECT_NAME} glfw assimp
 #                               ${GLFW_LIBRARIES}
-                               ${GLAD_LIBRARIES})
-#                      BulletDynamics BulletCollision LinearMath)
+                               ${GLAD_LIBRARIES}
+                      BulletDynamics BulletCollision LinearMath)
                                
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

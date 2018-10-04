@@ -32,12 +32,12 @@ class Light : public ILight
 {
   public:
     Light() = delete;
-    Light(int type, Vec3 *pos, Vec3 *color);  //, Vec3 *amb, Vec3 *diff, Vec3 *spec);
-    ~Light() = default;                       //{ mIDCounter--; };
-    Light(const Light &) = delete;            // copy ctor
-    Light(Light &&other);                     // move ctor
-    Light &operator=(Light const &) = delete; // copy assignment op
-    Light &operator=(Light &&other);          // move assignment op
+    Light(uint64_t id, int type, Vec3 *pos, Vec3 *color); //, Vec3 *amb, Vec3 *diff, Vec3 *spec);
+    ~Light() = default;                                   //{ mIDCounter--; };
+    Light(const Light &) = delete;                        // copy ctor
+    Light(Light &&other);                                 // move ctor
+    Light &operator=(Light const &) = delete;             // copy assignment op
+    Light &operator=(Light &&other);                      // move assignment op
 
     const Vec3 *getPosition() const { return mPosition; };
     const Vec3 *getColor() const { return mColor; };

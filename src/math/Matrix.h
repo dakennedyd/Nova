@@ -67,6 +67,8 @@ class Mat4
     Mat4 calcNormalMatrix() const;
     // friend Mat4 operator*(const Vec4& left, Mat4& right);
     const float *getDataPtr() const;
+    void setDataPtr(float *data);
+    // float *getNonConstDataPtr() const { return mData; }
 
     void debugPrint() const;
     static Mat4 makePerspectiveMatrix(const float vertFOV, const float aspectRatio,

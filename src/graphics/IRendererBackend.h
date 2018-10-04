@@ -22,7 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 
 #pragma once
-#include <vector>
+//#include <vector>
+#include <unordered_map>
 namespace Nova
 {
 struct Skybox;
@@ -34,7 +35,7 @@ class IRendererBackend
     virtual void init() = 0;
     virtual void render() = 0;
     virtual void setSkyBox(const Skybox &skyBox) = 0;
-    virtual std::vector<std::pair<std::string, long>> &getProfileTimes() = 0;
+    virtual std::unordered_map<std::string, long> &getProfileTimes() = 0;
     // virtual void setSkyBox(std::shared_ptr<TextureCube> skyBox) = 0;
     // virtual void setIBLData(std::shared_ptr<IBL_Data> data) = 0; NOO
     // virtual std::uint64_t addLight(ILight light) = 0;

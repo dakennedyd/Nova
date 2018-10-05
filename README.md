@@ -6,10 +6,6 @@
 	<meta name="generator" content="LibreOffice 5.1.6.2 (Linux)"/>
 	<meta name="created" content="2018-10-04T19:59:48.175005066"/>
 	<meta name="changed" content="2018-10-04T20:11:25.121003403"/>
-	<style type="text/css">
-		@page { margin: 0.79in }
-		p { margin-bottom: 0.1in; line-height: 120% }
-	</style>
 </head>
 <body lang="en-US" dir="ltr">
 <p style="margin-bottom: 0in; line-height: 100%">Nova is a very small

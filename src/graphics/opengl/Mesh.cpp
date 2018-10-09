@@ -83,7 +83,7 @@ Mesh::Mesh(Mesh &&otherMesh)
     : mVAO(otherMesh.mVAO), mSize(otherMesh.mSize), mNumIndices(otherMesh.mNumIndices),
       mState(std::move(otherMesh.mState)), mColor(std::move(otherMesh.mColor))
 {
-    otherMesh.mVAO = 0;
+    otherMesh.mVAO = -1;
 }
 
 void Mesh::bind() const { glBindVertexArray(mVAO); }
@@ -136,6 +136,7 @@ Mesh Mesh::makeBox(const float length, const float width, const float height,
     float h = height / 2.0f;
 
     return Mesh(
+        // vertices
         std::vector<GLfloat>{// front
                              -w, -h, l, w, -h, l, w, h, l, -w, h, l,
                              // top
@@ -148,6 +149,7 @@ Mesh Mesh::makeBox(const float length, const float width, const float height,
                              -w, -h, -l, -w, -h, l, -w, h, l, -w, h, -l,
                              // right
                              w, -h, l, w, -h, -l, w, h, -l, w, h, l},
+        // indices
         std::vector<GLuint>{// front
                             0, 1, 2, 2, 3, 0,
                             // top
@@ -160,6 +162,7 @@ Mesh Mesh::makeBox(const float length, const float width, const float height,
                             16, 17, 18, 18, 19, 16,
                             // right
                             20, 21, 22, 22, 23, 20},
+        // normals
         std::vector<GLfloat>{// front
                              0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
                              // top
@@ -172,6 +175,7 @@ Mesh Mesh::makeBox(const float length, const float width, const float height,
                              -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
                              // right
                              1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0},
+        // textures coords
         std::vector<GLfloat>{0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
                              1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
                              0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
@@ -185,15 +189,16 @@ Mesh Mesh::makeIcosahedron(const float size)
     // const float z = 0.5f*radius;
     // const float x = z*0.6f*radius;
 
-    return Mesh(std::vector<GLfloat>{-x,0.0f,z,   x,0.0f,z,   -x,0.0f,-z,    x,0.0f,-z,
-											 0.0f,z,x,   0.0,z,-x,    0.0f,-z,x,    0.0f,-z,-x,
-											 z,x,0.0f,  -z,x,0.0f,    z,-x,0.0f,   -z,-x,0.0f },				
-					std::vector<GLuint> {0, 1,4,  0,4,9,   9,4,5,   4,8,5,   4,1,8,
-											8,1,10,  8,10,3,  5,8,3,   5,3,2,   2,3,7,
-											7,3,10,  7,10,6,  7,6,11,  11,6,0,  0,6,1,
-											6,10,1,  9,11,0,  9,2,11,  9,5,2,   7,11,2}/*,
-					std::array<GLfloat, 24> {0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-											0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f}*/);
+    return Mesh(
+        std::vector<GLfloat>{-x,   0.0f, z,    x,   0.0f, z,    -x,   0.0f, -z,   x,    0.0f, -z,
+                             0.0f, z,    x,    0.0, z,    -x,   0.0f, -z,   x,    0.0f, -z,   -x,
+                             z,    x,    0.0f, -z,  x,    0.0f, z,    -x,   0.0f, -z,   -x,   0.0f},
+        std::vector<GLuint>{0, 1, 4, 0, 4, 9, 9,  4, 5, 4,  8, 5, 4,  1,  8,  8, 1, 10, 8,  10,
+                            3, 5, 8, 3, 5, 3, 2,  2, 3, 7,  7, 3, 10, 7,  10, 6, 7, 6,  11, 11,
+                            6, 0, 0, 6, 1, 6, 10, 1, 9, 11, 0, 9, 2,  11, 9,  5, 2, 7,  11, 2},
+        std::vector<GLfloat>{0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f,
+                             1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f,
+                             0.0f, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f});
 }
 
 Mesh Mesh::makeSkyBoxMesh()
@@ -212,48 +217,12 @@ Mesh Mesh::makeSkyBoxMesh()
             -1.0, 1.0, -1.0,  // 7
         },
         std::vector<GLuint>{
-            // front
-            0,
-            2,
-            1,
-            2,
-            0,
-            3,
-            // top
-            1,
-            6,
-            5,
-            6,
-            1,
-            2,
-            // back
-            7,
-            5,
-            6,
-            5,
-            7,
-            4,
-            // bottom
-            4,
-            3,
-            0,
-            3,
-            4,
-            7,
-            // left
-            4,
-            1,
-            5,
-            1,
-            4,
-            0,
-            // right
-            3,
-            6,
-            2,
-            6,
-            3,
-            7,
+            0, 2, 1, 2, 0, 3, // front
+            1, 6, 5, 6, 1, 2, // top
+            7, 5, 6, 5, 7, 4, // back
+            4, 3, 0, 3, 4, 7, // bottom
+            4, 1, 5, 1, 4, 0, // left
+            3, 6, 2, 6, 3, 7, // right
         });
 }
 
@@ -322,7 +291,7 @@ Mesh Mesh::makeIcoSphere(const float radius, const int iterations)
         indices.erase(indices.begin(), indices.begin() + indicesSize);
     }
 
-    return Mesh(vertices, indices);
+    return Mesh{vertices, indices};
 }
 
 Mesh Mesh::makeQuad(const float width, const float height,

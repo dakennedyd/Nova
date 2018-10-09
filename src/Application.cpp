@@ -90,9 +90,10 @@ void Application::World::destroyEntity(Entity &entity)
 Entity &Application::World::getEntity(const std::string &name)
 {
     // return mEntities.at(SID(name.c_str()));
-    if (mEntities.find(SID(name.c_str())) != mEntities.end()) // does the entity exist?
+    auto it = mEntities.find(SID(name.c_str()));
+    if (it != mEntities.end()) // does the entity exist?
     {
-        return mEntities.find(SID(name.c_str()))->second;
+        return it->second;
     }
     else
     {
@@ -234,7 +235,7 @@ void Application::startUp()
 
         LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
         this->mIsInitialized = true;
-        }
+    }
 }
 void Application::startMainLoop()
 {

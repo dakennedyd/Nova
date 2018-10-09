@@ -23,6 +23,7 @@
 
 #pragma once
 #include "ECS/IComponent.h"
+#include "logger/Logger.h"
 #include "math/Matrix.h"
 #include "math/Quaternion.h"
 #include "math/Vector.h"
@@ -89,12 +90,30 @@ class Entity
 
     /*Gets a component of the type specified. If the type specified does not exist then
     it launches an error*/
-    template <typename T> T &GetComponent()
+    template <typename T> T &getComponent()
     {
         static_assert(
             std::is_base_of<IComponent, T>::value,
             "Invalid Component: a valid component has to be a subclass of IComponent class");
+        // if (!containsComponent<T>())
+        // {
+        //     LOG_ERROR("trying to get non existent component");
+        //     std::exit(1);
+        // }
         return *(static_cast<T *>(mComponents.at(std::type_index(typeid(T)))));
+    }
+
+    template <typename T> bool containsComponent()
+    {
+        // auto search = mComponents.find(std::type_index(typeid(T)));
+        if (mComponents.find(std::type_index(typeid(T))) != mComponents.end())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /*-----------------FIX THIS MESS!!------------------------------*/

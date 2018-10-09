@@ -82,17 +82,19 @@ struct LightComponent final : public IComponent
 struct PhysicalComponent final : public IComponent
 {
     PhysicalComponent() = delete;
-    PhysicalComponent(float mass, PhysicalShape shape, Vec3 dimensions,
-                      Vec3 localInertia = Vec3(0.0f))
+    PhysicalComponent(float mass, PhysicalShape shape, const Vec3 &dimensions,
+                      float friction = 0.0f, float restitution = 0.0f,
+                      const std::function<void(int, int)> callback = nullptr)
         : mass(mass), shape(shape),
-          dimensions(dimensions.getX(), dimensions.getY(), dimensions.getZ()),
-          localInertia(localInertia.getX(), localInertia.getY(), localInertia.getZ())
+          dimensions(dimensions.getX(), dimensions.getY(), dimensions.getZ()), friction(friction),
+          restitution(restitution), callback(callback)
     {
     }
     float mass;
     PhysicalShape shape;
     Vec3 dimensions;
-    Vec3 localInertia;
-    // friction coeficient?
+    float friction;
+    float restitution;
+    std::function<void(int, int)> callback;
 };
 } // namespace Nova

@@ -32,12 +32,13 @@ class Light : public ILight
 {
   public:
     Light() = delete;
-    Light(uint64_t id, int type, Vec3 *pos, Vec3 *color); //, Vec3 *amb, Vec3 *diff, Vec3 *spec);
-    ~Light() = default;                                   //{ mIDCounter--; };
-    Light(const Light &) = delete;                        // copy ctor
-    Light(Light &&other);                                 // move ctor
-    Light &operator=(Light const &) = delete;             // copy assignment op
-    Light &operator=(Light &&other);                      // move assignment op
+    Light(uint64_t id, int type, Vec3 *pos,
+          Vec3 *color);                       //, Vec3 *amb, Vec3 *diff, Vec3 *spec);
+    ~Light() = default;                       //{ mIDCounter--; };
+    Light(const Light &) = delete;            // copy ctor
+    Light(Light &&other);                     // move ctor
+    Light &operator=(Light const &) = delete; // copy assignment op
+    Light &operator=(Light &&other);          // move assignment op
 
     const Vec3 *getPosition() const { return mPosition; };
     const Vec3 *getColor() const { return mColor; };
@@ -46,7 +47,7 @@ class Light : public ILight
     const Vec3 *getSpecularColor() const;*/
     const int getTypeCode() const { return mType; };
 
-    const std::uint64_t getID() const { return mID; };
+    const uint64_t getID() const { return mID; };
     /*float mConstant = 1.0f;
     float mLinear = 0.7f;
     float mQuadratic = 1.1f;*/
@@ -57,10 +58,10 @@ class Light : public ILight
     Vec3 *mDiffuse;
     Vec3 *mSpecular;*/
 
+    uint64_t mID;
     Vec3 *mPosition;
     Vec3 *mColor;
     int mType;
-    std::uint64_t mID;
     // static std::uint64_t mIDCounter;
 };
 } // namespace Nova

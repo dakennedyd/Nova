@@ -51,11 +51,16 @@ class ResourceManager : public ISingleton<ResourceManager>, public ISubSystem
     void startUp() override;
     void shutDown() override{};
 
-    /* retrieve the object that corresponds to the name passed as the argument
-    if the object is not yet loaded in memory it loads it
-    note that name is also the name of the resource file that the returned
-    object manages
-    */
+    /**
+     * @brief retrieve the object that corresponds to the name passed as the argument
+     if the object is not yet loaded in memory it loads it
+     note that name is also the name of the resource file that the returned
+     object manages
+     *
+     * @tparam T
+     * @param name
+     * @return std::shared_ptr<T>
+     */
     template <typename T> std::shared_ptr<T> get(const std::string &name)
     {
         uint32_t key = SID(name.c_str());
@@ -69,10 +74,11 @@ class ResourceManager : public ISingleton<ResourceManager>, public ISubSystem
             }
             else
             {
-                XMLNode metaDataNode = iterator->second->metaData;
-                std::shared_ptr<ResourceBase> resource = iterator->second->load(metaDataNode);
-                iterator->second->resourcePointer = resource;
-                return std::dynamic_pointer_cast<T>(resource); // this is probably a bad idea :/
+                XMLNode &metaDataNode = iterator->second->metaData;
+                // std::shared_ptr<ResourceBase> resource = iterator->second->load(metaDataNode);
+                iterator->second->resourcePointer = iterator->second->load(metaDataNode);
+                return std::dynamic_pointer_cast<T>(
+                    iterator->second->resourcePointer); // this is probably a bad idea :/
             }
         }
         else
@@ -87,29 +93,31 @@ class ResourceManager : public ISingleton<ResourceManager>, public ISubSystem
         }
     }
 
-    template <typename T, typename... Params>
-    void registerResource(const std::string &name, Params &&... parameters)
-    {
-        uint32_t key = SID(name.c_str());
-        auto iterator = mResources.find(key);
-        if (iterator != mResources.end()) // is the resource already loaded?
-        {
-            // return std::dynamic_pointer_cast<T>(iterator->second->resourcePointer);
-        }
-        else
-        {
-            mResourcesRegistered++;
-            std::shared_ptr<ResourceData> resourceData = std::make_shared<ResourceData>();
-            resourceData->resourcePointer =
-                std::make_shared<T>(std::forward<Params>(parameters)...);
-            mResources.emplace(std::make_pair(key, resourceData));
-            // constructs the object in place
-            // const auto& resource = mResources.emplace(std::make_pair(key,
-            // std::make_shared<T>(std::forward<Params>(parameters)...))).first; mUsedBytes +=
-            // (sizeof(resource->first) + sizeof(static_cast<T&>(*(resource->second)))); return
-            // std::dynamic_pointer_cast<T>(resourceData->resourcePointer);
-        }
-    }
+    // template <typename T, typename... Params>
+    // void registerResource(const std::string &name, Params &&... parameters)
+    // {
+    //     uint32_t key = SID(name.c_str());
+    //     auto iterator = mResources.find(key);
+    //     if (iterator != mResources.end()) // is the resource already registered?
+    //     {
+    //         // return std::dynamic_pointer_cast<T>(iterator->second->resourcePointer);
+    //         LOG_WARNING("Trying to register already loaded resource "
+    //                     << iterator->second->metaData.getName());
+    //     }
+    //     else
+    //     {
+    //         mResourcesRegistered++;
+    //         std::shared_ptr<ResourceData> resourceData = std::make_shared<ResourceData>();
+    //         resourceData->resourcePointer =
+    //             std::make_shared<T>(std::forward<Params>(parameters)...);
+    //         mResources.emplace(std::make_pair(key, resourceData));
+    //         // constructs the object in place
+    //         // const auto& resource = mResources.emplace(std::make_pair(key,
+    //         // std::make_shared<T>(std::forward<Params>(parameters)...))).first; mUsedBytes +=
+    //         // (sizeof(resource->first) + sizeof(static_cast<T&>(*(resource->second)))); return
+    //         // std::dynamic_pointer_cast<T>(resourceData->resourcePointer);
+    //     }
+    // }
 
     /**
     register a resource with the resource manager to be loaded
@@ -137,6 +145,10 @@ class ResourceManager : public ISingleton<ResourceManager>, public ISubSystem
                                                    << " resource loader not registered for type "
                                                    << metaData.getName());
             }
+        }
+        else
+        {
+            LOG_WARNING("resource:" << metaData.getAttributeValue("name") << " already registered");
         }
         return;
     }

@@ -27,11 +27,13 @@
 #include "ISubSystem.h"
 //#include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
+#include "logger/Logger.h"
 #include "math/Quaternion.h"
 #include "math/Vector.h"
-//#include <vector>
-#include "logger/Logger.h"
+#include <algorithm>
+#include <functional>
 #include <unordered_map>
+#include <vector>
 
 namespace Nova
 {
@@ -41,6 +43,7 @@ enum PhysicalShape
     CUBE,
     SPHERE,
     CAPSULE,
+    CONE,
     PLANE
 };
 struct PhysicsObject
@@ -74,13 +77,22 @@ struct PhysicsTransform
     UnitQuat rotation;
 };
 
-struct MyContactResultCallback : public btCollisionWorld::ContactResultCallback
+struct PhysicalContactCallback : public btCollisionWorld::ContactResultCallback
 {
-    // MyContactResultCallback(const int id) : mID(id) {}
+    PhysicalContactCallback(const std::function<void(int, int)> callback) : callback(callback) {}
     btScalar addSingleResult(btManifoldPoint &cp, const btCollisionObjectWrapper *colObj0Wrap,
                              int partId0, int index0, const btCollisionObjectWrapper *colObj1Wrap,
                              int partId1, int index1) override;
-    // int mID;
+    std::function<void(int, int)> callback;
+};
+
+struct CollisionAction
+{
+    uint32_t id;
+    // void *callback;
+    PhysicalContactCallback *callback;
+    // std::function<void(int, int)> callback;
+    btCollisionObject *body;
 };
 
 class Physics : public ISingleton<Physics>, public ISubSystem
@@ -93,9 +105,48 @@ class Physics : public ISingleton<Physics>, public ISubSystem
 
     void addObject(const uint64_t id, const PhysicalShape shape, const Vec3 &dimensions,
                    const Vec3 &scale, const Vec3 &translation, const UnitQuat &rotation,
-                   const float mass);
+                   const float mass, const float friction, const float restitution);
     void removeObject(const uint64_t id);
     void simulate(const float timeStep);
+
+    /**
+     * @brief add a callback for when a entity with id "id" collides with any other object
+     *
+     * @param id of the entity that colliding with any other entity
+     * @param callback that defines the action to take when the object collides
+     */
+    void addContactCallback(uint64_t id, std::function<void(int, int)> &callback)
+    {
+        // PhysicalContactCallback *c = new PhysicalContactCallback(callback);
+        // mCollisionActions.emplace_back(std::make_pair(id, new
+        // PhysicalContactCallback(callback)));
+        CollisionAction ca;
+        ca.id = id;
+        ca.body = mObjects.at(id).body;
+        ca.body->setCollisionFlags(
+            ca.body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK /*|
+            btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
+        // PhysicalContactCallback *pcc = new PhysicalContactCallback(callback);
+        ca.callback = new PhysicalContactCallback(callback);
+        mCollisionActions.push_back(ca);
+    }
+    void removeContactCallback(u_int64_t id)
+    {
+        auto pred = [id](const CollisionAction &item) { return item.id == id; };
+        // auto a = std::find_if(std::begin(mCollisionActions), std::end(mCollisionActions), pred)
+        // != std::end(mCollisionActions);
+        auto it = std::find_if(std::begin(mCollisionActions), std::end(mCollisionActions), pred);
+
+        // mCollisionActions.erase(std::remove(mCollisionActions.begin(), mCollisionActions.end(),
+        // it),mCollisionActions.end());
+
+        if (it != mCollisionActions.end())
+        {
+            delete it->callback;
+            std::swap(*it, mCollisionActions.back());
+            mCollisionActions.pop_back();
+        }
+    }
 
     PhysicsTransform getObjectTransform(const uint64_t id);
 
@@ -111,8 +162,8 @@ class Physics : public ISingleton<Physics>, public ISubSystem
     // std::vector<std::pair<uint64_t, PhysicsObject>> mObjects;
     std::unordered_map<uint64_t, PhysicsObject> mObjects;
 
-    PhysicsObject *limitPlane;
-    MyContactResultCallback *contactCallback;
+    std::vector<CollisionAction>
+        mCollisionActions; // stores the action callbacks, id and the collisionObject
 };
 
 } // namespace Nova

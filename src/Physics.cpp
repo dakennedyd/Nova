@@ -53,20 +53,20 @@ void Physics::startUp()
 
     //===================================================================
 
-    contactCallback = new MyContactResultCallback();
-    limitPlane = new PhysicsObject;
-    limitPlane->shape = new btStaticPlaneShape(btVector3(0.0, 1.0, 0.0), -15.0);
-    // limitPlane->shape = new btBoxShape(btVector3(20.0, .1, 20.0));
-    limitPlane->mass = 0;
-    limitPlane->transform.setIdentity();
-    limitPlane->motionState = new btDefaultMotionState(limitPlane->transform);
-    limitPlane->bodyInfo = new btRigidBody::btRigidBodyConstructionInfo(
-        limitPlane->mass, limitPlane->motionState, limitPlane->shape, btVector3(0.0, 0.0, 0.0));
-    limitPlane->body = new btRigidBody(*limitPlane->bodyInfo);
-    mDynamicsWorld->addRigidBody(limitPlane->body);
-    limitPlane->body->setCollisionFlags(limitPlane->body->getCollisionFlags() |
-                                        btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK |
-                                        btCollisionObject::CF_NO_CONTACT_RESPONSE);
+    // contactCallback = new PhysicalContactCallback();
+    // limitPlane = new PhysicsObject;
+    // limitPlane->shape = new btStaticPlaneShape(btVector3(0.0, 1.0, 0.0), -15.0);
+    // // limitPlane->shape = new btBoxShape(btVector3(20.0, .1, 20.0));
+    // limitPlane->mass = 0;
+    // limitPlane->transform.setIdentity();
+    // limitPlane->motionState = new btDefaultMotionState(limitPlane->transform);
+    // limitPlane->bodyInfo = new btRigidBody::btRigidBodyConstructionInfo(
+    //     limitPlane->mass, limitPlane->motionState, limitPlane->shape, btVector3(0.0, 0.0, 0.0));
+    // limitPlane->body = new btRigidBody(*limitPlane->bodyInfo);
+    // mDynamicsWorld->addRigidBody(limitPlane->body);
+    // limitPlane->body->setCollisionFlags(limitPlane->body->getCollisionFlags() |
+    //                                     btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK |
+    //                                     btCollisionObject::CF_NO_CONTACT_RESPONSE);
 }
 void Physics::shutDown()
 {
@@ -79,7 +79,7 @@ void Physics::shutDown()
 
 void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3 &dimensions,
                         const Vec3 &scale, const Vec3 &translation, const UnitQuat &rotation,
-                        const float mass)
+                        const float mass, const float friction, const float restitution)
 {
     PhysicsObject object;
     if (shape == PhysicalShape::PLANE)
@@ -101,7 +101,12 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
     if (shape == PhysicalShape::CAPSULE)
     {
         object.shape = new btCapsuleShape(dimensions.getX(), dimensions.getY());
-        // btConeShape btCylinderShape
+        object.shape->setLocalScaling(btVector3(scale.getX(), scale.getY(), scale.getZ()));
+    }
+    if (shape == PhysicalShape::CONE)
+    {
+        object.shape = new btConeShape(dimensions.getX(), dimensions.getY());
+        object.shape->setLocalScaling(btVector3(scale.getX(), scale.getY(), scale.getZ()));
     }
     // object.transform.setFromOpenGLMatrix(transform);
     object.transform.setOrigin(
@@ -118,8 +123,8 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
     object.motionState = new btDefaultMotionState(object.transform);
     object.bodyInfo = new btRigidBody::btRigidBodyConstructionInfo(
         object.mass, object.motionState, object.shape, object.localInertia);
-    object.bodyInfo->m_restitution = 0.5f;
-    object.bodyInfo->m_friction = 1.5f;
+    object.bodyInfo->m_friction = friction;
+    object.bodyInfo->m_restitution = restitution;
     object.body = new btRigidBody(*object.bodyInfo);
     // object.body->setFriction(1.f);
     // object.body->setActivationState(DISABLE_DEACTIVATION);
@@ -141,8 +146,8 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
     mDynamicsWorld->addRigidBody(object.body);
     // mObjects.emplace_back(std::pair<uint64_t, PhysicsObject>(id, std::move(object)));
     mObjects[id] = object;
-    object.body->setCollisionFlags(object.body->getCollisionFlags() |
-                                   btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+    // object.body->setCollisionFlags(object.body->getCollisionFlags() |
+    //                                btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 }
 
 PhysicsTransform Physics::getObjectTransform(const uint64_t id)
@@ -212,40 +217,40 @@ void Physics::removeObject(const uint64_t id)
     delete mObjects.at(id).motionState;
     delete mObjects.at(id).bodyInfo;
     delete mObjects.at(id).id;
-    // delete mObjects.at(id).body;
+    delete mObjects.at(id).body;
     mObjects.erase(id);
 }
 
 void Physics::simulate(const float timeStep)
 {
     mDynamicsWorld->stepSimulation(timeStep);
-    // for (auto &object : mObjects)
-    // {
-    // }
-    mDynamicsWorld->contactTest(limitPlane->body, *contactCallback);
+    for (auto &collisionAction : mCollisionActions)
+    {
+        mDynamicsWorld->contactTest(collisionAction.body, *collisionAction.callback);
+    }
 }
 
-btScalar MyContactResultCallback::addSingleResult(btManifoldPoint &cp,
+btScalar PhysicalContactCallback::addSingleResult(btManifoldPoint &cp,
                                                   const btCollisionObjectWrapper *colObj0Wrap,
                                                   int partId0, int index0,
                                                   const btCollisionObjectWrapper *colObj1Wrap,
                                                   int partId1, int index1)
 {
-    uint32_t id;
-    if (colObj0Wrap->getCollisionObject()->getUserPointer())
-    {
-        id = *((uint32_t *)(((btRigidBody *)colObj0Wrap->getCollisionObject())->getUserPointer()));
-        // Physics::getInstance().removeObject(id);
-        // uint64_t x = SID(std::string("star").c_str());
-        // std::string entityName = Application::getInstance().getWorld().getEntity(id).getName();
-        // LOG_DEBUG("Contact:" << entityName);
+    uint32_t id1, id2;
+    // if (colObj0Wrap->getCollisionObject()->getUserPointer())
+    //{
+    // ugly cast incoming!
+    id1 = *((uint32_t *)(((btRigidBody *)colObj0Wrap->getCollisionObject())->getUserPointer()));
+    id2 = *((uint32_t *)(((btRigidBody *)colObj1Wrap->getCollisionObject())->getUserPointer()));
+    callback(id1, id2);
+    // LOG_DEBUG("Contact:" << entityName);
 
-        // Physics::getInstance().mDynamicsWorld->removeRigidBody(
-        //     (btRigidBody *)colObj0Wrap->getCollisionObject()->getUserIndex();
+    // Application::getInstance().getWorld().destroyEntity(
+    //     Application::getInstance().getWorld().getEntity(id));
 
-                Application::getInstance().getWorld().destroyEntity(
-            Application::getInstance().getWorld().getEntity(id));
-    }
+    // ((btRigidBody *)(colObj0Wrap->getCollisionObject()))
+    //     ->applyCentralImpulse(btVector3(0.0f, 1.0f, 0.0f));
+    //}
     return 0;
 }
 } // namespace Nova

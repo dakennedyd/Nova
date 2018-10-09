@@ -49,8 +49,8 @@ RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
 
     addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "uModel"),
                                              transform.finalTransform.getDataPtr()));
-    addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "uNormalMat"),
-                                             transform.normalMatrix.getDataPtr()));
+    // addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "uNormalMat"),
+    //                                          transform.normalMatrix.getDataPtr()));
     // addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "view"),
     //                                          gs.getCurrentCamera().view->getDataPtr()));
     // addParameter(new GPUProgramParameterMat4(glGetUniformLocation(id, "proj"),

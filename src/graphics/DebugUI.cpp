@@ -158,6 +158,9 @@ void DebugUI::drawGUI()
             ImGui::Text("post process:%ld us.", rpt["Post-process"]); // post process
 
             auto &apt = Application::getInstance().getProfileTimes();
+            ImGui::Text("render time:%.1f ms.",
+                        apt["Render time"] / 1000.0f); // render time
+
             ImGui::Text("entities update:%ld us.", apt["Entities update"]); // entity update
             profileTimes[3][profileTimesOffset[3]] = apt["Entities update"];
             profileTimesOffset[3] = (profileTimesOffset[3] + 1) % IM_ARRAYSIZE(profileTimes[3]);
@@ -170,8 +173,6 @@ void DebugUI::drawGUI()
             //                  profileTimesOffset[2], "post process", 0.0f, 5000.0f, ImVec2(0,
             //                  40));
 
-            ImGui::Text("render time:%.1f ms.",
-                        apt["Render time"] / 1000.0f); // render time
             // ImGui::Text("Frametime:%.2f ms. (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
             //             ImGui::GetIO().Framerate); // frametime
             ImGui::Text("Frametime:%.2f ms.", 1000.0f / ImGui::GetIO().Framerate); // frametime

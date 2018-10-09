@@ -45,7 +45,7 @@ class RendererFrontend : public IRendererFrontend
     //     auto &graphicsSystem = GraphicsSystem::getInstance();
     //     for (auto &numberEntityPair : lightEntities) // for each entity that produces light
     //     {
-    //         auto &lc = numberEntityPair.second->GetComponent<LightComponent>();
+    //         auto &lc = numberEntityPair.second->getComponent<LightComponent>();
     //         // int type = 1;
     //         // if (lc.type == LightType::POINT_LIGHT) type = 1;
     //         // else if(lc.type == LightType::DIRECTIONAL_LIGHT) type = 0;
@@ -60,7 +60,7 @@ class RendererFrontend : public IRendererFrontend
     //     visualSystem->getEntities(); for (auto &idEntityPair : visualEntities) // for each
     //     registered renderable entity
     //     {
-    //         auto &vc = idEntityPair.second->GetComponent<VisualComponent>();
+    //         auto &vc = idEntityPair.second->getComponent<VisualComponent>();
     //         graphicsSystem.addPacket(
     //             RenderPacket{vc.mesh, vc.material, idEntityPair.second->getTransformStruct()});
     //     }

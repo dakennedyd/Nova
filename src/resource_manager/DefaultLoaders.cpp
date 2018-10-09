@@ -207,6 +207,7 @@ std::shared_ptr<ResourceBase> loadMesh(const XMLNode &metadata)
     {
         std::string src{MODELS_PATH + metadata.getChildElement("src").getText()};
         return loadModel(src);
+        // return std::make_shared<Mesh>(Mesh::makeIcosahedron());
     }
     else
     {

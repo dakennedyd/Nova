@@ -53,7 +53,7 @@ class VisualSystem final : public System
     void onRegister(Entity *entity) override
     {
         // creates a RenderPacket based on this component data and adds it to the renderer's list
-        auto &vc = entity->GetComponent<VisualComponent>();
+        auto &vc = entity->getComponent<VisualComponent>();
         RenderPacket packet{vc.mesh, vc.material, entity->getTransformStruct()};
         vc.packetID = packet.getID();
         GraphicsSystem::getInstance().addPacket(std::move(packet));
@@ -61,7 +61,7 @@ class VisualSystem final : public System
 
     void onUnregister(Entity *entity) override
     {
-        auto &vc = entity->GetComponent<VisualComponent>();
+        auto &vc = entity->getComponent<VisualComponent>();
         GraphicsSystem::getInstance().removePacket(vc.packetID);
     }
 };
@@ -73,7 +73,7 @@ class LightSystem final : public System
     void onRegister(Entity *entity) override
     {
         // creates a light object and adds it to the renderer list
-        LightComponent &lc = entity->GetComponent<LightComponent>();
+        LightComponent &lc = entity->getComponent<LightComponent>();
         Light light{entity->getID(), lc.type,
                     &(entity->getNonConstTransformStruct().finalTranslation), &(lc.color)};
         lc.lightID = light.getID();
@@ -88,7 +88,7 @@ class LightSystem final : public System
 
     void onUnregister(Entity *entity) override
     {
-        LightComponent &lc = entity->GetComponent<LightComponent>();
+        LightComponent &lc = entity->getComponent<LightComponent>();
         // lc.color = Vec3(0.0f);
         GraphicsSystem::getInstance().removeLight(lc.lightID);
 
@@ -103,14 +103,14 @@ class RotationSystem final : public System
 {
     void processEntity(Entity *entity) override
     {
-        RotationComponent &rotComponent = entity->GetComponent<RotationComponent>();
+        RotationComponent &rotComponent = entity->getComponent<RotationComponent>();
         float t = SIMULATION_TIME_STEP * 0.001f; // 1 RPM
         entity->rotate(rotComponent.axis, toRadians(rotComponent.speed * t * 6));
     }
 
     void onRegister(Entity *entity) override
     {
-        entity->GetComponent<RotationComponent>().axis.normalizeSelf();
+        entity->getComponent<RotationComponent>().axis.normalizeSelf();
     }
 
     void onUnregister(Entity *entity) override {}
@@ -130,7 +130,7 @@ class PlayerInputSystem final : public System
         // Vec3 dir = mouseVector2 ^ entity->getTransformStruct().forward;
         // dir.normalizeSelf();
 
-        MovementComponent &m = entity->GetComponent<MovementComponent>();
+        MovementComponent &m = entity->getComponent<MovementComponent>();
         UnitQuat pitch(-mouseVector.getY() * mouse.getSensitivity(), 0.0f, 0.0f);
         UnitQuat yaw(0.0f, mouseVector.getX() * mouse.getSensitivity(), 0.0f);
 
@@ -166,7 +166,7 @@ class CameraSystem final : public System
     void processEntity(Entity *entity) override
     {
         // updates the view matrix
-        CameraComponent &camera = entity->GetComponent<CameraComponent>();
+        CameraComponent &camera = entity->getComponent<CameraComponent>();
         auto &ts = entity->getNonConstTransformStruct();
         // Vec3 pos{ts.finalTransform.getTranslation()};
         Vec3 pos{ts.finalTranslation};
@@ -212,17 +212,29 @@ class PhysicalSystem final : public System
     }
     void onRegister(Entity *entity) override
     {
-        auto &pc = entity->GetComponent<PhysicalComponent>();
+        auto &pc = entity->getComponent<PhysicalComponent>();
 
         // Physics::getInstance().addObject(entity->getID(), pc.shape, Vec3(1.0f),
         //                                  entity->getFinalTransform().getDataPtr(), pc.mass);
         Physics::getInstance().addObject(
             entity->getID(), pc.shape, pc.dimensions, entity->getTransformStruct().scale,
-            entity->getTransformStruct().translation, entity->getRotation(), pc.mass);
+            entity->getTransformStruct().translation, entity->getRotation(), pc.mass, pc.friction,
+            pc.restitution);
+
+        if (pc.callback)
+        {
+            Physics::getInstance().addContactCallback(entity->getID(), pc.callback);
+        }
     }
 
     void onUnregister(Entity *entity) override
     {
+
+        auto &pc = entity->getComponent<PhysicalComponent>();
+        if (pc.callback)
+        {
+            Physics::getInstance().removeContactCallback(entity->getID());
+        }
         Physics::getInstance().removeObject(entity->getID());
     }
 };

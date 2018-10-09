@@ -150,7 +150,7 @@ int main()
 
                 GraphicsSystem::getInstance().setCurrentCamera(
                     &engine.getWorld().getEntity("fpsCamera"));
-                Window::getInstance().hideCursor();
+                // Window::getInstance().hideCursor();
             }
         }
         if (keyboard.getKeyState(Keys::KEY_F))
@@ -159,29 +159,28 @@ int main()
             objCount++;
             Entity &thing = engine.getWorld().createEntity("thing" + std::to_string(objCount));
             // LOG_DEBUG(std::to_string(j + i*j));
-            thing.setPosition(Vec3(rnd.nextFloat(-5.0, 5.0), 2.0f, rnd.nextFloat(-5.0, 5.0)));
+            thing.setPosition(Vec3(rnd.nextFloat(-5.0, 5.0), 5.0f, rnd.nextFloat(-5.0, 5.0)));
             thing.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(45.0f)));
             thing.addComponent<RotationComponent>();
-            thing.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
-            thing.GetComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
+            thing.getComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
+            thing.getComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
             // engine.getWorld().GetSystem<RotationSystem>()->registerEntity(thing);
             if (rnd.nextDouble() > .5)
             {
                 thing.setScale(1.0f);
                 thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
                                                     rm.get<Material>("materials/yellow_plastic"));
-                thing.addComponent<PhysicalComponent>(1.0f, PhysicalShape::CUBE,
-                                                      thing.getTransformStruct().scale / 4.0f,
-                                                      thing.getTransformStruct().scale);
+                thing.addComponent<PhysicalComponent>(
+                    1.0f, PhysicalShape::CUBE, thing.getTransformStruct().scale / 4.0f, 1.5f, 0.5f);
             }
             else
             {
                 thing.setScale(0.5f);
-                thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/sphere"),
+                thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/icosphere"),
                                                     rm.get<Material>("materials/worn_cement"));
-                thing.addComponent<PhysicalComponent>(1.0f, PhysicalShape::SPHERE,
-                                                      thing.getTransformStruct().scale,
-                                                      thing.getTransformStruct().scale);
+                thing.addComponent<PhysicalComponent>(1.0f, PhysicalShape::CUBE,
+                                                      Vec3(.5f, .5f, .25f), 1.5f, 0.5f);
+                // thing.getTransformStruct().scale
             }
             engine.getWorld().GetSystem<VisualSystem>()->registerEntity(thing);
             engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(thing);
@@ -193,7 +192,7 @@ int main()
                                                         (float)rnd.nextDouble(0.1, 1.0),
                                                         (float)rnd.nextDouble(0.1, 1.0)},
                                                    false);
-                engine.getWorld().GetSystem<LightSystem>()->registerEntity(thing);
+                // engine.getWorld().GetSystem<LightSystem>()->registerEntity(thing);
             }
         }
         if (keyboard.getKeyState(Keys::KEY_R))
@@ -210,14 +209,14 @@ int main()
             /*if (changeMeshMaterial)
                     {
                             changeMeshMaterial = false;
-                            world.getEntity("star").GetComponent<VisualComponent>().mesh =
+                            world.getEntity("star").getComponent<VisualComponent>().mesh =
                ResourceManager::getInstance().get<Mesh>("angel");
                             world.GetSystem<VisualSystem>()->unregisterEntity(world.getEntity("star"));
                             world.GetSystem<VisualSystem>()->registerEntity(world.getEntity("star"));
                     }
                     else {
                             changeMeshMaterial = true;
-                            world.getEntity("star").GetComponent<VisualComponent>().mesh =
+                            world.getEntity("star").getComponent<VisualComponent>().mesh =
                ResourceManager::getInstance().get<Mesh>("bunny");
                             world.GetSystem<VisualSystem>()->unregisterEntity(world.getEntity("star"));
                             world.GetSystem<VisualSystem>()->registerEntity(world.getEntity("star"));
@@ -249,7 +248,7 @@ int main()
     engine.getWorld().GetSystem<CameraSystem>()->registerEntity(
         engine.getWorld().getEntity("fpsCamera"));
     fpsCamera.addComponent<MovementComponent>();
-    fpsCamera.GetComponent<MovementComponent>().speed = 2.0f;
+    fpsCamera.getComponent<MovementComponent>().speed = 2.0f;
     // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(fpsCamera);
 
     // GraphicsSystem::getInstance().setCurrentCamera(&fpsCamera);
@@ -260,57 +259,72 @@ int main()
                                         rm.get<Material>("materials/orange_plastic"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(floor);
     floor.setPosition(Vec3(0.0f, 0.0f, 0.0f));
-    floor.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(5.0f, 5.0f, 0.001f),
-                                          floor.getTransformStruct().scale);
+    floor.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(5.0f, 5.0f, 0.001f), 1.5f,
+                                          0.5f);
     engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(floor);
 
-    Entity &star = engine.getWorld().createEntity("star");
-    star.setPosition(Vec3{0.0f, 2.0f, 0.0f});
-    star.addComponent<VisualComponent>(rm.get<Mesh>("meshes/sphere"),
-                                       rm.get<Material>("materials/worn_cement"));
-    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(star);
-    star.addComponent<PhysicalComponent>(1.0f, PhysicalShape::SPHERE, Vec3(0.5f),
-                                         star.getTransformStruct().scale);
-    engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(star);
+    // Entity &star = engine.getWorld().createEntity("star");
+    // star.setPosition(Vec3{0.0f, 2.0f, 0.0f});
+    // star.addComponent<VisualComponent>(rm.get<Mesh>("meshes/bunny"),
+    //                                    rm.get<Material>("materials/worn_cement"));
+    // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(star);
+    // star.addComponent<PhysicalComponent>(5.0f, PhysicalShape::CUBE, Vec3(.5f, .5f, .25f), 1.5f,
+    //                                      0.5f);
+    // engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(star);
 
-    Entity &ship = engine.getWorld().createEntity("ship");
-    ship.setPosition(Vec3{-1.0f, 0.0f, -2.0f});
-    ship.setScale(0.25f);
-    ship.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
-                                       rm.get<Material>("materials/yellow_plastic"));
-    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship);
-    ship.addComponent<MovementComponent>();
-    ship.GetComponent<MovementComponent>().speed = 2.0f;
-    // ship.addComponent<PhysicalComponent>(1.0f, PhysicalShape::CUBE, Vec3(0.25f),
-    // ship.getTransformStruct().scale);
-    // engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(ship);
+    // Entity &planeOfDestruction = engine.getWorld().createEntity("planeOfDestruction");
+    // planeOfDestruction.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(90.0f)));
+    // planeOfDestruction.setPosition(Vec3(0.0f, -5.0f, 0.0f));
+    // // planeOfDestruction.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
+    // // rm.get<Material>("materials/worn_cement"));
+    // // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(planeOfDestruction);
+    // planeOfDestruction.addComponent<PhysicalComponent>(
+    //     0.0f, PhysicalShape::CUBE, Vec3(200.5f, 200.01f, 0.0025f), 1.5f, 0.5f,
+    //     [](int id1, int id2) {
+    //         auto &engine = Application::getInstance();
+    //         auto &e = engine.getWorld().getEntity(id2);
+    //         engine.getWorld().destroyEntity(e);
+    //     });
+    // engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(planeOfDestruction);
 
-    // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(ship);
-    Entity &ship2 = engine.getWorld().createEntity("ship2");
-    engine.getWorld().attachEntities(ship, engine.getWorld().getEntity("ship2"),
-                                     PropagationType::POSITION_ROTATION_SCALING);
+    // Entity &ship = engine.getWorld().createEntity("ship");
+    // ship.setPosition(Vec3{-1.0f, 0.0f, -2.0f});
+    // ship.setScale(0.25f);
+    // ship.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
+    //                                    rm.get<Material>("materials/yellow_plastic"));
+    // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship);
+    // ship.addComponent<MovementComponent>();
+    // ship.getComponent<MovementComponent>().speed = 2.0f;
+    // // ship.addComponent<PhysicalComponent>(1.0f, PhysicalShape::CUBE, Vec3(0.25f),
+    // // 1.5f, 0.5f);
+    // // engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(ship);
 
-    ship2.setPosition(Vec3{1.0f, 0.0f, 2.0f});
-    // ship2.setScale(0.25f);
-    ship2.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
-                                        rm.get<Material>("materials/worn_cement"));
-    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship2);
-    ship2.addComponent<MovementComponent>();
-    ship2.GetComponent<MovementComponent>().speed = 2.0f;
-    // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(ship2);
-    // engine.getWorld().attachEntities(ship2, engine.getWorld().getEntity("fpsCamera"),
+    // // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(ship);
+    // Entity &ship2 = engine.getWorld().createEntity("ship2");
+    // engine.getWorld().attachEntities(ship, engine.getWorld().getEntity("ship2"),
     //                                  PropagationType::POSITION_ROTATION_SCALING);
 
-    // star.addComponent<RotationComponent>();
-    // star.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
-    // star.GetComponent<RotationComponent>().speed = 1.0f;
-    // engine.getWorld().GetSystem<RotationSystem>()->registerEntity(star);
+    // ship2.setPosition(Vec3{1.0f, 0.0f, 2.0f});
+    // // ship2.setScale(0.25f);
+    // ship2.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
+    //                                     rm.get<Material>("materials/worn_cement"));
+    // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(ship2);
+    // ship2.addComponent<MovementComponent>();
+    // ship2.getComponent<MovementComponent>().speed = 2.0f;
+    // // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(ship2);
+    // // engine.getWorld().attachEntities(ship2, engine.getWorld().getEntity("fpsCamera"),
+    // //                                  PropagationType::POSITION_ROTATION_SCALING);
+
+    // // star.addComponent<RotationComponent>();
+    // // star.getComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
+    // // star.getComponent<RotationComponent>().speed = 1.0f;
+    // // engine.getWorld().GetSystem<RotationSystem>()->registerEntity(star);
 
     Entity &rotationAnchor = engine.getWorld().createEntity("rotation_anchor");
     rotationAnchor.setPosition(Vec3(0.0f, 1.0f, 0.0f));
     rotationAnchor.addComponent<RotationComponent>();
-    rotationAnchor.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
-    rotationAnchor.GetComponent<RotationComponent>().speed = 2.0f;
+    rotationAnchor.getComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
+    rotationAnchor.getComponent<RotationComponent>().speed = 2.0f;
     engine.getWorld().GetSystem<RotationSystem>()->registerEntity(rotationAnchor);
     engine.getWorld().attachEntities(rotationAnchor, engine.getWorld().getEntity("Default Camera"),
                                      PropagationType::POSITION_ROTATION);
@@ -328,8 +342,8 @@ int main()
             // LOG_DEBUG(std::to_string(j + i*j));
             anchor.setPosition(Vec3((float)j - x / 2.0f, 0.0f, (float)i - y / 2.0f));
             anchor.addComponent<RotationComponent>();
-            anchor.GetComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
-            anchor.GetComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
+            anchor.getComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
+            anchor.getComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
             engine.getWorld().GetSystem<RotationSystem>()->registerEntity(anchor);
             anchor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
                                                  rm.get<Material>("materials/aluminium"));

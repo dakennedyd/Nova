@@ -38,8 +38,8 @@ Light::Light(uint64_t id, int type, Vec3 *pos,
     // mIDCounter++;
 }
 Light::Light(Light &&other)
-    : mPosition(std::move(other.mPosition)), mColor(std::move(other.mColor)),
-      mType(std::move(other.mType)), mID(other.mID)
+    : mID(other.mID), mPosition(std::move(other.mPosition)), mColor(std::move(other.mColor)),
+      mType(std::move(other.mType))
 /*mAmbient(std::move(other.mAmbient)),
 mDiffuse(std::move(other.mDiffuse)), mSpecular(std::move(other.mSpecular)),
 mConstant(std::move(other.mConstant)), mLinear(std::move(other.mLinear)),
@@ -51,10 +51,10 @@ Light &Light::operator=(Light &&other)
 {
     if (&other != this)
     {
-        mType = std::move(other.mType);
+        mID = std::move(other.mID);
         mPosition = std::move(other.mPosition);
         mColor = std::move(other.mColor);
-        mID = std::move(other.mID);
+        mType = std::move(other.mType);
     }
     return *this;
 }

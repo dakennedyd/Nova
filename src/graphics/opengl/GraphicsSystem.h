@@ -101,8 +101,8 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     void setCurrentCamera(Entity *camera) override
     {
         // mCurrentCamera = camera;
-        mCamera.projection = &(camera->GetComponent<CameraComponent>().projection);
-        mCamera.view = &(camera->GetComponent<CameraComponent>().view);
+        mCamera.projection = &(camera->getComponent<CameraComponent>().projection);
+        mCamera.view = &(camera->getComponent<CameraComponent>().view);
         mCamera.position = &(camera->getNonConstTransformStruct().finalTranslation);
     };
     Camera &getCurrentCamera() override { return mCamera; };

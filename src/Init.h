@@ -37,8 +37,9 @@ static const std::string NOVA_DESCRIPTION_STRING("NOVA " + std::to_string(NOVA_V
 static const std::string DEFAULT_FILE_PATH("");
 static const std::string RESOURCES_PATH("Resources/");
 static const std::string TEXTURES_PATH(RESOURCES_PATH + "textures/");
-
 static const std::string MODELS_PATH(RESOURCES_PATH + "models/");
+static const std::string SOUNDS_PATH(RESOURCES_PATH + "sounds/");
+
 static const std::string LOGGER_OUTPUT_FILE_NAME(DEFAULT_FILE_PATH + "nova_log.txt");
 static const std::string CONFIGURATION_FILE_NAME(DEFAULT_FILE_PATH + "configuration.ini");
 static const std::string RESOURCE_INDEX_FILE_NAME(RESOURCES_PATH + "resource_index.xml");

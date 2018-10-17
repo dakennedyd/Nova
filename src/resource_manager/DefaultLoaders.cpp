@@ -40,6 +40,7 @@
 #    include "graphics/opengl/Texture.h"
 #    include "graphics/opengl/TextureCube.h"
 #endif
+#include "audio/SoundBuffer.h"
 #include "logger/Logger.h"
 #include "math/miscellaneous.h"
 #include "resource_manager/ResourceBase.h"
@@ -151,6 +152,7 @@ std::shared_ptr<ResourceBase> loadMaterial(const XMLNode &metadata)
         
 
 
+
         }*/
         // std::string textureName{ texture.getText() };
         // std::shared_ptr<ITexture> a = rm.get<ITexture>(textureName);
@@ -214,6 +216,22 @@ std::shared_ptr<ResourceBase> loadMesh(const XMLNode &metadata)
         LOG_WARNING("mesh resource " << name << " has an unrecognized type");
         return std::make_shared<Mesh>(Mesh::makeBox());
     }
+}
+
+std::shared_ptr<ResourceBase> loadSound(const XMLNode &metadata)
+{
+    std::string name = metadata.getAttributeValue("name");
+    // bool looped = false;
+    // std::string loopedString = metadata.getAttributeValue("looped");
+    // if (loopedString == "yes") looped = true;
+    // float gain = std::stof(metadata.getAttributeValue("gain"));
+    // float pitch = std::stof(metadata.getAttributeValue("pitch"));
+
+    // std::string fileName = metadata.getText();
+    std::string fileName{SOUNDS_PATH + metadata.getChildElement("filename").getText()};
+    LOG_DEBUG("loading sound:" << name);
+
+    return std::make_shared<SoundBuffer>(fileName);
 }
 
 } // namespace Nova

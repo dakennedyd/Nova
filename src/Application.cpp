@@ -42,6 +42,7 @@
 #    include "graphics/opengl/RendererBackendDeferred.h"
 #endif
 #include "Physics.h"
+#include "audio/Audio.h"
 #include "graphics/DebugUI.h"
 #include "resource_manager/ResourceManager.h"
 #include <thread>
@@ -192,6 +193,7 @@ void Application::startUp()
         InputSystem::getInstance().startUp();
         GraphicsSystem::getInstance().startUp();
         DebugUI::getInstance().startUp();
+        Audio::getInstance().startUp();
         ResourceManager::getInstance().startUp();
 
         // registers application to get keyboard events
@@ -298,6 +300,7 @@ void Application::shutDown()
     {
         this->mIsClosing = true;
         ResourceManager::getInstance().shutDown();
+        Audio::getInstance().shutDown();
         DebugUI::getInstance().shutDown();
         GraphicsSystem::getInstance().shutDown();
         InputSystem::getInstance().shutDown();

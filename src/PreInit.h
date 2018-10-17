@@ -40,9 +40,9 @@ namespace Nova
 #define GLFW_INCLUDE_NONE // lets you include gl extension header in any order
                           // not just before glfw
 
-#ifndef NDEBUG
-#    define LOG_ACTIVE // logger is active only on debug build
-#endif
+// #ifndef NDEBUG
+// #endif
+#define LOG_ACTIVE // logger is active only on debug build
 
 #define INFO_LOG_LEVEL_ACTIVE
 #define WARNING_LOG_LEVEL_ACTIVE

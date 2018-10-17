@@ -48,6 +48,8 @@ void ResourceManager::startUp()
     registerLoader("texture", loadTextureFunction);
     std::function<std::shared_ptr<ResourceBase>(const XMLNode &)> loadShaderFunction = loadShader;
     registerLoader("program", loadShaderFunction);
+    std::function<std::shared_ptr<ResourceBase>(const XMLNode &)> loadSoundFunction = loadSound;
+    registerLoader("sound", loadSoundFunction);
 
     /*FileSystem& fs = FileSystem::getInstance();
     auto fileNames = fs.getFilenamesInDirectory(TEXTURES_PATH + "skyboxes/", true);

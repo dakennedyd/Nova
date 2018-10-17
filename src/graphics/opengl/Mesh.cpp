@@ -137,44 +137,26 @@ Mesh Mesh::makeBox(const float length, const float width, const float height,
 
     return Mesh(
         // vertices
-        std::vector<GLfloat>{// front
-                             -w, -h, l, w, -h, l, w, h, l, -w, h, l,
-                             // top
-                             -w, h, l, w, h, l, w, h, -l, -w, h, -l,
-                             // back
-                             w, -h, -l, -w, -h, -l, -w, h, -l, w, h, -l,
-                             // bottom
-                             -w, -h, -l, w, -h, -l, w, -h, l, -w, -h, l,
-                             // left
-                             -w, -h, -l, -w, -h, l, -w, h, l, -w, h, -l,
-                             // right
-                             w, -h, l, w, -h, -l, w, h, -l, w, h, l},
+        std::vector<GLfloat>{-w, -h, l,  w,  -h, l,  w,  h,  l,  -w, h,  l,  // front
+                             -w, h,  l,  w,  h,  l,  w,  h,  -l, -w, h,  -l, // top
+                             w,  -h, -l, -w, -h, -l, -w, h,  -l, w,  h,  -l, // back
+                             -w, -h, -l, w,  -h, -l, w,  -h, l,  -w, -h, l,  // bottom
+                             -w, -h, -l, -w, -h, l,  -w, h,  l,  -w, h,  -l, // left
+                             w,  -h, l,  w,  -h, -l, w,  h,  -l, w,  h,  l}, // right
         // indices
-        std::vector<GLuint>{// front
-                            0, 1, 2, 2, 3, 0,
-                            // top
-                            4, 5, 6, 6, 7, 4,
-                            // back
-                            8, 9, 10, 10, 11, 8,
-                            // bottom
-                            12, 13, 14, 14, 15, 12,
-                            // left
-                            16, 17, 18, 18, 19, 16,
-                            // right
-                            20, 21, 22, 22, 23, 20},
+        std::vector<GLuint>{0,  1,  2,  2,  3,  0,   // front
+                            4,  5,  6,  6,  7,  4,   // top
+                            8,  9,  10, 10, 11, 8,   // back
+                            12, 13, 14, 14, 15, 12,  // bottom
+                            16, 17, 18, 18, 19, 16,  // left
+                            20, 21, 22, 22, 23, 20}, // right
         // normals
-        std::vector<GLfloat>{// front
-                             0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-                             // top
-                             0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-                             // back
-                             0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-                             // bottom
-                             0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-                             // left
-                             -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
-                             // right
-                             1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0},
+        std::vector<GLfloat>{0,  0,  1,  0,  0,  1,  0,  0,  1,  0,  0,  1,  // front
+                             0,  1,  0,  0,  1,  0,  0,  1,  0,  0,  1,  0,  // top
+                             0,  0,  -1, 0,  0,  -1, 0,  0,  -1, 0,  0,  -1, // back
+                             0,  -1, 0,  0,  -1, 0,  0,  -1, 0,  0,  -1, 0,  // bottom
+                             -1, 0,  0,  -1, 0,  0,  -1, 0,  0,  -1, 0,  0,  // left
+                             1,  0,  0,  1,  0,  0,  1,  0,  0,  1,  0,  0}, // right
         // textures coords
         std::vector<GLfloat>{0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
                              1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
@@ -291,7 +273,7 @@ Mesh Mesh::makeIcoSphere(const float radius, const int iterations)
         indices.erase(indices.begin(), indices.begin() + indicesSize);
     }
 
-    return Mesh{vertices, indices};
+    return Mesh{vertices, indices, vertices};
 }
 
 Mesh Mesh::makeQuad(const float width, const float height,

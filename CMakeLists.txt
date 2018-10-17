@@ -68,8 +68,15 @@ option(BUILD_OPENGL3_DEMOS OFF)
 option(BUILD_UNIT_TESTS OFF)
 add_subdirectory(Dependencies/bullet3)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(ALSOFT_UTILS OFF)
+option(ALSOFT_EXAMPLES OFF)
+option(ALSOFT_TESTS OFF)
+option(ALSOFT_INSTALL OFF)
+add_subdirectory(Dependencies/openal-soft-master)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#add_library(alsoft SHARED IMPORTED)
+#set_property(TARGET openal PROPERTY IMPORTED_LOCATION "Dependencies/openal-soft-master/libopenal.so")
 if(MSVC)
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++14")
@@ -96,8 +103,11 @@ include_directories(src/
                     Dependencies/glad/include/
                     Dependencies/glfw/include/
 
-                    Dependencies/imgui/
-                    Dependencies/imgui/examples/
+                    #Dependencies/openal-soft-master/
+                    Dependencies/openal-soft-master/include/
+
+                    Dependencies/imgui-master/
+                    Dependencies/imgui-master/examples/
 
                     Dependencies/glm/)
                     #Dependencies/stb/
@@ -106,9 +116,9 @@ include_directories(src/
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
                                #Dependencies/stb/stb_image.h
 
-                               Dependencies/imgui/*.cpp                               
-                               Dependencies/imgui/examples/imgui_impl_glfw.cpp
-                               Dependencies/imgui/examples/imgui_impl_opengl3.cpp
+                               Dependencies/imgui-master/*.cpp                               
+                               Dependencies/imgui-master/examples/imgui_impl_glfw.cpp
+                               Dependencies/imgui-master/examples/imgui_impl_opengl3.cpp
 
                                Dependencies/tinyxml2/tinyxml2.cpp)
                                #Dependencies/glm/glm/glm.hpp)
@@ -140,14 +150,16 @@ source_group("Shaders" FILES ${PROJECT_SHADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})
 source_group("Dependencies" FILES ${DEPENDENCIES_SOURCES})
 
-add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
+add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\"
+                -D IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/Dependencies/openal-soft-master/)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${DEPENDENCIES_SOURCES})
                                
-target_link_libraries(${PROJECT_NAME} glfw assimp
-#                               ${GLFW_LIBRARIES}
+target_link_libraries(${PROJECT_NAME} glfw assimp openal
                                ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
                                

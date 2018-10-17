@@ -40,7 +40,7 @@
 
 namespace Nova
 {
-std::shared_ptr<Mesh> loadedMesh;
+std::shared_ptr<Mesh> loadedMesh = nullptr;
 
 void processMesh(aiMesh *mesh, const aiScene *scene)
 {
@@ -160,9 +160,10 @@ std::shared_ptr<ResourceBase> loadModel(const std::string &fileAndPath)
 {
     LOG_DEBUG("loading mesh file:" << fileAndPath);
     Assimp::Importer import;
-    const aiScene *scene =
-        import.ReadFile(fileAndPath, aiProcess_Triangulate /*| aiProcess_FlipUVs */ /*|*/
-                        /* aiProcess_FlipWindingOrder */ /*|*/ /*aiProcess_MakeLeftHanded*/);
+    const aiScene *scene = import.ReadFile(
+        fileAndPath,
+        0 /*aiProcess_OptimizeMeshes*/ /*, aiProcess_Triangulate*/ /*| aiProcess_FlipUVs */ /*|*/
+        /* aiProcess_FlipWindingOrder */ /*|*/ /*aiProcess_MakeLeftHanded*/);
 
     if (scene && scene->mFlags != AI_SCENE_FLAGS_INCOMPLETE && scene->mRootNode)
     {

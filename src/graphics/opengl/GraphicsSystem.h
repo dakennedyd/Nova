@@ -73,9 +73,8 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     }
     void removeLight(std::uint64_t id)
     {
-        int r = mLights.erase(id);
+        assert(mLights.erase(id));
         currentNumLights--;
-        assert(r);
     };
     auto &getRenderPackets() { return mRenderPackets; };
     auto &getLights() { return mLights; };

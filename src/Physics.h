@@ -133,13 +133,12 @@ class Physics : public ISingleton<Physics>, public ISubSystem
     void removeContactCallback(u_int64_t id)
     {
         auto pred = [id](const CollisionAction &item) { return item.id == id; };
-        // auto a = std::find_if(std::begin(mCollisionActions), std::end(mCollisionActions), pred)
-        // != std::end(mCollisionActions);
         auto it = std::find_if(std::begin(mCollisionActions), std::end(mCollisionActions), pred);
 
         // mCollisionActions.erase(std::remove(mCollisionActions.begin(), mCollisionActions.end(),
         // it),mCollisionActions.end());
 
+        // we don't care about order so we swap and then pop_back()
         if (it != mCollisionActions.end())
         {
             delete it->callback;

@@ -40,6 +40,9 @@
 #include "math/miscellaneous.h"
 
 #include "Settings.h"
+#include "audio/Audio.h"
+// #include "SoundBuffer.h"
+// #include "SoundSource.h"
 #include "resource_manager/ResourceManager.h"
 
 #ifdef NOVA_OPENGL

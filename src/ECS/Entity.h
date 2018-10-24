@@ -23,10 +23,12 @@
 
 #pragma once
 #include "ECS/IComponent.h"
+#include "audio/SoundBuffer.h"
 #include "logger/Logger.h"
 #include "math/Matrix.h"
 #include "math/Quaternion.h"
 #include "math/Vector.h"
+#include <memory>
 #include <typeindex>
 #include <unordered_map>
 
@@ -64,6 +66,7 @@ struct Transform
 };
 
 class System;
+// class SoundBuffer;
 /*don't create entities on your own use the world object*/
 class Entity
 {
@@ -103,7 +106,7 @@ class Entity
         return *(static_cast<T *>(mComponents.at(std::type_index(typeid(T)))));
     }
 
-    template <typename T> bool containsComponent()
+    template <typename T> bool containsComponent() const
     {
         // auto search = mComponents.find(std::type_index(typeid(T)));
         if (mComponents.find(std::type_index(typeid(T))) != mComponents.end())
@@ -154,6 +157,7 @@ class Entity
     const std::unordered_map<uint32_t, Entity *> &getChildren() const { return mChildren; };
     const Entity &getParent() const { return *mParent; };
     const Mat4 &getFinalTransform() const { return mTransform.finalTransform; };
+    void playSound(const std::shared_ptr<SoundBuffer> soundBuffer);
 
   private:
     void setFinalTransformAndPropagate(const Mat4 &propagatedTransform);

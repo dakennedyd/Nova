@@ -29,34 +29,60 @@
 #include "ISubSystem.h"
 #include "SoundUtil.h"
 //#include "logger/Logger.h"
-#include "SoundBuffer.h"
-#include "SoundSource.h"
+//#include "SoundBuffer.h"
+#include "ECS/Entity.h"
 #include "math/Vector.h"
+#include <deque>
 #include <memory>
+#include <vector>
 
 namespace Nova
 {
-
+class SoundBuffer;
 class Audio final : public ISingleton<Audio>, public ISubSystem
 {
-    friend SoundBuffer;
+    // friend SoundBuffer;
+    // friend class SoundSource;
+    friend class SoundSystem;
+    friend class Application;
+    friend class SoundBuffer;
 
   public:
     Audio() = default;
     ~Audio() = default;
     void startUp() override;
     void shutDown() override;
+
+    /**
+     * @brief Sets the audio listener's parameters like it's position, velocity and orientation
+     *
+     * @param position
+     * @param velocity
+     * @param forwardVec
+     * @param upVec
+     */
     void setListenerData(const Vec3 &position, const Vec3 &velocity = Vec3(0.0f),
                          const Vec3 &forwardVec = Vec3(0.0f, 0.0f, -1.0f),
                          const Vec3 &upVec = Vec3(0.0f, 1.0f, 0.0f));
     void setListenerPosition(const Vec3 &position);
 
-    void createSoundEmitter(uint64_t entityID);
-    void playSound(std::shared_ptr<SoundBuffer> soundBuffer, uint64_t soundSourceID);
+    void playSound(std::shared_ptr<SoundBuffer> soundBuffer, const Entity &entity);
 
   private:
+    void setSoundSourceData(const ALuint soundSourceID, const bool looped, const float pitch,
+                            const float gain, const float position[3], const float velocity[3]);
+    ALuint getAvailableSoundSource();
+
+    void registerSoundBuffer(const ALuint id) { mSoundBuffers.push_back(id); }
+
+    // moves the IDs of sound sources that are not playing anymore to the avalilable sources pile
+    void cleanUpSources();
     ALCdevice *mAudioDevice;
     ALCcontext *mAudioContext;
     ALfloat mListenerOrientation[6];
+
+    std::deque<ALuint> mAvailableSoundSources;
+    std::vector<ALuint> mPlayingSoundSources;
+    std::vector<ALuint> mSoundBuffers;
 };
 } // namespace Nova

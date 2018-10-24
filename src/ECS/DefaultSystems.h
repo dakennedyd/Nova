@@ -42,6 +42,7 @@ common enough to be necessary in any game*/
 #    include "graphics/opengl/GraphicsSystem.h"
 #endif
 #include "Physics.h"
+#include "audio/Audio.h"
 #include "logger/Logger.h"
 
 namespace Nova
@@ -236,6 +237,22 @@ class PhysicalSystem final : public System
             Physics::getInstance().removeContactCallback(entity->getID());
         }
         Physics::getInstance().removeObject(entity->getID());
+    }
+};
+
+class SoundSystem final : public System
+{
+    friend class Audio;
+    void processEntity(Entity *entity) override {}
+    void onRegister(Entity *entity) override
+    {
+        // auto &sc = entity->getComponent<SoundComponent>();
+        // Audio::getInstance().createSoundSource(*entity, sc.looped, sc.gain, sc.pitch);
+    }
+    void onUnregister(Entity *entity) override
+    {
+        // auto &sc = entity->getComponent<SoundComponent>();
+        // Audio::getInstance().destroySoundSource(*entity);
     }
 };
 } // namespace Nova

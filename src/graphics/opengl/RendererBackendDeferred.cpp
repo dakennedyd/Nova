@@ -175,6 +175,7 @@ void RendererBackendDeferred::render()
     glViewport(0, 0, mWidth, mHeight);
     mFinalPacket.bind();
     mFinalPacket.draw();
+    mFinalPacket.unBind(); // why do i have to unbind this exactly?
 
     // glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);

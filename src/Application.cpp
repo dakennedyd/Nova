@@ -191,10 +191,10 @@ void Application::startUp()
         Physics::getInstance().startUp();
         Window::getInstance().startUp();
         InputSystem::getInstance().startUp();
+        ResourceManager::getInstance().startUp();
         GraphicsSystem::getInstance().startUp();
         DebugUI::getInstance().startUp();
         Audio::getInstance().startUp();
-        ResourceManager::getInstance().startUp();
 
         // registers application to get keyboard events
         InputSystem::getInstance().getKeyboard().registerObserver(this);
@@ -206,6 +206,7 @@ void Application::startUp()
         mWorld.registerSystem<CameraSystem>();
         mWorld.registerSystem<LightSystem>();
         mWorld.registerSystem<PhysicalSystem>();
+        mWorld.registerSystem<SoundSystem>();
 
         /* this is just a basic key callback it is meant to be replaced with your own function
         when you press the ESC key it exits the program */
@@ -256,7 +257,7 @@ void Application::startMainLoop()
         long frameTime = 0; //, fps = 0; //, entityUpdateTime, renderTime;
 
         window.show();
-        Timer frameTimeClock, renderClock, entityUpdateClock;
+        Timer frameTimeClock, renderClock, entityUpdateClock, soundCleanUp;
         while (!this->isClosing() && !window.isClosing())
         {
             frameTimeClock.reset();
@@ -272,6 +273,11 @@ void Application::startMainLoop()
                 mouse.mPreviousX = mouse.mX;
                 mouse.mPreviousY = mouse.mY; // needed so that mouse.getMotionVector() can work
                 mouse.wheel = 0;
+            }
+            if (soundCleanUp.getMillis() > 500)
+            {
+                Audio::getInstance().cleanUpSources();
+                soundCleanUp.reset();
             }
             // Physics::getInstance().simulate(1.0f / 30.0f);
 
@@ -291,7 +297,7 @@ void Application::startMainLoop()
             //                 " us. logic:" + std::to_string(entityUpdateTime) + " us.");
             timeDelta += frameTimeClock.getMillis();
         }
-        // this->shutDown();
+        this->shutDown();
     }
 }
 void Application::shutDown()
@@ -299,12 +305,12 @@ void Application::shutDown()
     if (this->mIsInitialized)
     {
         this->mIsClosing = true;
-        ResourceManager::getInstance().shutDown();
         Audio::getInstance().shutDown();
         DebugUI::getInstance().shutDown();
         GraphicsSystem::getInstance().shutDown();
+        ResourceManager::getInstance().shutDown();
         InputSystem::getInstance().shutDown();
-        Window::getInstance().shutDown();
+        // Window::getInstance().shutDown();
         Physics::getInstance().shutDown();
         EngineSettings::getInstance().shutDown();
 #ifdef LOG_ACTIVE
@@ -313,5 +319,7 @@ void Application::shutDown()
         FileSystem::getInstance().shutDown();
         this->mIsInitialized = false;
     }
+    // int a;
+    // std::cin >> a;
 }
 } // namespace Nova

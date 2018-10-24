@@ -138,8 +138,8 @@ void GPUProgram::construct(const std::string &vertexShader, const std::string &p
     glAttachShader(mProgramID, fragmentShaderHandle);
     glAttachShader(mProgramID, vertexShaderHandle);
 
-    /*glBindAttribLocation(handle, 0, "vertex_position");		//attrib location must always be
-    set on the shader glBindAttribLocation(handle, 1, "vertex_colour");*/
+    /*glBindAttribLocation(handle, 0, "vertex_position");		//attrib location must
+    always be set on the shader glBindAttribLocation(handle, 1, "vertex_colour");*/
     glLinkProgram(mProgramID);
 
     // check if link was successful
@@ -152,7 +152,9 @@ void GPUProgram::construct(const std::string &vertexShader, const std::string &p
     }
 
     // we dont need those anymore
+    glDetachShader(mProgramID, vertexShaderHandle);
     glDeleteShader(vertexShaderHandle);
+    glDetachShader(mProgramID, fragmentShaderHandle);
     glDeleteShader(fragmentShaderHandle);
 }
 

@@ -102,7 +102,7 @@ TextureCube &TextureCube::operator=(TextureCube &&other)
 //			textureInfoArray[i].textureBuffer);
 
 //		FileSystem::getInstance().freeTexture(textureInfoArray[i].textureBuffer); //just
-//temp until the resource mgr is implemented
+// temp until the resource mgr is implemented
 //	}
 //
 //	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);

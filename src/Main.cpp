@@ -47,8 +47,8 @@ int main()
     bool light = true;
     int objCount = 0;
 
-    rm.get<Mesh>("meshes/bunny");
-    rm.get<SoundBuffer>("sounds/ping");
+    // rm.get<Mesh>("meshes/bunny");
+    // rm.get<SoundBuffer>("sounds/ping");
 
     engine.setKeyCallback([&]() {
         auto &keyboard = InputSystem::getInstance().getKeyboard();
@@ -179,7 +179,7 @@ int main()
             else
             {
                 thing.setScale(0.5f);
-                thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/bunny"),
+                thing.addComponent<VisualComponent>(rm.get<Mesh>("meshes/dragon"),
                                                     rm.get<Material>("materials/aluminium"));
                 thing.addComponent<PhysicalComponent>(1.0f, PhysicalShape::CUBE,
                                                       Vec3(.5f, .7f, .25f), 1.5f, 0.5f);
@@ -266,8 +266,9 @@ int main()
                                           0.5f);
     engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(floor);
 
-    // SoundSource ss(Application::getInstance().getWorld().getEntity("floor"), true);
-    // Audio::getInstance().playSound(rm.get<SoundBuffer>("sounds/inception"), ss.getID());
+    floor.addComponent<SoundComponent>(false, 1.0f, 1.0f);
+    engine.getWorld().GetSystem<SoundSystem>()->registerEntity(floor);
+    floor.playSound(rm.get<SoundBuffer>("sounds/nier"));
 
     // Entity &star = engine.getWorld().createEntity("star");
     // star.setPosition(Vec3{0.0f, 2.0f, 0.0f});
@@ -284,11 +285,13 @@ int main()
     // planeOfDestruction.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
     // rm.get<Material>("materials/worn_cement"));
     // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(planeOfDestruction);
+    planeOfDestruction.addComponent<SoundComponent>(false, 1.0f, 1.0f);
+    engine.getWorld().GetSystem<SoundSystem>()->registerEntity(planeOfDestruction);
+
     planeOfDestruction.addComponent<PhysicalComponent>(
         0.0f, PhysicalShape::CUBE, Vec3(200.5f, 200.01f, 0.0025f), 1.5f, 0.5f,
         [&](int id1, int id2) {
-            SoundSource ss(engine.getWorld().getEntity(id1), false);
-            Audio::getInstance().playSound(rm.get<SoundBuffer>("sounds/ping"), ss.getID());
+            engine.getWorld().getEntity(id1).playSound(rm.get<SoundBuffer>("sounds/ping"));
             auto &engine = Application::getInstance();
             auto &e = engine.getWorld().getEntity(id2);
             engine.getWorld().destroyEntity(e);

@@ -57,7 +57,7 @@ class Mesh : public IMesh
          const Vec3 &color = Vec3(1.0f, 1.0f, 1.0f), bool isDoubleSided = true);
 
     // rule of five
-    ~Mesh() { destroyData(); };
+    ~Mesh();
     Mesh(const Mesh &mesh) = delete;                // copy ctor
     Mesh operator=(const Mesh &otherMesh) = delete; // copy assignment op
     Mesh(Mesh &&otherMesh);                         // move ctor
@@ -139,6 +139,7 @@ class Mesh : public IMesh
     GLsizei mNumIndices;
     MeshState mState;
     Vec3 mColor;
+    bool mIsMoving = false;
 
     void destroyData(); // delete the mesh data from GPU memory
     void enableVertexAttributes();

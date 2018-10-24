@@ -215,6 +215,7 @@ FrameBuffer::~FrameBuffer()
     // that should be destroyed automatically when they
     // are not needed anymore
     // if (mHasDepth && mHasStencil) glDeleteRenderbuffers(1, &mDepthStencilRenderBufferID);
+
     glDeleteFramebuffers(1, &mFrameBufferID);
 }
 FrameBuffer::FrameBuffer(FrameBuffer &&other)

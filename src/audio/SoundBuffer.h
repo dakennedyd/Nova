@@ -32,6 +32,8 @@ namespace Nova
 {
 class SoundBuffer : public ResourceBase
 {
+    // friend class Audio;
+
   public:
     SoundBuffer() = delete;
     SoundBuffer(const std::string &fileAndPath);

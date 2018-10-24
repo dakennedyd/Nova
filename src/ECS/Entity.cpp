@@ -23,10 +23,13 @@
 
 #include "ECS/Entity.h"
 #include "Crc.h"
+#include "audio/Audio.h"
+#include "audio/SoundBuffer.h"
 #include "logger/Logger.h"
 #include "math/Matrix.h"
 #include "math/Quaternion.h"
 #include "math/Vector.h"
+//#include <memory>
 //#include <string>
 
 namespace Nova
@@ -143,6 +146,10 @@ void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
     {
         keyEntityPair.second->setFinalTransformAndPropagate(transformToPropagate);
     }
+}
+void Entity::playSound(const std::shared_ptr<SoundBuffer> soundBuffer)
+{
+    Audio::getInstance().playSound(soundBuffer, *this);
 }
 
 /*void Entity::setFinalTransform()

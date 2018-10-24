@@ -97,4 +97,16 @@ struct PhysicalComponent final : public IComponent
     float restitution;
     std::function<void(int, int)> callback;
 };
+
+struct SoundComponent final : public IComponent
+{
+    SoundComponent() = delete;
+    SoundComponent(const bool looped = false, const float gain = 1.0f, const float pitch = 1.0f)
+        : looped(looped), gain(gain), pitch(pitch)
+    {
+    }
+    bool looped;
+    float gain;
+    float pitch;
+};
 } // namespace Nova

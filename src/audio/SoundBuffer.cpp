@@ -25,6 +25,7 @@
 //#include "AL/al.h"
 #include "AL/alc.h"
 #include "AL/alext.h"
+#include "Audio.h"
 #include "SoundUtil.h"
 #include "logger/Logger.h"
 #include "stb/stb_vorbis.c"
@@ -48,7 +49,7 @@ SoundBuffer::SoundBuffer(const std::string &fileAndPath)
     {
         LOG_ERROR("Can't decode vorbis file:" << mFileNameAndPath);
     }
-    delete mSoundData; // note:should i delete this data??
+
     if (mNumChannels == 2)
     {
         mSoundFormat = AL_FORMAT_STEREO16;
@@ -65,10 +66,16 @@ SoundBuffer::SoundBuffer(const std::string &fileAndPath)
     // int const __length_samples = (::stb_vorbis_stream_length_in_samples(__file) *
     // __info.channels);
     mBufferSize = stb_vorbis_stream_length_in_samples(mVorbisStream);
-    alBufferData(mOpenALBufferID, mSoundFormat, mSoundData, mBufferSize * 4, mSampleRate);
+    alBufferData(mOpenALBufferID, mSoundFormat, mSoundData,
+                 mBufferSize * sizeof(short) * mNumChannels, mSampleRate);
     CHECK_OPENAL_ERRORS();
 
     stb_vorbis_close(mVorbisStream);
+    Audio::getInstance().registerSoundBuffer(mOpenALBufferID);
 }
-SoundBuffer::~SoundBuffer() {}
+SoundBuffer::~SoundBuffer()
+{
+    delete mSoundData;
+    // alDeleteBuffers(1, &mOpenALBufferID);
+}
 } // namespace Nova

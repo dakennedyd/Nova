@@ -22,6 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 
 #include "Audio.h"
+#include "ECS/DefaultComponents.h"
 #include "SoundBuffer.h"
 #include "logger/Logger.h"
 //#include "stb/stb_vorbis.c"
@@ -74,16 +75,64 @@ void Audio::startUp()
     const ALchar *defaultDeviceName = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
     CHECK_OPENAL_ERRORS();
     LOG_INFO("Default audio device:" << std::string{defaultDeviceName});
+
+    // creates sound sources pool
+    static const int NUM_SOUND_SOURCES = 32;
+    for (int i = 0; i < NUM_SOUND_SOURCES; i++)
+    {
+        ALuint id;
+        alGenSources(1, &id);
+        CHECK_OPENAL_ERRORS();
+        mAvailableSoundSources.push_back(id);
+    }
 }
 
 void Audio::shutDown()
 {
-    // alDeleteSources(1, &source);
-    // alDeleteBuffers(1, &buffer);
-    // device = alcGetContextsDevice(context);
+    for (auto id : mPlayingSoundSources)
+    {
+        alSourceStop(id); // stops playing sound
+        CHECK_OPENAL_ERRORS();
+        alSourcei(id, AL_BUFFER, 0); // unbind
+        CHECK_OPENAL_ERRORS();
+        alDeleteSources(1, &id);
+        CHECK_OPENAL_ERRORS();
+    }
+    for (auto id : mAvailableSoundSources)
+    {
+        alSourceStop(id); // stops playing sound ?????????
+        CHECK_OPENAL_ERRORS();
+
+        alSourcei(id, AL_BUFFER, 0); // unbind
+        CHECK_OPENAL_ERRORS();
+        alDeleteSources(1, &id);
+        CHECK_OPENAL_ERRORS();
+    }
+    for (auto id : mSoundBuffers)
+    {
+        alDeleteBuffers(1, &id);
+    }
+
     alcMakeContextCurrent(NULL);
     alcDestroyContext(mAudioContext);
-    alcCloseDevice(mAudioDevice);
+
+    auto r = alcCloseDevice(mAudioDevice);
+    if (r == ALC_FALSE) LOG_INFO("false");
+    if (r != ALC_TRUE) LOG_INFO("true");
+    // auto device = alcGetContextsDevice(mAudioContext);
+    // alcCloseDevice(device);
+}
+
+inline ALuint Audio::getAvailableSoundSource()
+{
+    if (mAvailableSoundSources.empty())
+    {
+        return 0;
+    }
+    auto id = mAvailableSoundSources.back();
+    mAvailableSoundSources.pop_back();
+    mPlayingSoundSources.push_back(id);
+    return id;
 }
 
 void Audio::setListenerData(const Vec3 &position, const Vec3 &velocity, const Vec3 &forwardVec,
@@ -111,16 +160,82 @@ void Audio::setListenerPosition(const Vec3 &position)
     CHECK_OPENAL_ERRORS();
 }
 
-void Audio::playSound(std::shared_ptr<SoundBuffer> soundBuffer, uint64_t soundSourceID)
+void Audio::playSound(std::shared_ptr<SoundBuffer> soundBuffer, const Entity &entity)
 {
-    if (!soundBuffer) LOG_ERROR("null pointer to sound buffer object");
+    if (!soundBuffer) LOG_ERROR("null pointer to sound buffer object")
+        {
+            if (!entity.containsComponent<SoundComponent>()) // sound source is created when
+                                                             // component is added
+            {
+                LOG_ERROR("Entity doesn't contain a sound component!");
+            }
+            else
+            {
+                // auto &ss = getSoundSource(entity.getID());
 
-    // bind source to buffer
-    alSourcei(soundSourceID, AL_BUFFER, soundBuffer->getOpenALID());
-    CHECK_OPENAL_ERRORS();
+                // auto sourceID = ss.mOpenALSourceID;
+                // // bind source to buffer
+                // alSourcei(sourceID, AL_BUFFER, soundBuffer->getOpenALID());
+                // CHECK_OPENAL_ERRORS();
+                // ss.mBindedBuffer = soundBuffer->getOpenALID(); // keeps track if binded buffer
 
-    // alSourceQueueBuffers(self->source, 2, self->buffers);
-    alSourcePlay(soundSourceID);
-    CHECK_OPENAL_ERRORS();
+                // // alSourceQueueBuffers(self->source, 2, self->buffers);
+                // alSourcePlay(sourceID);
+                // CHECK_OPENAL_ERRORS();
+
+                auto soundSourceID = getAvailableSoundSource();
+                if (soundSourceID == 0)
+                {
+                    LOG_WARNING("can't play sound available sound sources exhausted!");
+                }
+                else
+                {
+                    alSourceStop(soundSourceID); // i don't know why but this seesms to make openal
+                                                 // not trow and error
+                    // bind source to buffer
+                    alSourcei(soundSourceID, AL_BUFFER, soundBuffer->getOpenALID());
+                    CHECK_OPENAL_ERRORS();
+                    alSourcePlay(soundSourceID);
+                    CHECK_OPENAL_ERRORS();
+                }
+            }
+        }
 }
+
+void Audio::cleanUpSources()
+{
+
+    /*
+    Possible values of state
+    AL_INITIAL
+    AL_STOPPED
+    AL_PLAYING
+    AL_PAUSED
+    */
+    mPlayingSoundSources.erase(std::remove_if(mPlayingSoundSources.begin(),
+                                              mPlayingSoundSources.end(),
+                                              [&](ALuint id) {
+                                                  ALint state;
+                                                  alGetSourcei(id, AL_SOURCE_STATE, &state);
+                                                  CHECK_OPENAL_ERRORS();
+                                                  if (state == AL_STOPPED)
+                                                  {
+                                                      mAvailableSoundSources.push_back(id);
+                                                      return true;
+                                                  }
+                                                  else
+                                                  {
+                                                      return false;
+                                                  }
+                                              }),
+                               mPlayingSoundSources.end());
+
+    // erase remove idiom
+    // mPlayingSoundSources.erase(std::remove(mPlayingSoundSources.begin(),
+    // mPlayingSoundSources.end(), it),mPlayingSoundSources.end());
+
+    // mAvailableSoundSources.insert(mAvailableSoundSources.end(), stoppedAources.begin(),
+    //                               stoppedAources.end());
+}
+
 } // namespace Nova

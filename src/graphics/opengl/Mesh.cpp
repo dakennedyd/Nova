@@ -81,9 +81,17 @@ GL_STREAM_DRAW);
 
 Mesh::Mesh(Mesh &&otherMesh)
     : mVAO(otherMesh.mVAO), mSize(otherMesh.mSize), mNumIndices(otherMesh.mNumIndices),
-      mState(std::move(otherMesh.mState)), mColor(std::move(otherMesh.mColor))
+      mState(std::move(otherMesh.mState)), mColor(std::move(otherMesh.mColor)), mIsMoving(false)
 {
-    otherMesh.mVAO = -1;
+    otherMesh.mIsMoving = true;
+}
+
+Mesh::~Mesh()
+{
+    if (!mIsMoving)
+    {
+        destroyData();
+    }
 }
 
 void Mesh::bind() const { glBindVertexArray(mVAO); }
@@ -294,6 +302,7 @@ Mesh Mesh::makeQuad(const float width, const float height,
 void Mesh::destroyData()
 {
     // bind();
+
     glDeleteBuffers(1, &mState.verticesVBO);
     glDeleteBuffers(1, &mState.EBO);
     if (mState.enabledVertexAttributes[TEX_ATTRIB_LOC]) // does it have texture coordinates?

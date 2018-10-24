@@ -55,6 +55,7 @@ void processMesh(aiMesh *mesh, const aiScene *scene)
     // GPUProgram *program;
     // Mesh* novaMesh;
 
+    if (mesh->mNumVertices < 1) LOG_WARNING("Mesh has no vertices!");
     for (GLuint i = 0; i < mesh->mNumVertices; i++)
     {
         // Process vertex positions, normals and texture coordinates
@@ -68,12 +69,20 @@ void processMesh(aiMesh *mesh, const aiScene *scene)
             normals.push_back(mesh->mNormals[i].y);
             normals.push_back(mesh->mNormals[i].z);
         }
+        else
+        {
+            LOG_WARNING("Mesh doesn't have normals!");
+        }
 
         if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
         {
             // only uses the first one for the moment
             texturesCoodinates.push_back(mesh->mTextureCoords[0][i].x);
             texturesCoodinates.push_back(mesh->mTextureCoords[0][i].y);
+        }
+        else
+        {
+            LOG_WARNING("Mesh has no texture coords!");
         }
     }
     // Process indices
@@ -161,8 +170,7 @@ std::shared_ptr<ResourceBase> loadModel(const std::string &fileAndPath)
     LOG_DEBUG("loading mesh file:" << fileAndPath);
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(
-        fileAndPath,
-        0 /*aiProcess_OptimizeMeshes*/ /*, aiProcess_Triangulate*/ /*| aiProcess_FlipUVs */ /*|*/
+        fileAndPath, aiProcess_OptimizeMeshes | aiProcess_Triangulate | aiProcess_FlipUVs /*|*/
         /* aiProcess_FlipWindingOrder */ /*|*/ /*aiProcess_MakeLeftHanded*/);
 
     if (scene && scene->mFlags != AI_SCENE_FLAGS_INCOMPLETE && scene->mRootNode)

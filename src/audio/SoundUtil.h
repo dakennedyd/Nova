@@ -28,6 +28,9 @@
 
 namespace Nova
 {
+
+static const int NUM_SOUND_SOURCES = 32;
+
 #define NOVA_CHECK_OPENAL_ERRORS
 #ifdef NOVA_CHECK_OPENAL_ERRORS
 #    define CHECK_OPENAL_ERRORS()                                                                  \

@@ -108,5 +108,7 @@ struct SoundComponent final : public IComponent
     bool looped;
     float gain;
     float pitch;
+
+    int soundSourceID = 0;
 };
 } // namespace Nova

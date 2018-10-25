@@ -26,6 +26,7 @@
 #include "ECS/DefaultComponents.h"
 #include "ISingleton.h"
 #include "ISubSystem.h"
+#include "audio/Audio.h"
 #include "graphics/IGraphicsSystem.h"
 #include "graphics/IRendererBackend.h"
 #include "graphics/IRendererFrontend.h"
@@ -103,6 +104,7 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
         mCamera.projection = &(camera->getComponent<CameraComponent>().projection);
         mCamera.view = &(camera->getComponent<CameraComponent>().view);
         mCamera.position = &(camera->getNonConstTransformStruct().finalTranslation);
+        Audio::getInstance().assignListener(*camera);
     };
     Camera &getCurrentCamera() override { return mCamera; };
     std::size_t currentNumLights = 0;

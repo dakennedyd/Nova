@@ -64,9 +64,16 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
     void setListenerData(const Vec3 &position, const Vec3 &velocity = Vec3(0.0f),
                          const Vec3 &forwardVec = Vec3(0.0f, 0.0f, -1.0f),
                          const Vec3 &upVec = Vec3(0.0f, 1.0f, 0.0f));
+
+    /**
+     * @brief assigns an entity as the current listener
+     *
+     * @param entity
+     */
+    void assignListener(Entity &entity) { mListenerEntity = &entity; };
     void setListenerPosition(const Vec3 &position);
 
-    void playSound(std::shared_ptr<SoundBuffer> soundBuffer, const Entity &entity);
+    void playSound(std::shared_ptr<SoundBuffer> soundBuffer, Entity &entity);
 
   private:
     void setSoundSourceData(const ALuint soundSourceID, const bool looped, const float pitch,
@@ -74,6 +81,8 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
     ALuint getAvailableSoundSource();
 
     void registerSoundBuffer(const ALuint id) { mSoundBuffers.push_back(id); }
+    void updateListenerData();
+    void updateSoundSource(Entity &entity);
 
     // moves the IDs of sound sources that are not playing anymore to the avalilable sources pile
     void cleanUpSources();
@@ -84,5 +93,7 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
     std::deque<ALuint> mAvailableSoundSources;
     std::vector<ALuint> mPlayingSoundSources;
     std::vector<ALuint> mSoundBuffers;
+
+    Entity *mListenerEntity;
 };
 } // namespace Nova

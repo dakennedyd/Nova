@@ -243,7 +243,7 @@ class PhysicalSystem final : public System
 class SoundSystem final : public System
 {
     friend class Audio;
-    void processEntity(Entity *entity) override {}
+    void processEntity(Entity *entity) override { Audio::getInstance().updateSoundSource(*entity); }
     void onRegister(Entity *entity) override
     {
         // auto &sc = entity->getComponent<SoundComponent>();

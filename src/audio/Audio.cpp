@@ -35,7 +35,6 @@ void Audio::startUp()
     LOG_INFO("Initiating Audio subsystem");
     ALboolean enumeration;
     enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
-    // CHECK_OPENAL_ERRORS();
     if (enumeration == AL_TRUE) // enumeration supported
     {
         // const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
@@ -65,6 +64,8 @@ void Audio::startUp()
     }
 
     // context initialization
+    // ALCint attribs[] = {ALC_HRTF_SOFT, ALC_TRUE, 0};
+    // mAudioContext = alcCreateContext(mAudioDevice, attribs);
     mAudioContext = alcCreateContext(mAudioDevice, NULL);
     if (!alcMakeContextCurrent(mAudioContext))
     {
@@ -76,8 +77,10 @@ void Audio::startUp()
     CHECK_OPENAL_ERRORS();
     LOG_INFO("Default audio device:" << std::string{defaultDeviceName});
 
+    alDistanceModel(AL_EXPONENT_DISTANCE);
+    CHECK_OPENAL_ERRORS();
+
     // creates sound sources pool
-    static const int NUM_SOUND_SOURCES = 32;
     for (int i = 0; i < NUM_SOUND_SOURCES; i++)
     {
         ALuint id;
@@ -116,9 +119,8 @@ void Audio::shutDown()
     alcMakeContextCurrent(NULL);
     alcDestroyContext(mAudioContext);
 
-    auto r = alcCloseDevice(mAudioDevice);
-    if (r == ALC_FALSE) LOG_INFO("false");
-    if (r != ALC_TRUE) LOG_INFO("true");
+    alcCloseDevice(mAudioDevice);
+
     // auto device = alcGetContextsDevice(mAudioContext);
     // alcCloseDevice(device);
 }
@@ -154,13 +156,39 @@ void Audio::setListenerData(const Vec3 &position, const Vec3 &velocity, const Ve
     CHECK_OPENAL_ERRORS();
 }
 
+void Audio::updateListenerData()
+{
+    // WARNING: mListenerEntity must not be NULL!!
+    alListenerfv(AL_POSITION, mListenerEntity->getTransformStruct().finalTranslation.getDataPtr());
+    CHECK_OPENAL_ERRORS();
+    // mListenerEntity.getTransformStruct().finalTranslation.debugPrint();
+
+    mListenerOrientation[0] = mListenerEntity->getTransformStruct().forward.getX();
+    mListenerOrientation[1] = -mListenerEntity->getTransformStruct().forward.getY();
+    mListenerOrientation[2] = mListenerEntity->getTransformStruct().forward.getZ();
+    mListenerOrientation[3] = mListenerEntity->getTransformStruct().up.getX();
+    mListenerOrientation[4] = -mListenerEntity->getTransformStruct().up.getY();
+    mListenerOrientation[5] = mListenerEntity->getTransformStruct().up.getZ();
+    alListenerfv(AL_ORIENTATION, mListenerOrientation);
+    CHECK_OPENAL_ERRORS();
+}
+
+void Audio::updateSoundSource(Entity &entity)
+{
+    auto &sc = entity.getComponent<SoundComponent>();
+    if (sc.soundSourceID == 0) return;
+    alSourcefv(sc.soundSourceID, AL_POSITION,
+               entity.getTransformStruct().finalTranslation.getDataPtr());
+    // CHECK_OPENAL_ERRORS();
+}
+
 void Audio::setListenerPosition(const Vec3 &position)
 {
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
     CHECK_OPENAL_ERRORS();
 }
 
-void Audio::playSound(std::shared_ptr<SoundBuffer> soundBuffer, const Entity &entity)
+void Audio::playSound(std::shared_ptr<SoundBuffer> soundBuffer, Entity &entity)
 {
     if (!soundBuffer) LOG_ERROR("null pointer to sound buffer object")
         {
@@ -190,11 +218,28 @@ void Audio::playSound(std::shared_ptr<SoundBuffer> soundBuffer, const Entity &en
                 }
                 else
                 {
-                    alSourceStop(soundSourceID); // i don't know why but this seesms to make openal
-                                                 // not trow and error
+                    // alSourceStop(soundSourceID);
+
                     // bind source to buffer
                     alSourcei(soundSourceID, AL_BUFFER, soundBuffer->getOpenALID());
                     CHECK_OPENAL_ERRORS();
+
+                    auto &sc = entity.getComponent<SoundComponent>();
+                    sc.soundSourceID = soundSourceID;
+                    alSourcef(soundSourceID, AL_PITCH, sc.pitch);
+                    // CHECK_OPENAL_ERRORS();
+                    alSourcef(soundSourceID, AL_GAIN, sc.gain);
+                    // CHECK_OPENAL_ERRORS();
+                    alSource3f(soundSourceID, AL_POSITION,
+                               entity.getTransformStruct().finalTranslation.getDataPtr()[0],
+                               entity.getTransformStruct().finalTranslation.getDataPtr()[1],
+                               entity.getTransformStruct().finalTranslation.getDataPtr()[2]);
+                    // CHECK_OPENAL_ERRORS();
+                    // alSource3f(soundSourceID, AL_VELOCITY, 0, 0, 0);
+                    // CHECK_OPENAL_ERRORS();
+                    alSourcei(soundSourceID, AL_LOOPING, sc.looped ? AL_TRUE : AL_FALSE);
+                    // CHECK_OPENAL_ERRORS();
+
                     alSourcePlay(soundSourceID);
                     CHECK_OPENAL_ERRORS();
                 }

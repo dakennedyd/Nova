@@ -251,24 +251,25 @@ int main()
     engine.getWorld().GetSystem<CameraSystem>()->registerEntity(
         engine.getWorld().getEntity("fpsCamera"));
     fpsCamera.addComponent<MovementComponent>();
-    fpsCamera.getComponent<MovementComponent>().speed = 2.0f;
+    fpsCamera.getComponent<MovementComponent>().speed = 10.0f;
     // engine.getWorld().GetSystem<PlayerInputSystem>()->registerEntity(fpsCamera);
 
     // GraphicsSystem::getInstance().setCurrentCamera(&fpsCamera);
 
-    Entity &floor = engine.getWorld().createEntity("floor");
-    floor.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(70.0f)));
-    floor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
-                                        rm.get<Material>("materials/orange_plastic"));
-    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(floor);
-    floor.setPosition(Vec3(0.0f, 0.0f, 0.0f));
-    floor.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(5.0f, 5.0f, 0.001f), 1.5f,
-                                          0.5f);
-    engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(floor);
+    // Entity &floor = engine.getWorld().createEntity("floor");
+    // floor.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(70.0f)));
+    // floor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
+    //                                     rm.get<Material>("materials/orange_plastic"));
+    // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(floor);
+    // floor.setPosition(Vec3(0.0f, 0.0f, 0.0f));
+    // floor.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(5.0f, 5.0f,
+    // 0.001f), 1.5f,
+    //                                       0.5f);
+    // engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(floor);
 
-    floor.addComponent<SoundComponent>(false, 1.0f, 1.0f);
-    engine.getWorld().GetSystem<SoundSystem>()->registerEntity(floor);
-    floor.playSound(rm.get<SoundBuffer>("sounds/nier"));
+    // floor.addComponent<SoundComponent>(false, 1.0f, 1.0f);
+    // engine.getWorld().GetSystem<SoundSystem>()->registerEntity(floor);
+    // floor.playSound(rm.get<SoundBuffer>("sounds/nier"));
 
     // Entity &star = engine.getWorld().createEntity("star");
     // star.setPosition(Vec3{0.0f, 2.0f, 0.0f});
@@ -285,8 +286,9 @@ int main()
     // planeOfDestruction.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
     // rm.get<Material>("materials/worn_cement"));
     // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(planeOfDestruction);
-    planeOfDestruction.addComponent<SoundComponent>(false, 1.0f, 1.0f);
+    planeOfDestruction.addComponent<SoundComponent>(false, 5.0f, 1.0f);
     engine.getWorld().GetSystem<SoundSystem>()->registerEntity(planeOfDestruction);
+    // Audio::getInstance().assignListener(planeOfDestruction);
 
     planeOfDestruction.addComponent<PhysicalComponent>(
         0.0f, PhysicalShape::CUBE, Vec3(200.5f, 200.01f, 0.0025f), 1.5f, 0.5f,
@@ -331,6 +333,15 @@ int main()
     // // star.getComponent<RotationComponent>().speed = 1.0f;
     // // engine.getWorld().GetSystem<RotationSystem>()->registerEntity(star);
 
+    auto &dc = engine.getWorld().getEntity("Default Camera");
+    dc.addComponent<SoundComponent>(true);
+    dc.playSound(rm.get<SoundBuffer>("sounds/ping"));
+    engine.getWorld().GetSystem<SoundSystem>()->registerEntity(dc);
+
+    dc.addComponent<VisualComponent>(rm.get<Mesh>("meshes/sphere"),
+                                     rm.get<Material>("materials/orange_plastic"));
+    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(dc);
+
     Entity &rotationAnchor = engine.getWorld().createEntity("rotation_anchor");
     rotationAnchor.setPosition(Vec3(0.0f, 1.0f, 0.0f));
     rotationAnchor.addComponent<RotationComponent>();
@@ -339,6 +350,9 @@ int main()
     engine.getWorld().GetSystem<RotationSystem>()->registerEntity(rotationAnchor);
     engine.getWorld().attachEntities(rotationAnchor, engine.getWorld().getEntity("Default Camera"),
                                      PropagationType::POSITION_ROTATION);
+    rotationAnchor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
+                                                 rm.get<Material>("materials/yellow_plastic"));
+    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(rotationAnchor);
 
     // creates some random colored lights
     Random rnd;

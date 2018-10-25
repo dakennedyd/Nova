@@ -273,6 +273,7 @@ void Application::startMainLoop()
                 mouse.mPreviousX = mouse.mX;
                 mouse.mPreviousY = mouse.mY; // needed so that mouse.getMotionVector() can work
                 mouse.wheel = 0;
+                Audio::getInstance().updateListenerData();
             }
             if (soundCleanUp.getMillis() > 500)
             {

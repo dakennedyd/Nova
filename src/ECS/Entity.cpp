@@ -152,6 +152,8 @@ void Entity::playSound(const std::shared_ptr<SoundBuffer> soundBuffer)
     Audio::getInstance().playSound(soundBuffer, *this);
 }
 
+void Entity::stopSound() { Audio::getInstance().stopSound(*this); }
+
 /*void Entity::setFinalTransform()
 {
         Mat4 transform(mTransform.rotation.toRotationMatrix4()

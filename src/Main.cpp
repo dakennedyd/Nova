@@ -90,14 +90,18 @@ int main()
             if (rotatePlanet)
             {
                 rotatePlanet = false;
-                Entity &planet = world.getEntity("star");
-                world.GetSystem<RotationSystem>()->unregisterEntity(planet);
+                // Entity &planet = world.getEntity("star");
+                // world.GetSystem<RotationSystem>()->unregisterEntity(planet);
+                Entity &floor = world.getEntity("floor");
+                floor.stopSound();
             }
             else
             {
                 rotatePlanet = true;
-                Entity &planet = world.getEntity("star");
-                world.GetSystem<RotationSystem>()->registerEntity(planet);
+                // Entity &planet = world.getEntity("star");
+                // world.GetSystem<RotationSystem>()->registerEntity(planet);
+                Entity &floor = world.getEntity("floor");
+                floor.playSound(rm.get<SoundBuffer>("sounds/music1"));
             }
         }
         if (keyboard.getKeyState(Keys::KEY_ESC))
@@ -164,9 +168,9 @@ int main()
             // LOG_DEBUG(std::to_string(j + i*j));
             thing.setPosition(Vec3(rnd.nextFloat(-5.0, 5.0), 5.0f, rnd.nextFloat(-5.0, 5.0)));
             thing.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(45.0f)));
-            thing.addComponent<RotationComponent>();
-            thing.getComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
-            thing.getComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
+            // thing.addComponent<RotationComponent>();
+            // thing.getComponent<RotationComponent>().axis = Vec3(0.0f, 1.0f, 0.0f);
+            // thing.getComponent<RotationComponent>().speed = (float)rnd.nextDouble(1.0, 10.0);
             // engine.getWorld().GetSystem<RotationSystem>()->registerEntity(thing);
             if (rnd.nextDouble() > .5)
             {
@@ -256,20 +260,19 @@ int main()
 
     // GraphicsSystem::getInstance().setCurrentCamera(&fpsCamera);
 
-    // Entity &floor = engine.getWorld().createEntity("floor");
-    // floor.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(70.0f)));
-    // floor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
-    //                                     rm.get<Material>("materials/orange_plastic"));
-    // engine.getWorld().GetSystem<VisualSystem>()->registerEntity(floor);
-    // floor.setPosition(Vec3(0.0f, 0.0f, 0.0f));
-    // floor.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(5.0f, 5.0f,
-    // 0.001f), 1.5f,
-    //                                       0.5f);
-    // engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(floor);
+    Entity &floor = engine.getWorld().createEntity("floor");
+    floor.setRotation(UnitQuat(Vec3(1.0f, 0.0f, 0.0f), toRadians(70.0f)));
+    floor.addComponent<VisualComponent>(rm.get<Mesh>("meshes/floor"),
+                                        rm.get<Material>("materials/orange_plastic"));
+    engine.getWorld().GetSystem<VisualSystem>()->registerEntity(floor);
+    floor.setPosition(Vec3(0.0f, 0.0f, 0.0f));
+    floor.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(5.0f, 5.0f, 0.001f), 1.5f,
+                                          0.5f);
+    engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(floor);
 
-    // floor.addComponent<SoundComponent>(false, 1.0f, 1.0f);
-    // engine.getWorld().GetSystem<SoundSystem>()->registerEntity(floor);
-    // floor.playSound(rm.get<SoundBuffer>("sounds/nier"));
+    floor.addComponent<SoundComponent>(false, 1.0f, 1.0f);
+    engine.getWorld().GetSystem<SoundSystem>()->registerEntity(floor);
+    floor.playSound(rm.get<SoundBuffer>("sounds/music1"));
 
     // Entity &star = engine.getWorld().createEntity("star");
     // star.setPosition(Vec3{0.0f, 2.0f, 0.0f});

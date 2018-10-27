@@ -158,6 +158,7 @@ class Entity
     const Entity &getParent() const { return *mParent; };
     const Mat4 &getFinalTransform() const { return mTransform.finalTransform; };
     void playSound(const std::shared_ptr<SoundBuffer> soundBuffer);
+    void stopSound();
 
   private:
     void setFinalTransformAndPropagate(const Mat4 &propagatedTransform);

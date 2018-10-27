@@ -247,6 +247,21 @@ void Audio::playSound(std::shared_ptr<SoundBuffer> soundBuffer, Entity &entity)
         }
 }
 
+void Audio::stopSound(Entity &entity)
+{
+    if (!entity.containsComponent<SoundComponent>()) // sound source is created when
+                                                     // component is added
+    {
+        LOG_ERROR("Entity doesn't contain a sound component!");
+    }
+    else
+    {
+        auto &sc = entity.getComponent<SoundComponent>();
+        alSourceStop(sc.soundSourceID);
+        CHECK_OPENAL_ERRORS();
+    }
+}
+
 void Audio::cleanUpSources()
 {
 

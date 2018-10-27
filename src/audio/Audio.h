@@ -64,6 +64,7 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
     void setListenerData(const Vec3 &position, const Vec3 &velocity = Vec3(0.0f),
                          const Vec3 &forwardVec = Vec3(0.0f, 0.0f, -1.0f),
                          const Vec3 &upVec = Vec3(0.0f, 1.0f, 0.0f));
+    void setListenerPosition(const Vec3 &position);
 
     /**
      * @brief assigns an entity as the current listener
@@ -71,17 +72,22 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
      * @param entity
      */
     void assignListener(Entity &entity) { mListenerEntity = &entity; };
-    void setListenerPosition(const Vec3 &position);
 
     void playSound(std::shared_ptr<SoundBuffer> soundBuffer, Entity &entity);
+    void stopSound(Entity &entity);
 
   private:
     void setSoundSourceData(const ALuint soundSourceID, const bool looped, const float pitch,
                             const float gain, const float position[3], const float velocity[3]);
     ALuint getAvailableSoundSource();
 
+    // keeps track of created sound buffers to be able to delete them afterwards
     void registerSoundBuffer(const ALuint id) { mSoundBuffers.push_back(id); }
+
+    // updates the listener position, orientation etc in relation to the listener entity
     void updateListenerData();
+
+    // updates the sound source position in relation to their containing entities
     void updateSoundSource(Entity &entity);
 
     // moves the IDs of sound sources that are not playing anymore to the avalilable sources pile

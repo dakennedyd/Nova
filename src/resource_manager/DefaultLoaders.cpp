@@ -56,7 +56,11 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
     std::string name{metadata.getAttributeValue("name")};
     std::string type{metadata.getAttributeValue("type")};
     std::string filtering{metadata.getAttributeValue("filtering")};
-    std::string src{TEXTURES_PATH + metadata.getText()};
+    std::string src{PATH_TO_ENGINE_BINARY + TEXTURES_PATH + metadata.getText()};
+    if (!FileSystem::fileExists(src))
+    {
+        src = PATH_TO_BINARY + TEXTURES_PATH + metadata.getText();
+    }
     if (type == "2d")
     {
         auto texPtr = std::make_shared<Texture>(src);
@@ -75,20 +79,42 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
     {
         return std::make_shared<TextureCube>(src);
     }
-    else if (type == "IBL")
+    else if (type == "Skybox")
     {
+        std::string skyboxPath{PATH_TO_ENGINE_BINARY + TEXTURES_PATH};
+        if (!FileSystem::fileExists(skyboxPath))
+        {
+            skyboxPath = PATH_TO_BINARY + TEXTURES_PATH;
+        }
         std::string irradianceTextureFilePath{"NO TEXTURE"};
+        std::string albedoTextureFilePath{"NO TEXTURE"};
+        std::string brdflutTextureFilePath{"NO TEXTURE"};
+
+        XMLNode textureNode{metadata.getChildElement("albedo")};
+        if (!textureNode.isEmpty())
+        {
+            albedoTextureFilePath = textureNode.getText();
+        }
+        auto albedo = std::make_shared<TextureCube>(skyboxPath + albedoTextureFilePath);
+
+        XMLNode brdflutNode{metadata.getChildElement("BRDFLUT")};
+        if (!brdflutNode.isEmpty())
+        {
+            brdflutTextureFilePath = brdflutNode.getText();
+        }
+        auto brdflut = std::make_shared<Texture>(skyboxPath + brdflutTextureFilePath);
+
         XMLNode irradianceNode{metadata.getChildElement("irradiance")};
         if (!irradianceNode.isEmpty())
         {
             irradianceTextureFilePath = irradianceNode.getText();
         }
-        auto irradiance = std::make_shared<TextureCube>(TEXTURES_PATH + irradianceTextureFilePath);
+        auto irradiance = std::make_shared<TextureCube>(skyboxPath + irradianceTextureFilePath);
         XMLNode radianceLOD{metadata.getChildElement("radiance_LOD")};
         std::vector<std::string> filenames;
         while (!radianceLOD.isEmpty())
         {
-            filenames.push_back(TEXTURES_PATH + radianceLOD.getText());
+            filenames.push_back(skyboxPath + radianceLOD.getText());
             radianceLOD = radianceLOD.getNextElement();
         }
         TextureInfo t = FileSystem::getInstance().loadTexture(filenames, false);
@@ -96,7 +122,7 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
         // auto ibl = std::make_shared<IBL_Data>(irradiance, radiance);
         // ibl->irradiance = irradiance;
         // ibl->radiance = radiance;
-        return std::make_shared<IBL_Data>(irradiance, radiance);
+        return std::make_shared<PBRSkybox>(albedo, irradiance, radiance, brdflut);
     }
     else
     {
@@ -107,9 +133,15 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
 
 std::shared_ptr<ResourceBase> loadShader(const XMLNode &metadata)
 {
+    std::string shaderPath{PATH_TO_ENGINE_BINARY + SHADERS_PATH};
+    if (!FileSystem::fileExists(shaderPath))
+    {
+        shaderPath = PATH_TO_BINARY + SHADERS_PATH;
+    }
+
     std::string name{metadata.getAttributeValue("name")};
     XMLNode programNode(metadata.getChildElement(RENDERER));
-    std::string src{SHADERS_PATH + programNode.getText()};
+    std::string src{shaderPath + programNode.getText()};
     return std::make_shared<GPUProgram>(src);
 }
 
@@ -150,6 +182,10 @@ std::shared_ptr<ResourceBase> loadMaterial(const XMLNode &metadata)
         else if (type == "specular")
         {
         
+
+
+
+
 
 
 
@@ -207,7 +243,13 @@ std::shared_ptr<ResourceBase> loadMesh(const XMLNode &metadata)
     }
     else if (type == "file")
     {
-        std::string src{MODELS_PATH + metadata.getChildElement("src").getText()};
+        std::string modelPath{PATH_TO_ENGINE_BINARY + MODELS_PATH};
+        if (!FileSystem::fileExists(modelPath))
+        {
+            modelPath = PATH_TO_BINARY + MODELS_PATH;
+        }
+
+        std::string src{modelPath + metadata.getChildElement("src").getText()};
         return loadModel(src);
         // return std::make_shared<Mesh>(Mesh::makeIcosahedron());
     }
@@ -220,6 +262,12 @@ std::shared_ptr<ResourceBase> loadMesh(const XMLNode &metadata)
 
 std::shared_ptr<ResourceBase> loadSound(const XMLNode &metadata)
 {
+    std::string soundPath{PATH_TO_ENGINE_BINARY + SOUNDS_PATH};
+    if (!FileSystem::fileExists(soundPath))
+    {
+        soundPath = PATH_TO_BINARY + SOUNDS_PATH;
+    }
+
     std::string name = metadata.getAttributeValue("name");
     // bool looped = false;
     // std::string loopedString = metadata.getAttributeValue("looped");
@@ -228,7 +276,7 @@ std::shared_ptr<ResourceBase> loadSound(const XMLNode &metadata)
     // float pitch = std::stof(metadata.getAttributeValue("pitch"));
 
     // std::string fileName = metadata.getText();
-    std::string fileName{SOUNDS_PATH + metadata.getChildElement("filename").getText()};
+    std::string fileName{soundPath + metadata.getChildElement("filename").getText()};
     LOG_DEBUG("loading sound:" << name);
 
     return std::make_shared<SoundBuffer>(fileName);

@@ -45,6 +45,7 @@ namespace Nova
 
 GPUProgram::GPUProgram(const std::string &fileAndPath) : mProgramID(glCreateProgram())
 {
+    LOG_DEBUG("Loading shader:" << fileAndPath);
     size_t secondLinePosition = 0;
     std::string srcFile(FileSystem::getInstance().loadFileAsString(fileAndPath));
 

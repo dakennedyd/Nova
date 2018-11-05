@@ -90,10 +90,10 @@ UnitQuat UnitQuat::operator*(const UnitQuat &right) const
     Vec3 v = (ps * qv) + (qs * pv) + (pv ^ qv);
     float s = ps * qs - pv * qv;
     return UnitQuat(v.mData[0], v.mData[1], v.mData[2], s);
-    /*return UnitQuat(mY*right.mZ - mZ*right.mY + mW*right.mX + mW*right.mX,
-                            mZ*right.mX - mX*right.mZ + mW*right.mY + mW*right.mX,
-                            mX*right.mY - mY*right.mX + mW*right.mZ + mW*right.mZ,
-                            mW*right.mW - mX*right.mX - mY*right.mY - mZ*right.mZ);*/
+    // return UnitQuat(mY*right.mZ - mZ*right.mY + mW*right.mX + mW*right.mX,
+    //                         mZ*right.mX - mX*right.mZ + mW*right.mY + mW*right.mX,
+    //                         mX*right.mY - mY*right.mX + mW*right.mZ + mW*right.mZ,
+    //                         mW*right.mW - mX*right.mX - mY*right.mY - mZ*right.mZ);
 }
 
 Vec3 UnitQuat::getVector() const { return Vec3(mX, mY, mZ); }

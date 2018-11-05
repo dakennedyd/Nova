@@ -31,7 +31,10 @@
 #endif
 #include "ECS/Entity.h"
 #include "ECS/System.h"
+//#include "NovaExports.h"
+//#include "Settings.h"
 #include <functional>
+
 //#include <unordered_map>
 
 namespace Nova

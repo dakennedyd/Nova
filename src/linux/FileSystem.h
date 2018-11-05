@@ -24,7 +24,10 @@
 #pragma once
 #include "ISingleton.h"
 #include "ISubSystem.h"
+#include <limits.h>
 #include <string>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <vector>
 
 struct aiScene;
@@ -65,6 +68,30 @@ class FileSystem : public ISingleton<FileSystem>, public ISubSystem
     std::vector<std::string> getFilenamesInDirectory(const std::string &path,
                                                      bool recursive = true);
     std::string getFilenameExtension(const std::string &filenameAndPath);
+
+    bool static fileExists(const std::string &name)
+    {
+        struct stat buffer;
+        return (stat(name.c_str(), &buffer) == 0);
+    }
+
+    std::string static getExecutablePath()
+    {
+        char pathAndExe[PATH_MAX];
+        ssize_t count = readlink("/proc/self/exe", pathAndExe, PATH_MAX);
+        if (count > 0)
+        {
+            std::string str{pathAndExe};
+            auto const pos = str.find_last_of('/');
+            const auto path = str.substr(0, pos) + "/";
+            return path;
+        }
+        else
+        {
+            return "";
+        }
+        // return std::string(pathAndExe, (count > 0) ? count : 0);
+    }
 
   private:
 };

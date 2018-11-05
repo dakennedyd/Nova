@@ -40,16 +40,10 @@
 namespace Nova
 {
 RendererBackendDeferred::RendererBackendDeferred()
-    : mIBL(
-          ResourceManager::getInstance().get<IBL_Data>("textures/skyboxes/fireSky_IBL")->irradiance,
-          ResourceManager::getInstance().get<IBL_Data>("textures/skyboxes/fireSky_IBL")->radiance),
-
+    : mCurrentSkybox(ResourceManager::getInstance().get<PBRSkybox>("textures/skyboxes/fireSky")),
       mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
-
       mLightPassFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth, mHeight)),
-
       mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),
-
       mVBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),
 
       mLightPassRenderPacket(
@@ -63,9 +57,9 @@ RendererBackendDeferred::RendererBackendDeferred()
                    "uGNormRough"}, // gBuffer normal and roughness channel
                   {mGBuffer.getColorTexture(2), "uGAlbedoSkyboxmask"}, // Albedo and skybox mask
                   {mGBuffer.getColorTexture(3), "uGNormalMapAO"},
-                  {mIBL.irradiance, "uIrradianceMap"},
-                  {mIBL.radiance, "uRadianceMap"},
-                  {ResourceManager::getInstance().get<Texture>("textures/brdf_LUT"), "uBRDFLUT"}})),
+                  {mCurrentSkybox->irradiance, "uIrradianceMap"},
+                  {mCurrentSkybox->radiance, "uRadianceMap"},
+                  {mCurrentSkybox->BRDFLUT, "uBRDFLUT"}})),
 
       mFinalPacket(mScreenQuad,
                    std::make_shared<Material>(
@@ -87,13 +81,11 @@ RendererBackendDeferred::RendererBackendDeferred()
                         std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
                             {mHBloomFrameBuffer.getColorTexture(0), "uAlbedo"}})),
 
-      mCurrentSkyBox(
-          std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
-          std::make_shared<Material>(
-              ResourceManager::getInstance().get<GPUProgram>("shaders/skybox"),
-              std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                  {ResourceManager::getInstance().get<TextureCube>("textures/skyboxes/fireSky"),
-                   "skyboxTexture"}}))
+      mCurrentSkyBoxPacket(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
+                           std::make_shared<Material>(
+                               ResourceManager::getInstance().get<GPUProgram>("shaders/skybox"),
+                               std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                   {mCurrentSkybox->texture, "skyboxTexture"}}))
 {
 }
 
@@ -123,9 +115,9 @@ void RendererBackendDeferred::render()
     }
     /*glStencilMask(0x00);*/
 
-    mCurrentSkyBox.bind();
-    mCurrentSkyBox.updateAllUniforms();
-    mCurrentSkyBox.draw();
+    mCurrentSkyBoxPacket.bind();
+    mCurrentSkyBoxPacket.updateAllUniforms();
+    mCurrentSkyBoxPacket.draw();
     // mGBuffer.unBind();
     mProfileTimes["Geometry pass"] = timer.getMicro();
     timer.reset();
@@ -191,36 +183,29 @@ void RendererBackendDeferred::render()
     //                                std::to_string(mPostprocessTime));
 }
 
-void RendererBackendDeferred::setSkyBox(const Skybox &skybox)
+void RendererBackendDeferred::setSkyBox(const std::shared_ptr<PBRSkybox> &skybox)
 {
-    // ResourceManager::getInstance().get<Material>("skybox_material")->ge
-    // mCurrentSkyBox->setMaterial(ResourceManager::getInstance().get<Material>("garden_skybox"));
-    std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> texturesVector{
-        {skybox.skyboxTexture, "uSkyboxTexture"}};
-    mCurrentSkyBox.getMaterial()->setTextures(texturesVector);
-    /*auto skybox = std::make_shared<RenderPacket>(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
-            std::make_shared<Material>(ResourceManager::getInstance().get<GPUProgram>("skybox"),
-                    std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> {
-                            {ResourceManager::getInstance().get<TextureCube>("fireSky_skybox"),
-    "albedoMap"} })); GraphicsSystem::getInstance().addPacket(*skybox);*/
-    // mCurrentSkyBox = skybox;
-    setIBLData(skybox.iblData);
-}
+    if (!skybox)
+    {
+        LOG_ERROR("can't set skybox, the skybox object is invalid");
+        return;
+    }
+    mCurrentSkybox = skybox;
 
-void RendererBackendDeferred::setIBLData(std::shared_ptr<IBL_Data> data)
-{
-    mIBL.radiance = data->radiance;
-    mIBL.irradiance = data->irradiance;
-    std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> texturesVector{
-        {mGBuffer.getColorTexture(0), "gPosMetal"},  // gBuffer position and metallic channel
-        {mGBuffer.getColorTexture(1), "gNormRough"}, // gBuffer normal and roughness channel
-        {mGBuffer.getColorTexture(2),
-         "gAlbedoSkyboxmask"}, // gBuffer Albedo and (skybox mask)ambient occlussion channel
+    std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> v1{
+        {mCurrentSkybox->texture, "uSkyboxTexture"}};
+    mCurrentSkyBoxPacket.getMaterial()->setTextures(v1);
+
+    std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> v2{
+        {mGBuffer.getColorTexture(0), "gPosMetal"},         // gBuffer position and metallic channel
+        {mGBuffer.getColorTexture(1), "gNormRough"},        // gBuffer normal and roughness channel
+        {mGBuffer.getColorTexture(2), "gAlbedoSkyboxmask"}, // gBuffer Albedo and (skybox
+                                                            // mask)ambient occlussion channel
         {mGBuffer.getColorTexture(3), "gNormalMapAO"},
-        {mIBL.irradiance, "uIrradianceMap"},
-        {mIBL.radiance, "uRadianceMap"},
-        {ResourceManager::getInstance().get<Texture>("textures/brdf_LUT"), "uBRDFLUT"}};
-    mLightPassRenderPacket.getMaterial()->setTextures(texturesVector);
+        {mCurrentSkybox->irradiance, "uIrradianceMap"},
+        {mCurrentSkybox->radiance, "uRadianceMap"},
+        {mCurrentSkybox->BRDFLUT, "uBRDFLUT"}};
+    mLightPassRenderPacket.getMaterial()->setTextures(v2);
 }
 
 } // namespace Nova

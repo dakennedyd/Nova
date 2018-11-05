@@ -169,7 +169,7 @@ void Settings::clear() { mSettingsData.clear(); }
 void EngineSettings::startUp()
 {
     mFileName = CONFIGURATION_FILE_NAME;
-    mFileAndPath = DEFAULT_FILE_PATH + mFileName;
+    mFileAndPath = PATH_TO_BINARY + mFileName;
 
     // sets default values, this values are overridden
     // by CONFIGURATION_FILE_NAME if appropriate
@@ -179,6 +179,19 @@ void EngineSettings::startUp()
     add("Video", "fps", "30");
 
     add("Input", "mouse_sensitivity", "30");
+
+    add("Default-ActionContext", "key_w", "move_forward");
+    add("Default-ActionContext", "key_d", "strafe_right");
+    add("Default-ActionContext", "key_s", "move_backward");
+    add("Default-ActionContext", "key_right", "turn_right");
+    add("Default-ActionContext", "key_down", "turn_up");
+    add("Default-ActionContext", "key_space", "move_up");
+    add("Default-ActionContext", "key_x", "move_down");
+    add("Default-ActionContext", "key_q", "tilt_left");
+    add("Default-ActionContext", "key_e", "tilt_right");
+    add("Default-ActionContext", "key_a", "strafe_left");
+    add("Default-ActionContext", "key_left", "turn_left");
+    add("Default-ActionContext", "key_up", "turn_down");
 
     loadConfFile();
 }

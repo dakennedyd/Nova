@@ -74,7 +74,7 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
     void assignListener(Entity &entity) { mListenerEntity = &entity; };
 
     void playSound(std::shared_ptr<SoundBuffer> soundBuffer, Entity &entity);
-    void stopSound(Entity &entity);
+    void stopSound(Entity &entity); // fix: it only stops the last sound played!
 
   private:
     void setSoundSourceData(const ALuint soundSourceID, const bool looped, const float pitch,
@@ -84,10 +84,10 @@ class Audio final : public ISingleton<Audio>, public ISubSystem
     // keeps track of created sound buffers to be able to delete them afterwards
     void registerSoundBuffer(const ALuint id) { mSoundBuffers.push_back(id); }
 
-    // updates the listener position, orientation etc in relation to the listener entity
+    // updates the listener position, orientation etc this should be called in the main loop
     void updateListenerData();
 
-    // updates the sound source position in relation to their containing entities
+    // updates the sound source position from their entities
     void updateSoundSource(Entity &entity);
 
     // moves the IDs of sound sources that are not playing anymore to the avalilable sources pile

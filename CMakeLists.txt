@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 project(Nova)
 
+message("")
+message("********************* NOVA DEBUG BUILD *********************")
+message("")
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 option(GLFW_BUILD_DOCS ON)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
@@ -75,8 +80,7 @@ option(ALSOFT_INSTALL OFF)
 add_subdirectory(Dependencies/openal-soft-master)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-#add_library(alsoft SHARED IMPORTED)
-#set_property(TARGET openal PROPERTY IMPORTED_LOCATION "Dependencies/openal-soft-master/libopenal.so")
+
 if(MSVC)
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++14")
@@ -86,7 +90,7 @@ else()
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")    
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -std=c++14")    
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14 -Wpedantic -Wfatal-errors -msse2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -Wpedantic -Wfatal-errors -msse2")
     
     if(NOT WIN32)
         set(GLAD_LIBRARIES dl)
@@ -95,44 +99,26 @@ endif()
 
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
-include_directories(src/
-                    ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/assimp/include/
-                    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/assimp/include/
-                    Dependencies/bullet3/src/
-                    Dependencies/
-                    Dependencies/glad/include/
-                    Dependencies/glfw/include/
-
-                    #Dependencies/openal-soft-master/
-                    Dependencies/openal-soft-master/include/
-
-                    Dependencies/imgui-master/
-                    Dependencies/imgui-master/examples/
-
-                    Dependencies/glm/)
-                    #Dependencies/stb/
-                    #Dependencies/tinyxml2/)
-
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
-                               #Dependencies/stb/stb_image.h
+                                #Dependencies/stb/stb_image.h
 
-                               Dependencies/imgui-master/*.cpp                               
-                               Dependencies/imgui-master/examples/imgui_impl_glfw.cpp
-                               Dependencies/imgui-master/examples/imgui_impl_opengl3.cpp
+                                Dependencies/imgui-master/*.cpp                               
+                                Dependencies/imgui-master/examples/imgui_impl_glfw.cpp
+                                Dependencies/imgui-master/examples/imgui_impl_opengl3.cpp
 
-                               Dependencies/tinyxml2/tinyxml2.cpp)
-                               #Dependencies/glm/glm/glm.hpp)
-# file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
+                                Dependencies/tinyxml2/tinyxml2.cpp)
+                                #Dependencies/glm/glm/glm.hpp)
+                                # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
 
 if(WIN32)
     list(REMOVE_ITEM PROJECT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Window.cpp
-                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/FileSystem.cpp
-                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/InputSystem.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/FileSystem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/InputSystem.cpp)
 else()
     list(REMOVE_ITEM PROJECT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Window.cpp
-                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/FileSystem.cpp
-                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/InputSystem.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/FileSystem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/InputSystem.cpp)
 endif()
 
 # file(GLOB PROJECT_SHADERS Resources/Shaders/glsl/*.glsl
@@ -151,19 +137,48 @@ source_group("Sources" FILES ${PROJECT_SOURCES})
 source_group("Dependencies" FILES ${DEPENDENCIES_SOURCES})
 
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\"
-                -D IMGUI_IMPL_OPENGL_LOADER_GLAD)
+-D IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
+#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/Dependencies/openal-soft-master/)
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
-                               ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
-                               ${DEPENDENCIES_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS}
+                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
+                ${DEPENDENCIES_SOURCES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+                    src/
+                    ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/assimp/include/
+                    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/assimp/include/
+                    Dependencies/bullet3/src/
+                    Dependencies/
+                    Dependencies/glad/include/
+                    Dependencies/glfw/include/
+
+                    #Dependencies/openal-soft-master/
+                    Dependencies/openal-soft-master/include/
+
+                    Dependencies/imgui-master/
+                    Dependencies/imgui-master/examples/
+                    ${CMAKE_CURRENT_BINARY_DIR}/
+                    Dependencies/glm/)
+                    #Dependencies/stb/
+                    #Dependencies/tinyxml2/)
+
+include (GenerateExportHeader)
+generate_export_header(${PROJECT_NAME}
+    #BASE_NAME ${PROJECT_NAME}
+    EXPORT_MACRO_NAME NOVA_EXPORT
+    EXPORT_FILE_NAME NovaExports.h
+    #STATIC_DEFINE NOVA_EXPORT_BUILT_AS_STATIC
+    )
                                
-target_link_libraries(${PROJECT_NAME} glfw assimp openal
-                               ${GLAD_LIBRARIES}
-                      BulletDynamics BulletCollision LinearMath)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+                        glfw assimp
+                        ${GLAD_LIBRARIES}
+                        BulletDynamics BulletCollision LinearMath
+                        openal)
                                
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-#RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

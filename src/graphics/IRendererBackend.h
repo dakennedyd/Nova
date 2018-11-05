@@ -26,7 +26,7 @@
 #include <unordered_map>
 namespace Nova
 {
-struct Skybox;
+struct PBRSkybox;
 class IRendererBackend
 {
   public:
@@ -34,7 +34,7 @@ class IRendererBackend
     virtual ~IRendererBackend() = default;
     virtual void init() = 0;
     virtual void render() = 0;
-    virtual void setSkyBox(const Skybox &skyBox) = 0;
+    virtual void setSkyBox(const std::shared_ptr<PBRSkybox> &skyBox) = 0;
     virtual std::unordered_map<std::string, long> &getProfileTimes() = 0;
     // virtual void setSkyBox(std::shared_ptr<TextureCube> skyBox) = 0;
     // virtual void setIBLData(std::shared_ptr<IBL_Data> data) = 0; NOO

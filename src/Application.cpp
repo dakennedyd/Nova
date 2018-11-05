@@ -186,6 +186,7 @@ void Application::startUp()
         FileSystem::getInstance().startUp();
 #ifdef LOG_ACTIVE
         Logger::getInstance().startUp();
+        LOG_INFO("Excutable path is " << PATH_TO_BINARY);
 #endif
         EngineSettings::getInstance().startUp();
         Physics::getInstance().startUp();

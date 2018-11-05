@@ -15,7 +15,7 @@ Visual Studio should be able to configure, compile and build the project for you
 
 ### Linux(Ubuntu) instructions:
 Open a terminal and type:
-```
+```bash
 sudo apt install build-essential cmake git libpulse-dev portaudio19-dev libsndio-dev
 git clone https://gitlab.com/dakennedy/Nova
 cd Nova
@@ -28,17 +28,16 @@ cp -r ..Resources .
 
 ## Dependencies
 You don't need to download this is all included inside this repo, this is just for reference
-Functionality           					| Library
------------------------ 					| ------------------------------------------
-Mesh Loading            					| [assimp](https://github.com/assimp/assimp)
-Physics                 					| [bullet](https://github.com/bulletphysics/bullet3)
-OpenGL Function Loader  					| [glad](https://github.com/Dav1dde/glad)
-Windowing and Input     					| [glfw](https://github.com/glfw/glfw)
-OpenGL Mathematics      					| [glm](https://github.com/g-truc/glm) (only used for the test functions)
-Texture and sound decoding		         	| [stb](https://github.com/nothings/stb)
-Graphical UI								| [Imgui](https://github.com/ocornut/imgui)
-Sound										| [OpenAL Soft](https://github.com/kcat/openal-soft) (LGPL licensed)
-XML parser									| [Tinyxml2](https://github.com/leethomason/tinyxml2)
+|Functionality           					| Library                                                           |
+|----------------------- 					|------------------------------------------                         |
+|Mesh Loading            					| [assimp](https://github.com/assimp/assimp)                        |
+|Physics                 					| [bullet](https://github.com/bulletphysics/bullet3)                |
+|OpenGL Function Loader  					| [glad](https://github.com/Dav1dde/glad)                           |
+|Windowing and Input     					| [glfw](https://github.com/glfw/glfw)                              |
+|Texture and sound decoding		         	| [stb](https://github.com/nothings/stb)                            |
+|Graphical UI								| [Imgui](https://github.com/ocornut/imgui)                         |
+|Sound										| [OpenAL Soft](https://github.com/kcat/openal-soft) (LGPL licensed)|
+|XML parser									| [Tinyxml2](https://github.com/leethomason/tinyxml2)               |
 
 ## License
 >The MIT License (MIT)

@@ -41,7 +41,7 @@ class Settings
   public:
     Settings() : mFileName(CONFIGURATION_FILE_NAME){};
     /*defines the configuration file*/
-    Settings(const std::string &fileName) : mFileName(DEFAULT_FILE_PATH + fileName){};
+    Settings(const std::string &fileName) : mFileName(PATH_TO_BINARY + fileName){};
     virtual ~Settings() = default;
 
     void add(const std::string &section, const std::string &property, const std::string &value);
@@ -65,7 +65,7 @@ class Settings
     void clear();
     std::unordered_map<std::string, PropertyValue> mSettingsData;
     std::string mFileName;
-    std::string mFileAndPath = DEFAULT_FILE_PATH + mFileName;
+    std::string mFileAndPath = PATH_TO_BINARY + mFileName;
     const std::string mDelimiter = "=";
     const std::string mCommentMarker = "#";
     const std::string mSectionDelimiterStart = "[";

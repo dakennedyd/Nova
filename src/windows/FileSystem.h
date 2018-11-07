@@ -26,6 +26,7 @@
 #include "ISubSystem.h"
 #include <string>
 #include <vector>
+#include <windows.h>
 
 struct aiScene;
 namespace Nova
@@ -65,6 +66,20 @@ class FileSystem : public ISingleton<FileSystem>, public ISubSystem
     std::vector<std::string> getFilenamesInDirectory(const std::string &path,
                                                      bool recursive = true);
     std::string getFilenameExtension(const std::string &filenameAndPath);
+
+    bool static fileExists(const std::string &name)
+    {
+        LPCTSTR szPath = name;
+        DWORD dwAttrib = GetFileAttributes(szPath);
+
+        return (dwAttrib != INVALID_FILE_ATTRIBUTES /*&& !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY)*/);
+    }
+
+    std::string static getExecutablePath()
+    {
+        char result[MAX_PATH];
+        return std::string(result, GetModuleFileName(NULL, result, MAX_PATH));
+    }
 
   private:
 };

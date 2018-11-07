@@ -40,7 +40,7 @@
 namespace Nova
 {
 RendererBackendDeferred::RendererBackendDeferred()
-    : mCurrentSkybox(ResourceManager::getInstance().get<PBRSkybox>("textures/skyboxes/fireSky")),
+    : mCurrentSkybox(ResourceManager::getInstance().get<PBRSkybox>("textures/skyboxes/studio")),
       mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
       mLightPassFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth, mHeight)),
       mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),

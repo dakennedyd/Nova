@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>	
+<programs>
+		<program name="shaders/shadowmap">
+			<opengl version="3.3">shadowMap.glsl</opengl>	
+		</program>	
+		<program name="shaders/skybox">
+			<opengl version="3.3">skybox_deferred_pbr.glsl</opengl>	
+		</program>
+		<program name="shaders/geometry_pass_PBR">
+			<opengl version="3.3">geometryPassPBR.glsl</opengl>	
+		</program>				
+		<program name="shaders/light_pass_PBR">
+			<opengl version="3.3">lightPassPBR.glsl</opengl>	
+		</program>
+		<program name="shaders/vbloom">
+			<opengl version="3.3">vbloom.glsl</opengl>	
+		</program>
+		<program name="shaders/hbloom">
+			<opengl version="3.3">hbloom.glsl</opengl>	
+		</program>
+		<program name="shaders/tonemap">
+			<opengl version="3.3">tonemap.glsl</opengl>	
+		</program>
+	</programs>
+</resources>

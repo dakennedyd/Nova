@@ -81,11 +81,6 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
     }
     else if (type == "Skybox")
     {
-        std::string skyboxPath{PATH_TO_ENGINE_BINARY + TEXTURES_PATH};
-        if (!FileSystem::fileExists(skyboxPath))
-        {
-            skyboxPath = PATH_TO_BINARY + TEXTURES_PATH;
-        }
         std::string irradianceTextureFilePath{"NO TEXTURE"};
         std::string albedoTextureFilePath{"NO TEXTURE"};
         std::string brdflutTextureFilePath{"NO TEXTURE"};
@@ -94,6 +89,11 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
         if (!textureNode.isEmpty())
         {
             albedoTextureFilePath = textureNode.getText();
+        }
+        std::string skyboxPath{PATH_TO_ENGINE_BINARY + TEXTURES_PATH};
+        if (!FileSystem::fileExists(PATH_TO_ENGINE_BINARY + TEXTURES_PATH + albedoTextureFilePath))
+        {
+            skyboxPath = PATH_TO_BINARY + TEXTURES_PATH;
         }
         auto albedo = std::make_shared<TextureCube>(skyboxPath + albedoTextureFilePath);
 
@@ -133,16 +133,15 @@ std::shared_ptr<ResourceBase> loadTexture(const XMLNode &metadata)
 
 std::shared_ptr<ResourceBase> loadShader(const XMLNode &metadata)
 {
-    std::string shaderPath{PATH_TO_ENGINE_BINARY + SHADERS_PATH};
-    if (!FileSystem::fileExists(shaderPath))
-    {
-        shaderPath = PATH_TO_BINARY + SHADERS_PATH;
-    }
-
     std::string name{metadata.getAttributeValue("name")};
     XMLNode programNode(metadata.getChildElement(RENDERER));
-    std::string src{shaderPath + programNode.getText()};
-    return std::make_shared<GPUProgram>(src);
+    std::string src{programNode.getText()};
+    std::string shaderPath{PATH_TO_ENGINE_BINARY + SHADERS_PATH + src};
+    if (!FileSystem::fileExists(shaderPath))
+    {
+        shaderPath = PATH_TO_BINARY + SHADERS_PATH + src;
+    }
+    return std::make_shared<GPUProgram>(shaderPath);
 }
 
 /*this is just a placeholder loader until i implement pbr materials */
@@ -181,14 +180,6 @@ std::shared_ptr<ResourceBase> loadMaterial(const XMLNode &metadata)
         }
         else if (type == "specular")
         {
-        
-
-
-
-
-
-
-
         }*/
         // std::string textureName{ texture.getText() };
         // std::shared_ptr<ITexture> a = rm.get<ITexture>(textureName);
@@ -243,15 +234,13 @@ std::shared_ptr<ResourceBase> loadMesh(const XMLNode &metadata)
     }
     else if (type == "file")
     {
-        std::string modelPath{PATH_TO_ENGINE_BINARY + MODELS_PATH};
+        std::string src{metadata.getChildElement("src").getText()};
+        std::string modelPath{PATH_TO_ENGINE_BINARY + MODELS_PATH + src};
         if (!FileSystem::fileExists(modelPath))
         {
-            modelPath = PATH_TO_BINARY + MODELS_PATH;
+            modelPath = PATH_TO_BINARY + MODELS_PATH + src;
         }
-
-        std::string src{modelPath + metadata.getChildElement("src").getText()};
-        return loadModel(src);
-        // return std::make_shared<Mesh>(Mesh::makeIcosahedron());
+        return loadModel(modelPath);
     }
     else
     {
@@ -262,10 +251,11 @@ std::shared_ptr<ResourceBase> loadMesh(const XMLNode &metadata)
 
 std::shared_ptr<ResourceBase> loadSound(const XMLNode &metadata)
 {
-    std::string soundPath{PATH_TO_ENGINE_BINARY + SOUNDS_PATH};
+    std::string fileName{metadata.getChildElement("filename").getText()};
+    std::string soundPath{PATH_TO_ENGINE_BINARY + SOUNDS_PATH + fileName};
     if (!FileSystem::fileExists(soundPath))
     {
-        soundPath = PATH_TO_BINARY + SOUNDS_PATH;
+        soundPath = PATH_TO_BINARY + SOUNDS_PATH + fileName;
     }
 
     std::string name = metadata.getAttributeValue("name");
@@ -276,10 +266,9 @@ std::shared_ptr<ResourceBase> loadSound(const XMLNode &metadata)
     // float pitch = std::stof(metadata.getAttributeValue("pitch"));
 
     // std::string fileName = metadata.getText();
-    std::string fileName{soundPath + metadata.getChildElement("filename").getText()};
     LOG_DEBUG("loading sound:" << name);
 
-    return std::make_shared<SoundBuffer>(fileName);
+    return std::make_shared<SoundBuffer>(soundPath);
 }
 
 } // namespace Nova

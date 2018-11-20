@@ -31,6 +31,8 @@
 #include "math/Vector.h"
 //#include <memory>
 //#include <string>
+#include "DefaultComponents.h"
+#include "Physics.h"
 
 namespace Nova
 {
@@ -111,6 +113,8 @@ void Entity::move(const Vec3 &vector) { mTransform.translation = mTransform.tran
 
 void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
 {
+    // auto beforeMove = mTransform.finalTransform.getTranslation();
+
     Mat4 transformToPropagate;
     if (mTransform.propagationType == PropagationType::POSITION_ONLY)
     {
@@ -140,6 +144,13 @@ void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
     mTransform.finalTransform = mTransform.finalTransform * fatherTransform;
 
     mTransform.finalTranslation = mTransform.finalTransform.getTranslation();
+
+    if (containsComponent<PhysicalComponent>())
+    {
+        // Physics::getInstance().pushObject(mEntityID, mTransform.finalTranslation - beforeMove);
+        Physics::getInstance().moveObject(mEntityID, mTransform.finalTransform);
+    }
+    
     // TODO: should not calculate normal for transform that don't need them
     // mTransform.normalMatrix = mTransform.finalTransform.calcNormalMatrix();
     for (auto &keyEntityPair : mChildren)
@@ -154,40 +165,4 @@ void Entity::playSound(const std::shared_ptr<SoundBuffer> soundBuffer)
 
 void Entity::stopSound() { Audio::getInstance().stopSound(*this); }
 
-/*void Entity::setFinalTransform()
-{
-        Mat4 transform(mTransform.rotation.toRotationMatrix4()
-                * Mat4::makeTranslationMatrix(mTransform.translation)
-                * Mat4::makeScalingMatrix(mTransform.scale));
-
-        //this is not perfect frame by frame but seems to work fine
-        //at 75fps
-        if (mParent)
-        {
-                mTransform.finalTransform = transform * mParent->getFinalTransform();
-        }
-        else {
-                mTransform.finalTransform = transform;
-        }
-        mTransform.normal = mTransform.finalTransform.calcNormalMatrix();
-}*/
-
-/*void Entity::setTransform(const Mat4 & transform)
-{
-        mTransform.transform = transform;
-}*/
-
-/*void Entity::addComponent(IComponent * component)
-{
-        //mComponents[std::type_index(typeid(component))] = component;
-        mComponents.insert(std::make_pair(
-                std::type_index(typeid(component)),
-                component));
-}*/
-/*void Entity::subscribeTo(System * system)
-{
-        mSubscribedSystems.insert(std::make_pair(
-                std::type_index(typeid(system)),
-                system));
-}*/
 } // namespace Nova

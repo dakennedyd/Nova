@@ -22,5 +22,8 @@
 		<program name="shaders/tonemap">
 			<opengl version="3.3">tonemap.glsl</opengl>	
 		</program>
+		<program name="shaders/physicsDebugDraw">
+			<opengl version="3.3">PhysicsDebugDraw.glsl</opengl>	
+		</program>
 	</programs>
 </resources>

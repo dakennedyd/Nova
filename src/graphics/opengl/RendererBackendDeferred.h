@@ -34,6 +34,7 @@
 //#include "ECS/DefaultComponents.h"
 #include "ECS/Entity.h"
 #include "Mesh.h"
+#include "Physics.h"
 #include <memory>
 
 namespace Nova
@@ -76,7 +77,9 @@ class RendererBackendDeferred : public IRendererBackend
 
     std::unordered_map<std::string, long> &getProfileTimes() override { return mProfileTimes; };
 
+    void drawLine(const Vec3 &from, const Vec3 &to, const Vec3 &color = Vec3(1.0f)) override;
   private:
+    void PhysicsDebugDraw() { Physics::getInstance().mDynamicsWorld->debugDrawWorld(); };
     // bool mIsInitialized = false;
     int mWidth = Window::getInstance().getWidth();
     int mHeight = Window::getInstance().getHeight();

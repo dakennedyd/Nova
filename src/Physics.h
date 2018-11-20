@@ -95,6 +95,28 @@ struct CollisionAction
     btCollisionObject *body;
 };
 
+class PhysicsDebugDrawer : public btIDebugDraw
+{
+  public:
+    PhysicsDebugDrawer() = default;
+    ~PhysicsDebugDrawer() = default;
+    void drawLine(const btVector3 &from, const btVector3 &to, const btVector3 &color) override;
+    // virtual void drawSphere(const btVector3 &p, btScalar radius, const btVector3 &color);
+    // virtual void drawTriangle(const btVector3 &a, const btVector3 &b, const btVector3 &c,
+    //                           const btVector3 &color, btScalar alpha);
+    void drawContactPoint(const btVector3 &PointOnB, const btVector3 &normalOnB, btScalar distance,
+                          int lifeTime, const btVector3 &color) override
+    {
+    }
+    void reportErrorWarning(const char *warningString) override;
+    void draw3dText(const btVector3 &location, const char *textString) override {}
+    void setDebugMode(int debugMode) override { mDebugDrawerMode = debugMode; }
+    int getDebugMode() const override { return mDebugDrawerMode; }
+
+  private:
+    int mDebugDrawerMode;
+};
+
 class Physics : public ISingleton<Physics>, public ISubSystem
 {
   public:
@@ -107,6 +129,8 @@ class Physics : public ISingleton<Physics>, public ISubSystem
                    const Vec3 &scale, const Vec3 &translation, const UnitQuat &rotation,
                    const float mass, const float friction, const float restitution);
     void removeObject(const uint64_t id);
+    void moveObject(const uint64_t id, const Mat4 &transform);
+    void pushObject(const uint64_t id, const Vec3 &vector);
     void simulate(const float timeStep);
 
     /**
@@ -149,13 +173,15 @@ class Physics : public ISingleton<Physics>, public ISubSystem
 
     PhysicsTransform getObjectTransform(const uint64_t id);
 
+    btDiscreteDynamicsWorld *mDynamicsWorld;
+
   private:
+    btIDebugDraw *mDebugDrawer;
     // necessary for bullet init
     btDefaultCollisionConfiguration *mCollisionConfiguration;
     btCollisionDispatcher *mDispatcher;
     btBroadphaseInterface *mBroadPhase;
     btSequentialImpulseConstraintSolver *mSolver;
-    btDiscreteDynamicsWorld *mDynamicsWorld;
 
     // btAlignedObjectArray<std::pair<uint64_t, PhysicsObject>> mObjects;
     // std::vector<std::pair<uint64_t, PhysicsObject>> mObjects;

@@ -114,10 +114,15 @@ void RendererBackendDeferred::render()
         // packet.unBind();
     }
     /*glStencilMask(0x00);*/
+    auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
+    shader->bind();
+    PhysicsDebugDraw();
+    //shader->unBind();
 
     mCurrentSkyBoxPacket.bind();
     mCurrentSkyBoxPacket.updateAllUniforms();
     mCurrentSkyBoxPacket.draw();
+
     // mGBuffer.unBind();
     mProfileTimes["Geometry pass"] = timer.getMicro();
     timer.reset();
@@ -181,6 +186,7 @@ void RendererBackendDeferred::render()
     //                                " us. | light pass:" + std::to_string(mLightPassTime) +
     //                                " us. | postprocess pass:" +
     //                                std::to_string(mPostprocessTime));
+    DebugUI::getInstance().drawGUI();
 }
 
 void RendererBackendDeferred::setSkyBox(const std::shared_ptr<PBRSkybox> &skybox)
@@ -206,6 +212,45 @@ void RendererBackendDeferred::setSkyBox(const std::shared_ptr<PBRSkybox> &skybox
         {mCurrentSkybox->radiance, "uRadianceMap"},
         {mCurrentSkybox->BRDFLUT, "uBRDFLUT"}};
     mLightPassRenderPacket.getMaterial()->setTextures(v2);
+}
+
+void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const Vec3 &color)
+{
+    auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");    
+    auto id = shader->getProgramID();
+    auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
+    glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE, camera.view->getDataPtr());
+    glUniformMatrix4fv(glGetUniformLocation(id, "uProj"), 1, GL_FALSE,
+                       camera.projection->getDataPtr());
+
+    Vec3 vColor(0.0f,1.0f,0.0f);
+    glUniform3fv(glGetUniformLocation(id, "uColor"), 1, vColor.getDataPtr());
+
+    GLfloat vertices[] = {from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()};
+
+    GLuint vbo, vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao); // bind the VAO
+    
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glVertexAttribPointer(0,        // same as in glEnableVertexAttribArray(0)
+                          3,        // # of coordinates that build a vertex
+                          GL_FLOAT, // data type
+                          GL_FALSE, // normalized?
+                          0,        // stride
+                          nullptr); // vbo offset
+
+    glDrawArrays(GL_LINES, 0, 2);
+    glDisableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    glDeleteVertexArrays(1, &vao); //this is a bad idea
 }
 
 } // namespace Nova

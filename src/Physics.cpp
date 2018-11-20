@@ -28,6 +28,7 @@
 #include "math/Quaternion.h"
 //#include "math/Vector.h"
 #include "Crc.h"
+#include "graphics/opengl/GraphicsSystem.h"
 #include <string>
 
 namespace Nova
@@ -50,6 +51,12 @@ void Physics::startUp()
         new btDiscreteDynamicsWorld(mDispatcher, mBroadPhase, mSolver, mCollisionConfiguration);
 
     mDynamicsWorld->setGravity(btVector3(0, -9.81f, 0));
+
+    mDebugDrawer = new PhysicsDebugDrawer();
+    mDynamicsWorld->setDebugDrawer(mDebugDrawer);
+    
+    //mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe );
+    mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb);
 
     //===================================================================
 
@@ -75,6 +82,8 @@ void Physics::shutDown()
     delete mBroadPhase;
     delete mDispatcher;
     delete mCollisionConfiguration;
+
+    delete mDebugDrawer;
 }
 
 void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3 &dimensions,
@@ -113,7 +122,15 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
         btVector3(translation.getX(), translation.getY(), translation.getZ()));
     object.transform.setRotation(
         btQuaternion(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW()));
-    object.mass = mass;
+
+    bool kinematic = false;
+    float objectMass = mass;
+    if (objectMass < 0)
+    {
+        kinematic = true;
+        objectMass = 0;
+    }
+    object.mass = objectMass;
     // object.localInertia = btVector3(localInertia.getX(), localInertia.getY(),
     // localInertia.getZ());
     if (object.mass != 0.0f) object.shape->calculateLocalInertia(object.mass, object.localInertia);
@@ -126,9 +143,20 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
     object.bodyInfo->m_friction = friction;
     object.bodyInfo->m_restitution = restitution;
     object.body = new btRigidBody(*object.bodyInfo);
+
+    if (kinematic)
+    {
+        object.body->setCollisionFlags(object.body->getCollisionFlags() |
+                                       btCollisionObject::CF_KINEMATIC_OBJECT);
+        object.body->setActivationState(DISABLE_DEACTIVATION);
+    }
+    // object.body->setGravity(btVector3(0.0f, -gravity, 0.0f));
+
+    // object.body->setLinearVelocity(btVector3(1.0, 0.0, 0.0));
+    // object.body->applyCentralImpulse(btVector3(0.0, 0.0, 10.0));
+    // object.body->translate(btVector3(0.0, 0.0, 20.0));
     // object.body->setFriction(1.f);
     // object.body->setActivationState(DISABLE_DEACTIVATION);
-    object.body->applyCentralImpulse(btVector3(0.0, 0.0, 2.0));
     // object.body->setRollingFriction(.001);
     // object.body->setSpinningFriction(0.001);
     // object.body->setAnisotropicFriction(object.shape->getAnisotropicRollingFrictionDirection(),
@@ -221,6 +249,25 @@ void Physics::removeObject(const uint64_t id)
     mObjects.erase(id);
 }
 
+void Physics::moveObject(const uint64_t id, const Mat4 &transform)
+{
+    // Vec3 vector = transform.getTranslation();
+    // mObjects.at(id).body->applyCentralForce(btVector3{vector.getX(), vector.getY(),
+    // vector.getZ()});
+
+    btTransform btt;
+    btt.setFromOpenGLMatrix(transform.getDataPtr());
+    mObjects.at(id).motionState->setWorldTransform(btt);
+}
+
+void Physics::pushObject(const uint64_t id, const Vec3 &vector)
+{
+    // mObjects.at(id).body->applyCentralForce(btVector3{vector.getX(), vector.getY(),
+    // vector.getZ()});
+    mObjects.at(id).body->applyCentralImpulse(
+        btVector3{vector.getX(), vector.getY(), vector.getZ()});
+}
+
 void Physics::simulate(const float timeStep)
 {
     mDynamicsWorld->stepSimulation(timeStep);
@@ -253,4 +300,18 @@ btScalar PhysicalContactCallback::addSingleResult(btManifoldPoint &cp,
     //}
     return 0;
 }
+
+void PhysicsDebugDrawer::drawLine(const btVector3 &from, const btVector3 &to,
+                                  const btVector3 &color)
+{
+    GraphicsSystem::getInstance().getRendererBackend().drawLine(
+        Vec3{from.getX(), from.getY(), from.getZ()}, Vec3{to.getX(), to.getY(), to.getZ()},
+        Vec3{color.getX(), color.getY(), color.getZ()});
+}
+
+void PhysicsDebugDrawer::reportErrorWarning(const char *warningString)
+{
+    LOG_WARNING(std::string{warningString});
+}
+
 } // namespace Nova

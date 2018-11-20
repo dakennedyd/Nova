@@ -195,9 +195,9 @@ class PhysicalSystem final : public System
 {
     void processEntity(Entity *entity) override
     {
-        auto t = Physics::getInstance().getObjectTransform(entity->getID());
-        entity->setPosition(t.translation);
-        entity->setRotation(t.rotation);
+        // auto t = Physics::getInstance().getObjectTransform(entity->getID());
+        // entity->setPosition(t.translation);
+        // entity->setRotation(t.rotation);
 
         // float *object = Physics::getInstance().getObjectTransform(entity->getID());
         // entity->getNonConstTransformStruct().finalTransform.setDataPtr(object);

@@ -268,6 +268,8 @@ void Application::startMainLoop()
                 entityUpdateClock.reset();
                 mWorld.update(); // updates all entities in the world
                 Physics::getInstance().simulate(1.0f / timeDelta);
+
+
                 mProfileTimes["Entities update"] = entityUpdateClock.getMicro();
                 timeDelta -= SIMULATION_TIME_STEP;
 
@@ -275,6 +277,14 @@ void Application::startMainLoop()
                 mouse.mPreviousY = mouse.mY; // needed so that mouse.getMotionVector() can work
                 mouse.wheel = 0;
                 Audio::getInstance().updateListenerData();
+            }
+            // sync physics sim with the graphics system
+            for (auto &IDEntityPair : mWorld.GetSystem<PhysicalSystem>()->getEntities())
+            {
+                auto &e = *IDEntityPair.second;
+                auto t = Physics::getInstance().getObjectTransform(e.getID());
+                e.setPosition(t.translation);
+                e.setRotation(t.rotation);
             }
             if (soundCleanUp.getMillis() > 500)
             {
@@ -285,8 +295,7 @@ void Application::startMainLoop()
 
             renderClock.reset();
             rendererBackend.render();
-            mProfileTimes["Render time"] = renderClock.getMicro();
-            DebugUI::getInstance().drawGUI();
+            mProfileTimes["Render time"] = renderClock.getMicro();            
             window.swapFrameBuffers();
             // glFinish();
             frameTime = frameTimeClock.getMillis();

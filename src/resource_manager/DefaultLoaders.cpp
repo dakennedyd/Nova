@@ -135,16 +135,20 @@ std::shared_ptr<ResourceBase> loadShader(const XMLNode &metadata)
 {
     std::string name{metadata.getAttributeValue("name")};
     XMLNode programNode(metadata.getChildElement(RENDERER));
-    std::string src{programNode.getText()};
-    std::string shaderPath{PATH_TO_ENGINE_BINARY + SHADERS_PATH + src};
+    std::string srcFile{programNode.getText()};
+
+    //search for shader file in this path first
+    std::string shaderPath{PATH_TO_ENGINE_BINARY + SHADERS_PATH + srcFile};
     if (!FileSystem::fileExists(shaderPath))
     {
-        shaderPath = PATH_TO_BINARY + SHADERS_PATH + src;
+        shaderPath = PATH_TO_BINARY + SHADERS_PATH + srcFile;
+        if (!FileSystem::fileExists(shaderPath)){
+            LOG_ERROR("Can't find file:" << srcFile);
+        }
     }
     return std::make_shared<GPUProgram>(shaderPath);
 }
 
-/*this is just a placeholder loader until i implement pbr materials */
 std::shared_ptr<ResourceBase> loadMaterial(const XMLNode &metadata)
 {
     std::string name{metadata.getAttributeValue("name")};

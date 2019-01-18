@@ -87,14 +87,14 @@ class RendererBackendDeferred : public IRendererBackend
     std::shared_ptr<PBRSkybox> mCurrentSkybox = nullptr;
     FrameBuffer mGBuffer;
     FrameBuffer mLightPassFrameBuffer;
-    FrameBuffer mHBloomFrameBuffer;
-    FrameBuffer mVBloomFrameBuffer;
+    FrameBuffer mHBloomFrameBuffer[5];
+    FrameBuffer mVBloomFrameBuffer[5];
 
     RenderPacket mLightPassRenderPacket;
-    RenderPacket mFinalPacket;
-    RenderPacket mHBloomPacket;
-    RenderPacket mVBloomPacket;
+    RenderPacket mHBloomPacket[5];
+    RenderPacket mVBloomPacket[5];
     RenderPacket mCurrentSkyBoxPacket;
+    RenderPacket mFinalPacket;
 
     // long mGPassTime, mLightPassTime, mPostprocessTime;
     std::unordered_map<std::string, long> mProfileTimes;

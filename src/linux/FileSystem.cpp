@@ -34,14 +34,22 @@
 #include <stb/stb_image.h>
 #include <string>
 #include <vector>
+#include"Init.h"
+#ifdef NOVA_OPENGL
+    #include "graphics/opengl/RendererInit.h"
+#endif
 
 namespace Nova
 {
 void FileSystem::startUp()
 {
     // stbi_set_flip_vertically_on_load(true);
+    initDirWatcher();
 }
-void FileSystem::shutDown() {}
+void FileSystem::shutDown() 
+{ 
+    deInitDirWatcher();
+}
 std::string FileSystem::loadFileAsString(const std::string &pathAndFileName)
 {
     std::ifstream ifs(pathAndFileName.c_str(), std::ios::in /*| std::ios::binary*/ | std::ios::ate);
@@ -158,6 +166,80 @@ const aiScene *FileSystem::loadModel(const std::string &pathAndFileName)
     }
 
     return scene;
+}
+
+std::vector<std::string> FileSystem::checkIfShadersChanged()
+{
+    std::vector<std::string> result;
+    if (poll(&mFileDescriptorData, 1, 0) > 0)
+    {
+        /*some non portable alignment shiz(gcc only i dont know about clang etc),
+        you can live without it on x86 is probably gonna be a little bit slower
+        but in this case speed is of no concern*/
+        char buffer[4096] __attribute__((aligned(__alignof__(struct inotify_event))));
+        const struct inotify_event *event;
+        ssize_t readOffset;
+        char *ptr;
+
+        /* Read some events. */
+        readOffset = read(mFileDescriptor, buffer, sizeof buffer);
+        if (readOffset == -1) // && errno != EAGAIN)
+        {
+            LOG_ERROR("Inotify:Can't read events");
+        }
+
+        /* Loop over all events in the buffer */
+        for (ptr = buffer; ptr < buffer + readOffset;
+             ptr += sizeof(struct inotify_event) + event->len)
+        {
+            //event = (const struct inotify_event *)ptr;
+            event = (const struct inotify_event *)buffer;
+            if (event->len)
+            {
+                //std::cout << event->name << "\n";                
+                std::string shaderFile = event->name;
+                if(shaderFile.substr(shaderFile.size()-5, shaderFile.size()) == ".glsl")
+                {
+                    shaderFile = "shaders/" + shaderFile;                
+                    shaderFile = shaderFile.substr(0, shaderFile.size()-5);
+                    result.push_back(shaderFile);
+                }
+            }
+        }
+    }
+    return result; 
+}
+
+void FileSystem::initDirWatcher()
+{
+    /* Create the file descriptor for accessing the inotify API */
+    mFileDescriptor = inotify_init1(IN_NONBLOCK);
+    if (mFileDescriptor == -1)
+    {
+        LOG_ERROR("Inotify:Can't initialize the API");
+    }
+
+    /* Mark directories for events */
+    std::string s = PATH_TO_ENGINE_BINARY + SHADERS_PATH;
+    s = s.substr(0,s.size()-1);
+    const char *dirPath = s.c_str();
+    //const char *dirPath = "/home/david/src/project_nova/TestGame/bin/engine/Resources/shaders/glsl";
+    mWatchDescriptor =
+        inotify_add_watch(mFileDescriptor, dirPath, /*IN_OPEN | IN_CLOSE*/ IN_MODIFY);
+    if (mWatchDescriptor == -1)
+    {
+        LOG_ERROR("Inotify:Can't create dir watcher")
+    }
+
+    /* Prepare for polling */
+    mFileDescriptorData.fd = mFileDescriptor;
+    mFileDescriptorData.events = POLLIN;
+}
+
+void FileSystem::deInitDirWatcher()
+{
+    /* Close inotify file descriptor */
+    close(mFileDescriptor);
 }
 // std::vector<std::string> FileSystem::getFilenamesInDirectory(const std::string & path, bool
 // recursive)

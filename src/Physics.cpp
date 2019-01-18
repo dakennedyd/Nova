@@ -56,7 +56,8 @@ void Physics::startUp()
     mDynamicsWorld->setDebugDrawer(mDebugDrawer);
     
     //mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe );
-    mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb);
+    //mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb);
+    mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 
     //===================================================================
 
@@ -148,8 +149,8 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
     {
         object.body->setCollisionFlags(object.body->getCollisionFlags() |
                                        btCollisionObject::CF_KINEMATIC_OBJECT);
-        object.body->setActivationState(DISABLE_DEACTIVATION);
     }
+        object.body->setActivationState(DISABLE_DEACTIVATION);
     // object.body->setGravity(btVector3(0.0f, -gravity, 0.0f));
 
     // object.body->setLinearVelocity(btVector3(1.0, 0.0, 0.0));
@@ -258,6 +259,7 @@ void Physics::moveObject(const uint64_t id, const Mat4 &transform)
     btTransform btt;
     btt.setFromOpenGLMatrix(transform.getDataPtr());
     mObjects.at(id).motionState->setWorldTransform(btt);
+    //mObjects.at(id).body->proceedToTransform(btt);
 }
 
 void Physics::pushObject(const uint64_t id, const Vec3 &vector)

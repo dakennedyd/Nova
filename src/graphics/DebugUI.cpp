@@ -175,7 +175,7 @@ void DebugUI::drawGUI()
 
             // ImGui::Text("Frametime:%.2f ms. (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
             //             ImGui::GetIO().Framerate); // frametime
-            ImGui::Text("Frametime:%.2f ms.", 1000.0f / ImGui::GetIO().Framerate); // frametime
+            ImGui::Text("Framecap:%.2f ms.", 1000.0f / ImGui::GetIO().Framerate); // frametime
 
             ImGui::Text("Entities total:%d",
                         Application::getInstance().getWorld().getNumEntities());

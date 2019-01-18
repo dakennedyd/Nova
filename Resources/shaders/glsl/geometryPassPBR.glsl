@@ -49,6 +49,7 @@ layout(location = 3) out vec4 gNormalMapAO;
 void main()
 {
     vec4 details = texture(uDetailsMap, lerpedTexCoords);
+    //details = pow(details, vec4(2.2));
     // store the fragment position vector in the first gbuffer texture
     gPosMetal = vec4(fragPos, details.r);
     // also store the per-fragment normals into the gbuffer
@@ -56,9 +57,13 @@ void main()
     // and the diffuse per-fragment color
     gAlbedoSkyboxmask.rgb = texture(uAlbedoMap, lerpedTexCoords).rgb;
     gAlbedoSkyboxmask.rgb = pow(gAlbedoSkyboxmask.rgb, vec3(2.2));
+    
     // store specular intensity in gAlbedoSpec's alpha component
     gAlbedoSkyboxmask.a = 0; // details.b;//texture(diffuse0, lerpedTexCoords).r;
-    gNormalMapAO.xyz = texture(uNormalMap, lerpedTexCoords).xyz;
+    gNormalMapAO.xyz = texture(uNormalMap, lerpedTexCoords).xyz;    
+    //gNormalMapAO.xyz = pow(gNormalMapAO.xyz, vec3(2.2));
+
     gNormalMapAO.w = details.b;
+    //gNormalMapAO.w = pow(gNormalMapAO.w, 2.2);
 }
 #endif

@@ -28,16 +28,16 @@ cp -r ..Resources .
 
 ## Dependencies
 You don't need to download this is all included inside this repo, this is just for reference
-|Functionality           					| Library                                                           |
-|----------------------- 					|------------------------------------------                         |
-|Mesh Loading            					| [assimp](https://github.com/assimp/assimp)                        |
-|Physics                 					| [bullet](https://github.com/bulletphysics/bullet3)                |
-|OpenGL Function Loader  					| [glad](https://github.com/Dav1dde/glad)                           |
-|Windowing and Input     					| [glfw](https://github.com/glfw/glfw)                              |
-|Texture and sound decoding		         	| [stb](https://github.com/nothings/stb)                            |
-|Graphical UI								| [Imgui](https://github.com/ocornut/imgui)                         |
-|Sound										| [OpenAL Soft](https://github.com/kcat/openal-soft) (LGPL licensed)|
-|XML parser									| [Tinyxml2](https://github.com/leethomason/tinyxml2)               |
+|Functionality           	| Library                                                           |
+|----------------------- 	|------------------------------------------                         |
+|Mesh Loading            	| [assimp](https://github.com/assimp/assimp)                        |
+|Physics                 	| [bullet](https://github.com/bulletphysics/bullet3)                |
+|OpenGL Function Loader  	| [glad](https://github.com/Dav1dde/glad)                           |
+|Windowing and Input     	| [glfw](https://github.com/glfw/glfw)                              |
+|Texture and sound decoding	| [stb](https://github.com/nothings/stb)                            |
+|Graphical UI				| [Imgui](https://github.com/ocornut/imgui)                         |
+|Sound						| [OpenAL Soft](https://github.com/kcat/openal-soft) (LGPL licensed)|
+|XML parser					| [Tinyxml2](https://github.com/leethomason/tinyxml2)               |
 
 ## License
 >The MIT License (MIT)

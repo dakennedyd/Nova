@@ -113,7 +113,7 @@ void Entity::move(const Vec3 &vector) { mTransform.translation = mTransform.tran
 
 void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
 {
-    // auto beforeMove = mTransform.finalTransform.getTranslation();
+    auto beforeMove = mTransform.finalTransform.getTranslation();
 
     Mat4 transformToPropagate;
     if (mTransform.propagationType == PropagationType::POSITION_ONLY)
@@ -140,23 +140,25 @@ void Entity::setFinalTransformAndPropagate(const Mat4 &fatherTransform)
     {
         LOG_ERROR("unrecognized propagation type for entity:" << mName);
     }
-    transformToPropagate = transformToPropagate * fatherTransform;
+    transformToPropagate = fatherTransform * transformToPropagate;
     mTransform.finalTransform = mTransform.finalTransform * fatherTransform;
-
     mTransform.finalTranslation = mTransform.finalTransform.getTranslation();
 
-    if (containsComponent<PhysicalComponent>())
-    {
-        // Physics::getInstance().pushObject(mEntityID, mTransform.finalTranslation - beforeMove);
-        Physics::getInstance().moveObject(mEntityID, mTransform.finalTransform);
-    }
-    
     // TODO: should not calculate normal for transform that don't need them
     // mTransform.normalMatrix = mTransform.finalTransform.calcNormalMatrix();
     for (auto &keyEntityPair : mChildren)
     {
         keyEntityPair.second->setFinalTransformAndPropagate(transformToPropagate);
     }
+
+    // if (containsComponent<PhysicalComponent>())
+    // {
+    //     auto &pc = getComponent<PhysicalComponent>();
+    //     if (pc.mass < 0)
+    //     //Physics::getInstance().pushObject(mEntityID, mTransform.finalTranslation - beforeMove);
+    //     Physics::getInstance().moveObject(mEntityID, mTransform.finalTransform);
+    //     //Physics::getInstance().moveObject(mEntityID, transformToPropagate);
+    // }
 }
 void Entity::playSound(const std::shared_ptr<SoundBuffer> soundBuffer)
 {

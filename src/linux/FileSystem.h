@@ -29,6 +29,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <vector>
+#include <string>
+#include <poll.h>
+#include <sys/inotify.h>
 
 struct aiScene;
 namespace Nova
@@ -93,6 +96,17 @@ class FileSystem : public ISingleton<FileSystem>, public ISubSystem
         // return std::string(pathAndExe, (count > 0) ? count : 0);
     }
 
+    /**
+     * @brief checks if shaders in SHADERS_PATH changed and
+     * return a vector of strings containing the names of
+     * the shaders that have been modified
+     */
+    std::vector<std::string> checkIfShadersChanged();
+
   private:
+    int mFileDescriptor, mWatchDescriptor;
+    struct pollfd mFileDescriptorData;    
+    void initDirWatcher();
+    void deInitDirWatcher();
 };
 } // namespace Nova

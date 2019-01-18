@@ -49,7 +49,9 @@ class FrameBuffer : public IFrameBuffer
     void bind() const override;
     void unBind() const override;
 
+    unsigned getFrameBufferID() { return mFrameBufferID; }
     const std::shared_ptr<Texture> getColorTexture(const int textureNumber);
+    const std::shared_ptr<Texture> getDepthBuffer();
 
     static FrameBuffer makeShadowMapFrameBuffer(const int width = DEFAULT_SHADOW_MAP_WIDTH,
                                                 const int height = DEFAULT_SHADOW_MAP_HEIGHT)
@@ -68,10 +70,11 @@ class FrameBuffer : public IFrameBuffer
     void bindAllTextutes(); // binds all color textures attached to this framebuffer
     void unBindAllTextures();
 
-  private:
     // attaches textures to the framebuffer, after attaching all the textures
     // you have to check for FB completeness
     void attachTexture(const std::shared_ptr<Texture> texture);
+
+  private:
     GLuint mFrameBufferID;
     // GLuint mDepthBufferID;
     // GLuint mDepthStencilRenderBufferID;

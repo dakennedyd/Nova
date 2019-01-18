@@ -198,6 +198,7 @@ class PhysicalSystem final : public System
         // auto t = Physics::getInstance().getObjectTransform(entity->getID());
         // entity->setPosition(t.translation);
         // entity->setRotation(t.rotation);
+        
 
         // float *object = Physics::getInstance().getObjectTransform(entity->getID());
         // entity->getNonConstTransformStruct().finalTransform.setDataPtr(object);

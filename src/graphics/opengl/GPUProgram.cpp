@@ -38,16 +38,21 @@
 
 namespace Nova
 {
-/*GPUProgram::GPUProgram(const std::string & vertexShader, const std::string & pixelShader)
+GPUProgram::GPUProgram(const std::string &fileAndPath) 
+: mProgramID(0), mPathAndFile(fileAndPath)
 {
-        construct(vertexShader, pixelShader);
-}*/
+    LOG_DEBUG("Loading shader:" << mPathAndFile);
+    recompile();
+}
 
-GPUProgram::GPUProgram(const std::string &fileAndPath) : mProgramID(glCreateProgram())
+GPUProgram::~GPUProgram() { glDeleteProgram(mProgramID); }
+
+void GPUProgram::recompile()
 {
-    LOG_DEBUG("Loading shader:" << fileAndPath);
+    glDeleteProgram(mProgramID);    
+    mProgramID = glCreateProgram();
     size_t secondLinePosition = 0;
-    std::string srcFile(FileSystem::getInstance().loadFileAsString(fileAndPath));
+    std::string srcFile(FileSystem::getInstance().loadFileAsString(mPathAndFile));
 
     if (srcFile.find_first_of(std::string("#version")) != std::string::npos)
     {
@@ -60,33 +65,13 @@ GPUProgram::GPUProgram(const std::string &fileAndPath) : mProgramID(glCreateProg
     std::string vs(srcFile);
     vs.insert(secondLinePosition, "#define NOVA_VERTEX_SHADER\n");
     std::string ps(srcFile);
-    ps.insert(secondLinePosition, "#define NOVA_FRAGMENT_SHADER\n");
-    ps.insert(secondLinePosition + 29,
-              "#define MAX_LIGHTS " + std::to_string(MAX_LIGHTS) + "\n"); // this is ugly!!!
-    // ps = std::to_string(MAX_LIGHTS) + ps;
-    construct(vs, ps, fileAndPath);
+    ps.insert(secondLinePosition, "#define NOVA_FRAGMENT_SHADER\n#define MAX_LIGHTS " +
+                                      std::to_string(MAX_LIGHTS) + "\n");
+    construct(vs, ps, mPathAndFile);
 }
 
-GPUProgram::~GPUProgram() { glDeleteProgram(mProgramID); }
-/*unsigned int GPUProgram::getProgramID()
-{
-        return mProgramID;
-}*/
 void GPUProgram::bind() const { glUseProgram(mProgramID); }
 void GPUProgram::unBind() const { glUseProgram(0); }
-
-/*void GPUProgram::updateAllUniforms()
-{
-        for (IGPUProgramParameter* parameter : mParameters)
-        {
-                parameter->update();
-        }
-}
-
-void GPUProgram::addParameter(IGPUProgramParameter * parameter)
-{
-        mParameters.push_back(parameter);
-}*/
 
 void GPUProgram::construct(const std::string &vertexShader, const std::string &pixelShader,
                            const std::string &filename)
@@ -109,7 +94,8 @@ void GPUProgram::construct(const std::string &vertexShader, const std::string &p
         std::string str(std::begin(v), std::end(v) - 2);
         LOG_ERROR("GL vertex shader " + filename + " index " + std::to_string(vertexShaderHandle) +
                   " did not compile");
-        error(str);
+        LOG_ERROR(str);
+        //error(str);
     }
 
     // ======================= Fragment Shader =======================
@@ -130,7 +116,8 @@ void GPUProgram::construct(const std::string &vertexShader, const std::string &p
         std::string str(std::begin(v), std::end(v) - 2);
         LOG_ERROR("GL fragment shader " + filename + " index " +
                   std::to_string(fragmentShaderHandle) + " did not compile");
-        error(str);
+        LOG_ERROR(str);
+        //error(str);
     }
 
     // =========================== Program ===========================
@@ -148,7 +135,7 @@ void GPUProgram::construct(const std::string &vertexShader, const std::string &p
     glGetProgramiv(mProgramID, GL_LINK_STATUS, &params);
     if (GL_TRUE != params)
     {
-        error("could not link shader " + filename + " program GL index " +
+        LOG_ERROR("could not link shader " + filename + " program GL index " +
               std::to_string(mProgramID));
     }
 
@@ -159,24 +146,5 @@ void GPUProgram::construct(const std::string &vertexShader, const std::string &p
     glDeleteShader(fragmentShaderHandle);
 }
 
-/*void GPUProgram::updateUniforms(int location)
-{
-        GLint count;
 
-        GLint size; // size of the variable
-        GLenum type; // type of the variable (float, vec3 or mat4, etc)
-
-        const GLsizei bufSize = 16; // maximum name length
-        GLchar name[bufSize]; // variable name in GLSL
-        GLsizei length; // name length
-
-        glGetProgramiv(mProgramID, GL_ACTIVE_UNIFORMS, &count);
-
-        for (int i = 0; i < count; i++)
-        {
-                glGetActiveUniform(mProgramID, (GLuint)i, bufSize, &length, &size, &type, name);
-
-                printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
-        }
-}*/
 } // namespace Nova

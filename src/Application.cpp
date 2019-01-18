@@ -227,7 +227,7 @@ void Application::startUp()
             toRadians(60.0f),
             static_cast<float>(EngineSettings::getInstance().getInteger("Video", "width")) /
                 EngineSettings::getInstance().getInteger("Video", "height"),
-            0.01f, 100.0f));
+            0.1f, 300.0f));
         getWorld().GetSystem<CameraSystem>()->registerEntity(defaultCamera);
         GraphicsSystem::getInstance().setCurrentCamera(&defaultCamera);
 
@@ -269,7 +269,6 @@ void Application::startMainLoop()
                 mWorld.update(); // updates all entities in the world
                 Physics::getInstance().simulate(1.0f / timeDelta);
 
-
                 mProfileTimes["Entities update"] = entityUpdateClock.getMicro();
                 timeDelta -= SIMULATION_TIME_STEP;
 
@@ -299,13 +298,21 @@ void Application::startMainLoop()
             window.swapFrameBuffers();
             // glFinish();
             frameTime = frameTimeClock.getMillis();
+
+            auto s = FileSystem::getInstance().checkIfShadersChanged();
+            for(auto &shaderFile : s)
+            {
+                LOG_INFO("Recompiling shader:" << shaderFile);                
+                ResourceManager::getInstance().get<GPUProgram>(shaderFile)->recompile();
+            }
+
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(targetFrameTime - frameTime)); // UUUUUGGGGGLLLYYYYYY!!!
             // fps = 1000.0 / frameTimeClock.getMillis();
             // window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +
             //                 " frametime:" + std::to_string(frameTime) +
             //                 "ms. render:" + std::to_string(renderTime) +
-            //                 " us. logic:" + std::to_string(entityUpdateTime) + " us.");
+            //                 " us. logic:" + std::to_string(entityUpdateTime) + " us.");            
             timeDelta += frameTimeClock.getMillis();
         }
         this->shutDown();

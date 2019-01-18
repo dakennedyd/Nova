@@ -39,8 +39,11 @@ class GPUProgram : public IGPUProgram
     void unBind() const override;
     GLuint getProgramID() const { return mProgramID; }
 
+    void recompile() override;
+
   private:
-    const GLuint mProgramID;
+    GLuint mProgramID;
+    std::string mPathAndFile;//not technically necessary but good to have
 
     void construct(const std::string &vertexShader, const std::string &pixelShader,
                    const std::string &filename);

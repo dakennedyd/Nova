@@ -251,6 +251,10 @@ const std::shared_ptr<Texture> FrameBuffer::getColorTexture(const int textureNum
         LOG_ERROR("tried to get invalid color texture on framebuffer");
     return mColorTextures[textureNumber];
 }
+const std::shared_ptr<Texture> FrameBuffer::getDepthBuffer()
+{
+    return mDepthBuffer;
+}
 FrameBuffer FrameBuffer::makeDefaultFrameBuffer(const int width, const int height)
 {
     FrameBuffer fb;
@@ -271,7 +275,7 @@ FrameBuffer FrameBuffer::makeGBuffer(const int width, const int height)
                                                MipMapping::NO_MIPMAP));
     fb.attachTexture(std::make_shared<Texture>(width, height, nullptr, TextureType::GBUFFER_NORMAL,
                                                Filtering::NEAREST, MipMapping::NO_MIPMAP));
-    fb.attachTexture(std::make_shared<Texture>(width, height, nullptr, TextureType::COLOR_ALPHA,
+    fb.attachTexture(std::make_shared<Texture>(width, height, nullptr, TextureType::COLOR_HDR,
                                                Filtering::NEAREST, MipMapping::NO_MIPMAP));
     fb.attachTexture(std::make_shared<Texture>(width, height, nullptr, TextureType::NORMAL_MAP,
                                                Filtering::NEAREST, MipMapping::NO_MIPMAP));

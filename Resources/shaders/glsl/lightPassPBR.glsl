@@ -47,21 +47,51 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec3 getNormalFromMap();
 
-void main()
+vec3 gamma(vec3 color)
 {
+    return pow(color,vec3(1.0/2.2));
+}
+
+vec3 deGamma(vec3 color)
+{
+    return pow(color,vec3(2.2));
+}
+vec4 gamma(vec4 color)
+{
+    return pow(color,vec4(1.0/2.2));
+}
+
+vec4 deGamma(vec4 color)
+{
+    return pow(color,vec4(2.2));
+}
+float deGamma(float color)
+{
+    return pow(color,2.2);
+}
+void main()
+{    
     // retrieve data from G-buffer
     vec4 temp;
     temp = texture(uGPosMetal, lerpedTexCoords);
+    //temp = deGamma(temp);
+    //temp.a = deGamma(temp.a);
     vec3 WorldPos = temp.rgb;
     float metallic = temp.a;
+
     temp = texture(uGNormRough, lerpedTexCoords);
+    //temp = deGamma(temp);
+    //temp.a = deGamma(temp.a);
     vec3 Normal = temp.rgb;
     float roughness = temp.a;
-    temp = texture(uGAlbedoSkyboxmask, lerpedTexCoords);
-    // vec3 albedo = pow(temp.rgb,vec3(2.2));
+
+    temp = texture(uGAlbedoSkyboxmask, lerpedTexCoords);    
     vec3 albedo = temp.rgb;
+    //albedo  = deGamma(albedo);
     float skyboxMask = temp.a;
+
     temp = texture(uGNormalMapAO, lerpedTexCoords);
+    //temp = deGamma(temp);
     vec3 normalMap = temp.rgb;
     float ao = temp.a;
 
@@ -158,7 +188,12 @@ void main()
     // color = color*brightness-color;
     // color =max (albedo * skyboxMask, pow(color,vec3(2.2)));//so it doesnt light the skybox kinda
     // ulgy..
-    color = max(albedo * skyboxMask, color); // so it doesnt light the skybox kinda ulgy..
+
+
+    //color = max(albedo * skyboxMask, color); // so it doesnt light the skybox kinda ulgy..
+
+    // gamma correct
+    //color = pow(color, vec3(1.0/2.2));        
 
     fragment = vec4(color, 1.0);
 }

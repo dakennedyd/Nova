@@ -43,8 +43,17 @@ RendererBackendDeferred::RendererBackendDeferred()
     : mCurrentSkybox(ResourceManager::getInstance().get<PBRSkybox>("textures/skyboxes/studio")),
       mGBuffer(FrameBuffer::makeGBuffer(mWidth, mHeight)),
       mLightPassFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth, mHeight)),
-      mHBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),
-      mVBloomFrameBuffer(FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)),
+      mHBloomFrameBuffer{{FrameBuffer::makePostProcessFrameBuffer(mWidth / 2, mHeight / 2)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 3, mHeight / 3)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 5, mHeight / 5)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 6, mHeight / 6)}},
+
+      mVBloomFrameBuffer{{FrameBuffer::makePostProcessFrameBuffer(mWidth / 2, mHeight / 2)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 3, mHeight / 3)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 4, mHeight / 4)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 5, mHeight / 5)},
+                         {FrameBuffer::makePostProcessFrameBuffer(mWidth / 6, mHeight / 6)}},
 
       mLightPassRenderPacket(
           mScreenQuad,
@@ -61,32 +70,73 @@ RendererBackendDeferred::RendererBackendDeferred()
                   {mCurrentSkybox->radiance, "uRadianceMap"},
                   {mCurrentSkybox->BRDFLUT, "uBRDFLUT"}})),
 
-      mFinalPacket(mScreenQuad,
-                   std::make_shared<Material>(
-                       ResourceManager::getInstance().get<GPUProgram>("shaders/tonemap"),
-                       std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                           {mVBloomFrameBuffer.getColorTexture(0), "uBlurredImage"},
-                           {mLightPassFrameBuffer.getColorTexture(0), "uRenderedImage"},
-                       })),
 
-      mHBloomPacket(mScreenQuad,
-                    std::make_shared<Material>(
-                        ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
-                        std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                            {mLightPassFrameBuffer.getColorTexture(0), "uAlbedo"}})),
+      mHBloomPacket{
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mLightPassFrameBuffer.getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mVBloomFrameBuffer[0].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mVBloomFrameBuffer[1].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mVBloomFrameBuffer[2].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/hbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mVBloomFrameBuffer[3].getColorTexture(0), "uAlbedo"}})},
+      },
 
-      mVBloomPacket(mScreenQuad,
-                    std::make_shared<Material>(
-                        ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
-                        std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                            {mHBloomFrameBuffer.getColorTexture(0), "uAlbedo"}})),
+      mVBloomPacket{
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mHBloomFrameBuffer[0].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mHBloomFrameBuffer[1].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mHBloomFrameBuffer[2].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mHBloomFrameBuffer[3].getColorTexture(0), "uAlbedo"}})},
+          {mScreenQuad, std::make_shared<Material>(
+                            ResourceManager::getInstance().get<GPUProgram>("shaders/vbloom"),
+                            std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                                {mHBloomFrameBuffer[4].getColorTexture(0), "uAlbedo"}})},
+      },
 
       mCurrentSkyBoxPacket(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
                            std::make_shared<Material>(
                                ResourceManager::getInstance().get<GPUProgram>("shaders/skybox"),
                                std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                                   {mCurrentSkybox->texture, "skyboxTexture"}}))
+                                   {mCurrentSkybox->texture, "skyboxTexture"}})),
+      mFinalPacket(mScreenQuad,
+                   std::make_shared<Material>(
+                       ResourceManager::getInstance().get<GPUProgram>("shaders/tonemap"),
+                       std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                           {mVBloomFrameBuffer[4].getColorTexture(0), "uBlurredImage"},
+                           {mLightPassFrameBuffer.getColorTexture(0), "uRenderedImage"},
+                       }))
 {
+    //mLightPassFrameBuffer.attachTexture(mGBuffer.getDepthBuffer());
+
+    mLightPassFrameBuffer.attachTexture(std::make_shared<Texture>(mWidth, mHeight, nullptr, TextureType::DEPTHBUFFER,
+                                               Filtering::NEAREST, MipMapping::NO_MIPMAP));
+    if (!mLightPassFrameBuffer.isComplete()){
+        LOG_ERROR("can't attach depth buffer to lightpass framebuffer"); // check for framebuffer completeness
+    }
 }
 
 void RendererBackendDeferred::init() {}
@@ -98,13 +148,14 @@ void RendererBackendDeferred::render()
     // glScissor(0, 0, Window::getInstance().getWidth(), Window::getInstance().getHeight());
     // GraphicsSystem::getInstance().setWireframeMode(true);
     Timer timer;
-    // GEOMETRY PASS
+    // ==============================GEOMETRY PASS========================================
     mGBuffer.bind();
     // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
     /*glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);*/
 
+    
     auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
     for (const auto &packet : renderPackets) // for all drawable objects in the world
     {
@@ -114,21 +165,21 @@ void RendererBackendDeferred::render()
         // packet.unBind();
     }
     /*glStencilMask(0x00);*/
-    auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
-    shader->bind();
-    PhysicsDebugDraw();
-    //shader->unBind();
 
-    mCurrentSkyBoxPacket.bind();
-    mCurrentSkyBoxPacket.updateAllUniforms();
-    mCurrentSkyBoxPacket.draw();
+    
+    //=======DEBUG DRAW=========
+    // auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
+    // shader->bind();
+    // PhysicsDebugDraw();
+    // shader->unBind();
+
 
     // mGBuffer.unBind();
     mProfileTimes["Geometry pass"] = timer.getMicro();
     timer.reset();
 
-    // LIGHTING PASS
-    glDisable(GL_DEPTH_TEST);
+    //=================================LIGHTING PASS=============================================
+
     // glDepthMask(0x00);
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glEnable(GL_BLEND);
@@ -136,6 +187,10 @@ void RendererBackendDeferred::render()
 
     mLightPassFrameBuffer.bind();
     {
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
+        //glDepthMask(GL_FALSE);
+        //glDepthMask(GL_TRUE);
+
         mLightPassRenderPacket.bind();
         glUniform1i(glGetUniformLocation(
                         mLightPassRenderPacket.getMaterial()->getGPUProgram()->getProgramID(),
@@ -143,39 +198,56 @@ void RendererBackendDeferred::render()
                     GraphicsSystem::getInstance().currentNumLights);
         mLightPassRenderPacket.updateAllUniforms();
         mLightPassRenderPacket.draw();
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.getFrameBufferID());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
+        glBlitFramebuffer(0, 0, mWidth, mHeight,
+                            0, 0, mWidth, mHeight,
+                            GL_DEPTH_BUFFER_BIT, GL_NEAREST);                
+        //glDisable(GL_DEPTH_TEST);
+        mCurrentSkyBoxPacket.bind();
+        mCurrentSkyBoxPacket.updateAllUniforms();
+        mCurrentSkyBoxPacket.draw();
+        //glEnable(GL_DEPTH_TEST);
+
         mLightPassFrameBuffer.getColorTexture(0)->bind();
         glGenerateMipmap(GL_TEXTURE_2D);
         // mLightPassFrameBuffer.getColorTexture(0)->unBind();
+
     }
-    // mLightPassFrameBuffer.unBind();
+    
+    mLightPassFrameBuffer.unBind();
     mProfileTimes["Light pass"] = timer.getMicro();
     timer.reset();
 
-    // POST-PROCESS
-    glViewport(0, 0, mWidth / 4, mHeight / 4);
-    mHBloomFrameBuffer.bind();
-    mHBloomPacket.bind();
-    mHBloomPacket.draw();
-    mHBloomFrameBuffer.getColorTexture(0)->bind();
-    glGenerateMipmap(GL_TEXTURE_2D);
-    // mHBloomFrameBuffer.getColorTexture(0)->unBind();
+    //===============================POST-PROCESS====================================================
+    int i=0;
+    for (; i < 5; i++)
+    {
+        mHBloomFrameBuffer[i].bind();
+        glViewport(0, 0, mWidth / (i+2), mHeight / (i+2));
+        mHBloomPacket[i].bind();
+        mHBloomPacket[i].draw();
+        mHBloomFrameBuffer[i].getColorTexture(0)->bind();
+        glGenerateMipmap(GL_TEXTURE_2D);
+        //mHBloomFrameBuffer[i].getColorTexture(0)->unBind();
 
-    mVBloomFrameBuffer.getColorTexture(0)->bind();
-    glGenerateMipmap(GL_TEXTURE_2D);
-    // mVBloomFrameBuffer.getColorTexture(0)->unBind();
-    mVBloomFrameBuffer.bind();
-    mVBloomPacket.bind();
-    mVBloomPacket.draw();
-    mVBloomFrameBuffer.unBind();
+        mVBloomFrameBuffer[i].bind();
+        mVBloomPacket[i].bind();
+        mVBloomPacket[i].draw();
+        mVBloomFrameBuffer[i].getColorTexture(0)->bind();
+        glGenerateMipmap(GL_TEXTURE_2D);
+        //mVBloomFrameBuffer[i].getColorTexture(0)->unBind();
+        mVBloomFrameBuffer[i].unBind(); //doesn't work if is not inside loop
+    }
 
     // WRITES TO BACKBUFFER
     glViewport(0, 0, mWidth, mHeight);
     mFinalPacket.bind();
     mFinalPacket.draw();
-    mFinalPacket.unBind(); // why do i have to unbind this exactly?
+    mFinalPacket.unBind(); //necesarry to draw UI
 
     // glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
     // glDepthMask(0xFF);
     // renderPackets.clear();
     // lights.clear();
@@ -216,14 +288,14 @@ void RendererBackendDeferred::setSkyBox(const std::shared_ptr<PBRSkybox> &skybox
 
 void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const Vec3 &color)
 {
-    auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");    
+    auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
     auto id = shader->getProgramID();
     auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
     glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE, camera.view->getDataPtr());
     glUniformMatrix4fv(glGetUniformLocation(id, "uProj"), 1, GL_FALSE,
                        camera.projection->getDataPtr());
 
-    Vec3 vColor(0.0f,1.0f,0.0f);
+    Vec3 vColor(0.0f, 1.0f, 0.0f);
     glUniform3fv(glGetUniformLocation(id, "uColor"), 1, vColor.getDataPtr());
 
     GLfloat vertices[] = {from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()};
@@ -231,7 +303,7 @@ void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const V
     GLuint vbo, vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao); // bind the VAO
-    
+
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -250,7 +322,7 @@ void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const V
 
     glBindVertexArray(0);
 
-    glDeleteVertexArrays(1, &vao); //this is a bad idea
+    glDeleteVertexArrays(1, &vao); // this is a bad idea
 }
 
 } // namespace Nova

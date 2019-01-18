@@ -63,11 +63,12 @@ void main()
         col += sampleTex[i] * kernel[i];
     */
 
+    //vec3 color;
     // fragment =  texture(uRenderedImage, lerpedTexCoords);
-    fragment = // textureLod( uBlurredImage, lerpedTexCoords, 0.0)// * 0.001
-        textureLod(uBlurredImage, lerpedTexCoords, 3.0) * 0.2
+    fragment = //textureLod( uBlurredImage, lerpedTexCoords, 0.0) // * 0.001
+        texture(uRenderedImage, lerpedTexCoords)
+        + texture(uBlurredImage, lerpedTexCoords);
         // + textureLod( uBlurredImage, lerpedTexCoords, 3.0) * 0.01
-        + texture(uRenderedImage, lerpedTexCoords);
     // fragment =  texture( uBlurredImage, lerpedTexCoords);
     // fragment = textureLod(albedo, lerpedTexCoords,3);
     // fragment =  texture( albedo, lerpedTexCoords) * textureLod(albedo, lerpedTexCoords+1.0 /
@@ -77,9 +78,23 @@ void main()
     // float average = 0.2126 * fragment.r + 0.7152 * fragment.g + 0.0722 * fragment.b;
     // fragment = vec4(average, average, average, 1.0);
 
+    // saturate
+    //fragment = vec4(mix( vec3(fragment), vec3(dot(vec3(fragment),vec3(0.333))), -0.1 ),1.0);
+
+    // vignette
+    //vec2 q = lerpedTexCoords;// vec2(800,600);
+    //fragment *= (.5 + .5*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 1.2 ));//doesnt work well
+    // letterbox
+    //fragment *= 1.0 - smoothstep( 0.4, 0.41, abs(lerpedTexCoords.y-0.5) );//works
+
+    // flicker
+    //fragment *= 1.0 + 0.015*fract( 17.1*sin( 13.1*floor(12.0*iTime) ));
+    
+    // gamma correct
+    //fragment = pow(fragment, vec4(1.0/2.2));    
     // HDR tonemapping
     fragment = fragment / (fragment + vec4(1.0));
-    // gamma correct
-    fragment = pow(fragment, vec4(1.0 / 2.2));
+    
+    fragment = vec4(fragment.xyz, 1.0);
 }
 #endif

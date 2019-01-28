@@ -235,7 +235,7 @@ void Application::startUp()
         auto &gs = GraphicsSystem::getInstance();
         gs.setRendererFrontend(std::make_shared<RendererFrontend>());
         gs.setRendererBackend(std::make_shared<RendererBackendDeferred>());
-        // gs.getRendererBackend().init();
+        gs.getRendererBackend().init();
 
         LOG_INFO("Initialization took:" << Timer::getTimeSinceEngineStart() << "ms.");
         this->mIsInitialized = true;

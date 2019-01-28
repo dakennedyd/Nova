@@ -134,13 +134,15 @@ class PlayerInputSystem final : public System
         MovementComponent &m = entity->getComponent<MovementComponent>();
         UnitQuat pitch(-mouseVector.getY() * mouse.getSensitivity(), 0.0f, 0.0f);
         UnitQuat yaw(0.0f, mouseVector.getX() * mouse.getSensitivity(), 0.0f);
+        //UnitQuat rot(-mouseVector.getY() * mouse.getSensitivity(),mouseVector.getX() * mouse.getSensitivity(),0.0f);
 
         // * mouse.getSensitivity()));
 
         /*camera orientation is separated in pitch and yaw and multiplied
         in this specific order(yaw*orientation*pitch) to prevent camera tilt*/
-        entity->setRotation(yaw * entity->getRotation() * pitch);
-        // entity->rotate(pitch*yaw);
+        entity->setRotation(yaw * entity->getRotation() * pitch);        
+        //entity->rotate(rot);
+
         float t = SIMULATION_TIME_STEP * 0.001f; // 1 RPM
         if (is.getActionStatus(SID("move_forward"))) entity->move(ts.forward * m.speed * t);
         if (is.getActionStatus(SID("move_backward"))) entity->move(ts.forward * -m.speed * t);

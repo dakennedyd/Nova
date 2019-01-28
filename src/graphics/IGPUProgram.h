@@ -25,14 +25,22 @@
 //#include "graphics/IGPUProgramParameter.h"
 #include "graphics/Bindable.h"
 #include "resource_manager/ResourceBase.h"
+#include <vector>
 
 namespace Nova
 {
+enum ShaderType
+{
+    VERTEX_SHADER,
+    GEOMETRY_SHADER,
+    FRAGMENT_SHADER,
+    ALL
+};
 class IGPUProgram : public Bindable, public ResourceBase
 {
   public:
     virtual ~IGPUProgram() = default;
-    virtual void recompile() = 0;
+    virtual void recompile(std::vector<std::pair<enum ShaderType, std::string>> defines = {{}}) = 0;
     // virtual void addParameter(IGPUProgramParameter* parameter) = 0;
     // virtual void updateAllUniforms() = 0;
 };

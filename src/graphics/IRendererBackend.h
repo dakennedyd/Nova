@@ -46,6 +46,8 @@ class IRendererBackend
     // virtual void setSkyBox(RenderPacket *skyBox) = 0;
     //virtual void physicsDebugDraw() = 0;
     virtual void drawLine(const Vec3 &from, const Vec3 &to, const Vec3 &color) = 0;
+    virtual void addLight() = 0;
+    virtual void removeLight() = 0;
 };
 
 } // namespace Nova

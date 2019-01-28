@@ -28,6 +28,7 @@
 
 namespace Nova
 {
+
 class GPUProgram : public IGPUProgram
 {
   public:
@@ -39,11 +40,11 @@ class GPUProgram : public IGPUProgram
     void unBind() const override;
     GLuint getProgramID() const { return mProgramID; }
 
-    void recompile() override;
+    void recompile(std::vector<std::pair<enum ShaderType, std::string>> defines = {}) override;
 
   private:
-    GLuint mProgramID;
-    std::string mPathAndFile;//not technically necessary but good to have
+    GLuint mProgramID = 0;
+    std::string mPathAndFile; // not technically necessary but good to have
 
     void construct(const std::string &vertexShader, const std::string &pixelShader,
                    const std::string &filename);

@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>	
 <programs>
-		<program name="shaders/shadowmap">
+		<program name="shaders/shadowMap">
 			<opengl version="3.3">shadowMap.glsl</opengl>	
 		</program>	
-		<program name="shaders/skybox">
+		<program name="shaders/skybox_deferred_pbr">
 			<opengl version="3.3">skybox_deferred_pbr.glsl</opengl>	
 		</program>
 		<program name="shaders/geometry_pass_PBR">
-			<opengl version="3.3">geometryPassPBR.glsl</opengl>	
+			<opengl version="3.3">geometry_pass_PBR.glsl</opengl>	
 		</program>				
 		<program name="shaders/light_pass_PBR">
-			<opengl version="3.3">lightPassPBR.glsl</opengl>	
+			<opengl version="3.3">light_pass_PBR.glsl</opengl>	
 		</program>
 		<program name="shaders/vbloom">
 			<opengl version="3.3">vbloom.glsl</opengl>	

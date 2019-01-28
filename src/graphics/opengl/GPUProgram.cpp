@@ -47,7 +47,7 @@ GPUProgram::GPUProgram(const std::string &fileAndPath)
 
 GPUProgram::~GPUProgram() { glDeleteProgram(mProgramID); }
 
-void GPUProgram::recompile()
+void GPUProgram::recompile(std::vector<std::pair<enum ShaderType, std::string>> defines)
 {
     glDeleteProgram(mProgramID);    
     mProgramID = glCreateProgram();
@@ -57,16 +57,41 @@ void GPUProgram::recompile()
     if (srcFile.find_first_of(std::string("#version")) != std::string::npos)
     {
         secondLinePosition = srcFile.find_first_of(std::string("\n"));
-        if (secondLinePosition == std::string::npos) error("Malformed shader source file");
+        if (secondLinePosition == std::string::npos)
+        { 
+            LOG_ERROR("Malformed shader source file");
+            glDeleteProgram(mProgramID);
+            return;
+        }
     }
-    else
-        error("Malformed shader source file");
+    else{
+        LOG_ERROR("Malformed shader source file");
+        glDeleteProgram(mProgramID);
+        return;
+    }
     secondLinePosition++; // ugly
+    size_t linePositionVS = secondLinePosition;
+    size_t linePositionFS = secondLinePosition;
     std::string vs(srcFile);
-    vs.insert(secondLinePosition, "#define NOVA_VERTEX_SHADER\n");
     std::string ps(srcFile);
-    ps.insert(secondLinePosition, "#define NOVA_FRAGMENT_SHADER\n#define MAX_LIGHTS " +
-                                      std::to_string(MAX_LIGHTS) + "\n");
+    std::string vsDefine = "#define NOVA_VERTEX_SHADER\n";
+    std::string fsDefine = "#define NOVA_FRAGMENT_SHADER\n";
+    vs.insert(secondLinePosition, vsDefine);
+    linePositionVS+=vsDefine.size();
+    ps.insert(secondLinePosition, fsDefine);
+    linePositionFS+=fsDefine.size();
+    
+    for(auto &define : defines)
+    {
+        if(define.first == ShaderType::VERTEX_SHADER){
+            vs.insert(linePositionVS, define.second + "\n");
+            linePositionVS+=define.second.size();
+        }else if(define.first == ShaderType::FRAGMENT_SHADER)
+        {
+            ps.insert(linePositionFS, define.second + "\n");
+            linePositionFS+=define.second.size();
+        }
+    }
     construct(vs, ps, mPathAndFile);
 }
 

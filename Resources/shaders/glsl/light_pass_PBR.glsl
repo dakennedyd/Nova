@@ -25,6 +25,8 @@ uniform samplerCube uIrradianceMap;
 uniform samplerCube uRadianceMap;
 uniform sampler2D uBRDFLUT;
 
+uniform vec3 uCameraPos;
+#ifdef MAX_LIGHTS
 struct Light
 {
     vec3 position;
@@ -32,9 +34,9 @@ struct Light
     int type;
 };
 
-uniform int uCurrentMaxLights;
+//uniform int uCurrentMaxLights;
 uniform Light uLights[MAX_LIGHTS];
-uniform vec3 uCameraPos;
+#endif
 // uniform mat4 view;
 
 const float PI = 3.14159265359;
@@ -122,7 +124,8 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for (int i = 0; i < uCurrentMaxLights; ++i)
+    #ifdef MAX_LIGHTS
+    for (int i = 0; i < MAX_LIGHTS; ++i)
     {
         // calculate per-light radiance
         vec3 L = normalize(uLights[i].position - WorldPos);
@@ -159,6 +162,7 @@ void main()
               NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't
                      // multiply by kS again
     }
+    #endif
 
     // ambient lighting (we now use IBL as the ambient term)
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);

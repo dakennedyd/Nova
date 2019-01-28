@@ -35,7 +35,10 @@ class IRenderPacket : public Bindable
 
     virtual void addParameter(IGPUProgramParameter *parameter) = 0;
     virtual void updateAllUniforms() const = 0;
+    virtual void updateCamera() const =0;
     virtual void draw() const = 0;
     virtual uint64_t getID() const = 0;
+    virtual void setUniform(const std::string &name, const float value) const = 0;
+    virtual void setUniform(const std::string &name, const int value) const = 0;
 };
 } // namespace Nova

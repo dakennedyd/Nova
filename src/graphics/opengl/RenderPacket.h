@@ -52,6 +52,7 @@ class RenderPacket : public IRenderPacket
         mParameters.push_back(parameter);
     };
     void updateAllUniforms() const override;
+    void updateCamera() const override;
     void draw() const override;
 
     void bind() const override;
@@ -59,6 +60,8 @@ class RenderPacket : public IRenderPacket
 
     uint64_t getID() const override { return mID; };
 
+    void setUniform(const std::string &name, const float value) const override;
+    void setUniform(const std::string &name, const int value) const override;
   private:
     std::shared_ptr<Mesh> mMesh = nullptr;
     std::shared_ptr<Material> mMaterial = nullptr;

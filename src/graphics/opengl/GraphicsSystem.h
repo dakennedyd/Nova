@@ -68,14 +68,16 @@ class GraphicsSystem final : public ISingleton<GraphicsSystem>,
     void removePacket(std::uint64_t id) { mRenderPackets.erase(id); };
     inline void addLight(Light light)
     {
-        currentNumLights++;
+        //currentNumLights++;
         mLights.emplace(std::make_pair(light.getID(), std::move(light)));
+        getRendererBackend().addLight();
         // mLights.push_back(std::make_pair(light.getID(), std::move(light)));
     }
     void removeLight(std::uint64_t id)
     {
         assert(mLights.erase(id));
-        currentNumLights--;
+        getRendererBackend().removeLight();
+        //currentNumLights--;
     };
     auto &getRenderPackets() { return mRenderPackets; };
     auto &getLights() { return mLights; };

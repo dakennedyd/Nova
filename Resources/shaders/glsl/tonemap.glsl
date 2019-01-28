@@ -17,84 +17,138 @@ void main()
 in vec2 lerpedTexCoords;
 uniform sampler2D uBlurredImage;
 uniform sampler2D uRenderedImage;
+uniform float uTime;
 out vec4 fragment;
 
-// const float offset = 1.0 / 300.0;
+//shader Created by hornet in 2014-11-08
+//https://www.youtube.com/watch?v=XisQsjDkuvU
+
+// this software is released into public domain
+// For more information, please refer to http://unlicense.org/
+
+float sat( float t ) {
+	return clamp( t, 0.0, 1.0 );
+}
+vec2 sat( vec2 t ) {
+	return clamp( t, 0.0, 1.0 );
+}
+
+//note: [0;1]
+float rand( vec2 n ) {
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+}
+
+//note: [-1;1]
+float srand( vec2 n ) {
+	return rand(n) * 2.0 - 1.0;
+}
+
+float mytrunc( float x, float num_levels )
+{
+	return floor(x*num_levels) / num_levels;
+}
+vec2 mytrunc( vec2 x, vec2 num_levels )
+{
+	return floor(x*num_levels) / num_levels;
+}
+
+vec3 rgb2yuv( vec3 rgb )
+{
+	vec3 yuv;
+	yuv.x = dot( rgb, vec3(0.299,0.587,0.114) );
+	yuv.y = dot( rgb, vec3(-0.14713, -0.28886, 0.436) );
+	yuv.z = dot( rgb, vec3(0.615, -0.51499, -0.10001) );
+	return yuv;
+ }
+ vec3 yuv2rgb( vec3 yuv )
+ {
+	vec3 rgb;
+	rgb.r = yuv.x + yuv.z * 1.13983;
+	rgb.g = yuv.x + dot( vec2(-0.39465, -0.58060), yuv.yz );
+	rgb.b = yuv.x + yuv.y * 2.03211;
+	return rgb;
+ }
+
+ vec4 glitch(float amount)
+ {
+	float THRESHOLD = amount;
+	float time_s = mod( uTime, 32.0 );
+
+	float glitch_threshold = 1.0 - THRESHOLD;
+	const float max_ofs_siz = 0.1; //TOOD: input
+	const float yuv_threshold = 0.5; //TODO: input, >1.0f == no distort
+	const float time_frq = 16.0;
+
+	vec2 uv = lerpedTexCoords;
+    //uv.y = 1.0 -  uv.y;
+	
+	const float min_change_frq = 4.0;
+	float ct = mytrunc( time_s, min_change_frq );
+	float change_rnd = rand( mytrunc(uv.yy,vec2(16)) + 150.0 * ct );
+
+	float tf = time_frq*change_rnd;
+
+	float t = 5.0 * mytrunc( time_s, tf );
+	float vt_rnd = 0.5*rand( mytrunc(uv.yy + t, vec2(11)) );
+	vt_rnd += 0.5 * rand(mytrunc(uv.yy + t, vec2(7)));
+	vt_rnd = vt_rnd*2.0 - 1.0;
+	vt_rnd = sign(vt_rnd) * sat( ( abs(vt_rnd) - glitch_threshold) / (1.0-glitch_threshold) );
+
+	vec2 uv_nm = uv;
+	uv_nm = sat( uv_nm + vec2(max_ofs_siz*vt_rnd, 0) );
+
+	float rnd = rand( vec2( mytrunc( time_s, 8.0 )) );
+	uv_nm.y = (rnd>mix(1.0, 0.975, sat(THRESHOLD))) ? 1.0-uv_nm.y : uv_nm.y;
+
+	vec4 smpl = texture( uRenderedImage, uv_nm, -10.0 );
+	vec3 smpl_yuv = rgb2yuv( smpl.rgb );
+	smpl_yuv.y /= 1.0-3.0*abs(vt_rnd) * sat( yuv_threshold - vt_rnd );
+	smpl_yuv.z += 0.125 * vt_rnd * sat( vt_rnd - yuv_threshold );
+
+	return vec4( yuv2rgb(smpl_yuv), smpl.a );
+ }
+
+ //=======================================================================
+vec4 chromatic(int sampleCount, float blur, float falloff)
+{	
+    vec2 direction = normalize(lerpedTexCoords - 0.5); 
+	//vec2 direction = normalize(vec2(lerpedTexCoords.x,0.0) -vec2(0.5,0.0)); 
+	vec2 velocity = direction * blur * pow(length(lerpedTexCoords - 0.5), falloff);
+    //vec2 velocity = direction * blur * pow(length(vec2(lerpedTexCoords.x,0.0) -vec2(0.5,0.0)), falloff);
+	float inverseSampleCount = 1.0 / float(sampleCount); 
+    
+    mat3x2 increments = mat3x2(velocity * 1.0 * inverseSampleCount,
+                               velocity * 2.0 * inverseSampleCount,
+                               velocity * 4.0 * inverseSampleCount);
+
+    vec3 accumulator = vec3(0);
+    mat3x2 offsets = mat3x2(0); 
+    
+    for (int i = 0; i < sampleCount; i++) {
+        accumulator.r += texture(uRenderedImage, lerpedTexCoords + offsets[0]).r; 
+        accumulator.g += texture(uRenderedImage, lerpedTexCoords + offsets[1]).g; 
+        accumulator.b += texture(uRenderedImage, lerpedTexCoords + offsets[2]).b; 
+        
+        offsets -= increments;
+    }
+
+	return vec4(accumulator / float(sampleCount), 1.0);
+}
+//=========================================================================
+
+
 void main()
 {
-
-    /* vec2 offsets[9] = vec2[](
-         vec2(-offset,  offset), // top-left
-         vec2( 0.0f,    offset), // top-center
-         vec2( offset,  offset), // top-right
-         vec2(-offset,  0.0f),   // center-left
-         vec2( 0.0f,    0.0f),   // center-center
-         vec2( offset,  0.0f),   // center-right
-         vec2(-offset, -offset), // bottom-left
-         vec2( 0.0f,   -offset), // bottom-center
-         vec2( offset, -offset)  // bottom-right
-     );
-
-     float kernel[9] = float[]( //sharpen
-         -1, -1, -1,
-         -1,  9, -1,
-         -1, -1, -1
-     );*/
-
-    // float kernel[9] = float[]( //blur kinda
-    // 1.0 / 16, 2.0 / 16, 1.0 / 16,
-    // 2.0 / 16, 4.0 / 16, 2.0 / 16,
-    // 1.0 / 16, 2.0 / 16, 1.0 / 16
-    //);
-
-    // float kernel[9] = float[]( //edge detection
-    //    1,  1,  1,
-    //    1, -8,  1,
-    //    1,  1,  1
-    //);
-
-    /*vec3 sampleTex[9];
-    for(int i = 0; i < 9; i++)
-    {
-        sampleTex[i] = vec3(texture(albedo, lerpedTexCoords + offsets[i]));
-    }
-    vec3 col = vec3(0.0);
-    for(int i = 0; i < 9; i++)
-        col += sampleTex[i] * kernel[i];
-    */
-
-    //vec3 color;
-    // fragment =  texture(uRenderedImage, lerpedTexCoords);
-    fragment = //textureLod( uBlurredImage, lerpedTexCoords, 0.0) // * 0.001
-        texture(uRenderedImage, lerpedTexCoords)
-        + texture(uBlurredImage, lerpedTexCoords);
-        // + textureLod( uBlurredImage, lerpedTexCoords, 3.0) * 0.01
-    // fragment =  texture( uBlurredImage, lerpedTexCoords);
-    // fragment = textureLod(albedo, lerpedTexCoords,3);
-    // fragment =  texture( albedo, lerpedTexCoords) * textureLod(albedo, lerpedTexCoords+1.0 /
-    // textureSize(albedo, 4),4); fragment = texture( albedo, lerpedTexCoords + 0.005*vec2(
-    // sin(102.0*lerpedTexCoords.x),cos(76.0*lerpedTexCoords.y)) ); fragment = vec4(vec3(1.0 -
-    // texture(albedo, lerpedTexCoords)), 1.0);
-    // float average = 0.2126 * fragment.r + 0.7152 * fragment.g + 0.0722 * fragment.b;
-    // fragment = vec4(average, average, average, 1.0);
-
-    // saturate
-    //fragment = vec4(mix( vec3(fragment), vec3(dot(vec3(fragment),vec3(0.333))), -0.1 ),1.0);
-
-    // vignette
-    //vec2 q = lerpedTexCoords;// vec2(800,600);
-    //fragment *= (.5 + .5*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 1.2 ));//doesnt work well
-    // letterbox
-    //fragment *= 1.0 - smoothstep( 0.4, 0.41, abs(lerpedTexCoords.y-0.5) );//works
-
-    // flicker
-    //fragment *= 1.0 + 0.015*fract( 17.1*sin( 13.1*floor(12.0*iTime) ));
-    
+    fragment = texture(uRenderedImage, lerpedTexCoords) + texture(uBlurredImage, lerpedTexCoords);
+  	//fragment = (texture(uRenderedImage, lerpedTexCoords) + texture(uBlurredImage, lerpedTexCoords))+glitch(0.4);
+	//fragment = (texture(uRenderedImage, lerpedTexCoords) + texture(uBlurredImage, lerpedTexCoords))+glitch(0.4)+chromatic(50, 0.25,2.0+sin(uTime));
+	//fragment = chromatic(50, 0.25,2.0+sin(uTime));
+	//fragment = glitch(0.2);
+	//fragment = glitch(0.2) + chromatic(50, 0.25,2.0+sin(uTime));
     // gamma correct
     //fragment = pow(fragment, vec4(1.0/2.2));    
     // HDR tonemapping
-    fragment = fragment / (fragment + vec4(1.0));
-    
+    fragment = fragment / (fragment + vec4(1.0));    
     fragment = vec4(fragment.xyz, 1.0);
 }
 #endif

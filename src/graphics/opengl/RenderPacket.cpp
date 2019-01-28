@@ -57,6 +57,20 @@ RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
     //                                          gs.getCurrentCamera().projection->getDataPtr()));
 }
 
+// note: program has to be binded already
+void RenderPacket::setUniform(const std::string &name, const float value) const
+{
+    glUniform1f(glGetUniformLocation(mMaterial->getGPUProgram()->getProgramID(), name.c_str()),
+                value);
+}
+
+// note: program has to be binded already
+void RenderPacket::setUniform(const std::string &name, const int value) const
+{
+    glUniform1i(glGetUniformLocation(mMaterial->getGPUProgram()->getProgramID(), name.c_str()),
+                value);
+}
+
 RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
                            const std::shared_ptr<Material> &material)
     : mMesh(std::move(mesh)), mMaterial(std::move(material))
@@ -77,26 +91,10 @@ RenderPacket::~RenderPacket()
     mID = count--;
 }
 
-void inline updateLights(GLuint id)
-{
-    auto &lightsList = GraphicsSystem::getInstance().getLights();
-    std::size_t i = 0;
-    for (auto &light : lightsList)
-    {
-        if (i >= MAX_LIGHTS) break;
-        glUniform3fv(
-            glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].position").c_str()), 1,
-            light.second.getPosition()->getDataPtr());
-        glUniform3fv(glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].color").c_str()),
-                     1, light.second.getColor()->getDataPtr());
-        glUniform1i(glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].type").c_str()),
-                    light.second.getTypeCode());
-        i++;
-    }
-}
 
-void inline updateCamera(GLuint id)
+void RenderPacket::updateCamera() const
 {
+    GLuint id = mMaterial->getGPUProgram()->getProgramID();
     auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
     glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE, camera.view->getDataPtr());
     glUniformMatrix4fv(glGetUniformLocation(id, "uProj"), 1, GL_FALSE,
@@ -106,9 +104,7 @@ void inline updateCamera(GLuint id)
 
 /*todo: this function should be replaced by the ECSystem*/
 void RenderPacket::updateAllUniforms() const
-{
-    updateCamera(mMaterial->getGPUProgram()->getProgramID());
-    updateLights(mMaterial->getGPUProgram()->getProgramID());
+{    
     for (IGPUProgramParameter *parameter : mParameters)
     {
         parameter->update();

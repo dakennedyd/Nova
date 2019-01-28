@@ -223,7 +223,6 @@ void FileSystem::initDirWatcher()
     std::string s = PATH_TO_ENGINE_BINARY + SHADERS_PATH;
     s = s.substr(0,s.size()-1);
     const char *dirPath = s.c_str();
-    //const char *dirPath = "/home/david/src/project_nova/TestGame/bin/engine/Resources/shaders/glsl";
     mWatchDescriptor =
         inotify_add_watch(mFileDescriptor, dirPath, /*IN_OPEN | IN_CLOSE*/ IN_MODIFY);
     if (mWatchDescriptor == -1)

@@ -302,7 +302,7 @@ void Application::startMainLoop()
             auto s = FileSystem::getInstance().checkIfShadersChanged();
             for(auto &shaderFile : s)
             {
-                LOG_INFO("Recompiling shader:" << shaderFile);                
+                //LOG_INFO("Recompiling shader:" << shaderFile);                
                 ResourceManager::getInstance().get<GPUProgram>(shaderFile)->recompile();
             }
 

@@ -116,11 +116,12 @@ RendererBackendDeferred::RendererBackendDeferred()
                                 {mHBloomFrameBuffer[4].getColorTexture(0), "uAlbedo"}})},
       },
 
-      mCurrentSkyBoxPacket(std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
-                           std::make_shared<Material>(
-                               ResourceManager::getInstance().get<GPUProgram>("shaders/skybox_deferred_pbr"),
-                               std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
-                                   {mCurrentSkybox->texture, "skyboxTexture"}})),
+      mCurrentSkyBoxPacket(
+          std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
+          std::make_shared<Material>(
+              ResourceManager::getInstance().get<GPUProgram>("shaders/skybox_deferred_pbr"),
+              std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
+                  {mCurrentSkybox->texture, "uSkyboxTexture"}})),
       mFinalPacket(mScreenQuad,
                    std::make_shared<Material>(
                        ResourceManager::getInstance().get<GPUProgram>("shaders/tonemap"),
@@ -147,19 +148,17 @@ void RendererBackendDeferred::updateLights()
 {
     auto id = mLightPassRenderPacket.getMaterial()->getGPUProgram()->getProgramID();
     auto &lightsList = GraphicsSystem::getInstance().getLights();
-    std::size_t i = 0;    
+    std::size_t i = 0;
     for (auto &light : lightsList)
     {
         if (i >= MAX_LIGHTS) break;
         glUniform3fv(
-            glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].position").c_str()),
-            1, light.second.getPosition()->getDataPtr());
-        glUniform3fv(
-            glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].color").c_str()), 1,
-            light.second.getColor()->getDataPtr());
-        glUniform1i(
-            glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].type").c_str()),
-            light.second.getTypeCode());
+            glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].position").c_str()), 1,
+            light.second.getPosition()->getDataPtr());
+        glUniform3fv(glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].color").c_str()),
+                     1, light.second.getColor()->getDataPtr());
+        glUniform1i(glGetUniformLocation(id, ("uLights[" + std::to_string(i) + "].type").c_str()),
+                    light.second.getTypeCode());
         i++;
     }
 }
@@ -173,40 +172,42 @@ void RendererBackendDeferred::render()
     Timer timer;
     // ==============================GEOMETRY PASS========================================
     mGBuffer.bind();
-    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
-    /*glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilMask(0xFF);*/
-
-    auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
-    for (const auto &packet : renderPackets) // for all drawable objects in the world
     {
-        packet.second.bind();
-        packet.second.updateCamera();
-        packet.second.updateAllUniforms();
-        packet.second.draw();
-        //packet.second.unBind();
+        // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
+        /*glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);*/
+
+        auto &renderPackets = GraphicsSystem::getInstance().getRenderPackets();
+        for (const auto &packet : renderPackets) // for all drawable objects in the world
+        {
+            packet.second.bind();
+            packet.second.updateCamera();
+            packet.second.updateAllUniforms();
+            packet.second.draw();
+            // packet.second.unBind();
+        }
+        /*glStencilMask(0x00);*/
+
+        //=======DEBUG DRAW=========
+        // auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
+        // shader->bind();
+        // PhysicsDebugDraw();
+        // shader->unBind();
+
+        // mGBuffer.unBind();
+        mProfileTimes["Geometry pass"] = timer.getMicro();
+        timer.reset();
     }
-    /*glStencilMask(0x00);*/
-
-    //=======DEBUG DRAW=========
-    // auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
-    // shader->bind();
-    // PhysicsDebugDraw();
-    // shader->unBind();
-
-    // mGBuffer.unBind();
-    mProfileTimes["Geometry pass"] = timer.getMicro();
-    timer.reset();
-
-    //=================================LIGHTING PASS=============================================
+    //=================================LIGHTING PASS====================================
 
     // glDepthMask(0x00);
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_DEPTH_TEST);
+
     mLightPassFrameBuffer.bind();
     {
         glClear(/*GL_COLOR_BUFFER_BIT |*/ GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
@@ -218,51 +219,51 @@ void RendererBackendDeferred::render()
         // static_cast<int>(GraphicsSystem::getInstance().currentNumLights));
         updateLights();
         mLightPassRenderPacket.updateCamera();
-        //mLightPassRenderPacket.updateAllUniforms();
+        // mLightPassRenderPacket.updateAllUniforms();
         mLightPassRenderPacket.draw();
-        //mLightPassRenderPacket.unBind();
+        // mLightPassRenderPacket.unBind();
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.getFrameBufferID());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
+        //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
         glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_DEPTH_BUFFER_BIT,
                           GL_NEAREST);
-        //glBindFramebuffer(GL_READ_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
+        // glBindFramebuffer(GL_READ_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
         mCurrentSkyBoxPacket.bind();
         mCurrentSkyBoxPacket.updateCamera();
-        //mCurrentSkyBoxPacket.updateAllUniforms();
-        mCurrentSkyBoxPacket.draw();        
+        // mCurrentSkyBoxPacket.updateAllUniforms();
+        mCurrentSkyBoxPacket.draw();
 
         // mLightPassFrameBuffer.getColorTexture(0)->bind();
         // glGenerateMipmap(GL_TEXTURE_2D);
         // mLightPassFrameBuffer.getColorTexture(0)->unBind();
     }
-    //glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 
-    mLightPassFrameBuffer.unBind();
+    // mLightPassFrameBuffer.unBind();
     mProfileTimes["Light pass"] = timer.getMicro();
     timer.reset();
-
     //===============================POST-PROCESS====================================================
-    //int i = 0;
-    // for (; i < 5; i++)
-    // {
-    //     mHBloomFrameBuffer[i].bind();
-    //     glViewport(0, 0, mWidth / (i + 2), mHeight / (i + 2));
-    //     mHBloomPacket[i].bind();
-    //     mHBloomPacket[i].draw();
-    //     mHBloomFrameBuffer[i].getColorTexture(0)->bind();
-    //     glGenerateMipmap(GL_TEXTURE_2D);
-    //     // mHBloomFrameBuffer[i].getColorTexture(0)->unBind();
+    int i = 0;
+    for (; i < 5; i++)
+    {
+        glViewport(0, 0, mWidth / (i + 2), mHeight / (i + 2));
+        mHBloomFrameBuffer[i].bind();
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        mHBloomPacket[i].bind();
+        mHBloomPacket[i].draw();
+        // mHBloomFrameBuffer[i].getColorTexture(0)->bind();
+        // glGenerateMipmap(GL_TEXTURE_2D);
+        // mHBloomFrameBuffer[i].getColorTexture(0)->unBind();
 
-    //     mVBloomFrameBuffer[i].bind();
-    //     mVBloomPacket[i].bind();
-    //     mVBloomPacket[i].draw();
-    //     mVBloomFrameBuffer[i].getColorTexture(0)->bind();
-    //     glGenerateMipmap(GL_TEXTURE_2D);
-    //     // mVBloomFrameBuffer[i].getColorTexture(0)->unBind();
-    // }
-    // mVBloomFrameBuffer[i-1].unBind();
-
+        mVBloomFrameBuffer[i].bind();
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        mVBloomPacket[i].bind();
+        mVBloomPacket[i].draw();
+        // mVBloomFrameBuffer[i].getColorTexture(0)->bind();
+        // glGenerateMipmap(GL_TEXTURE_2D);
+        // mVBloomFrameBuffer[i].getColorTexture(0)->unBind();
+    }
+    mVBloomFrameBuffer[i - 1].unBind();
     // WRITES TO BACKBUFFER
     glViewport(0, 0, mWidth, mHeight);
     mFinalPacket.bind();
@@ -299,10 +300,10 @@ void RendererBackendDeferred::setSkyBox(const std::shared_ptr<PBRSkybox> &skybox
     mCurrentSkyBoxPacket.getMaterial()->setTextures(v1);
 
     std::vector<std::pair<std::shared_ptr<ITexture>, std::string>> v2{
-        {mGBuffer.getColorTexture(0), "uGPosMetal"},         // gBuffer position and metallic channel
-        {mGBuffer.getColorTexture(1), "uGNormRough"},        // gBuffer normal and roughness channel
+        {mGBuffer.getColorTexture(0), "uGPosMetal"},  // gBuffer position and metallic channel
+        {mGBuffer.getColorTexture(1), "uGNormRough"}, // gBuffer normal and roughness channel
         {mGBuffer.getColorTexture(2), "uGAlbedoSkyboxmask"}, // gBuffer Albedo and (skybox
-                                                            // mask)ambient occlussion channel
+                                                             // mask)ambient occlussion channel
         {mGBuffer.getColorTexture(3), "uGNormalMapAO"},
         {mCurrentSkybox->irradiance, "uIrradianceMap"},
         {mCurrentSkybox->radiance, "uRadianceMap"},
@@ -316,7 +317,8 @@ void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const V
     auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
     auto id = shader->getProgramID();
     auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
-    glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE, camera.view->getDataPtr());
+    glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE,
+                       camera.view->getDataPtr());
     glUniformMatrix4fv(glGetUniformLocation(id, "uProj"), 1, GL_FALSE,
                        camera.projection->getDataPtr());
 
@@ -353,21 +355,19 @@ void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const V
 void RendererBackendDeferred::addLight()
 {
     size_t numLights = GraphicsSystem::getInstance().getNumLights();
-    if(numLights <= MAX_LIGHTS && numLights > 0){
+    if (numLights <= MAX_LIGHTS && numLights > 0)
+    {
         LOG_DEBUG("adding light:" << GraphicsSystem::getInstance().getNumLights());
         mLightPassRenderPacket.getMaterial()->getGPUProgram()->recompile(
             {{ShaderType::FRAGMENT_SHADER,
-                "#define MAX_LIGHTS " + std::to_string(numLights) +
-                    "\n"}});
-    }else if(numLights < 1)
+              "#define MAX_LIGHTS " + std::to_string(numLights) + "\n"}});
+    }
+    else if (numLights < 1)
     {
         mLightPassRenderPacket.getMaterial()->getGPUProgram()->recompile();
-    }    
+    }
 }
 
-void RendererBackendDeferred::removeLight()
-{
-    addLight();
-}
+void RendererBackendDeferred::removeLight() { addLight(); }
 
 } // namespace Nova

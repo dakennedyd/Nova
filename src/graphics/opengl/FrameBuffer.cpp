@@ -290,21 +290,23 @@ FrameBuffer FrameBuffer::makeGBuffer(const int width, const int height)
 
     glDrawBuffers(4, fb.mAttachments);
     fb.unBind();
-    if (!fb.isComplete()) LOG_ERROR("can't create GBuffer"); // check for framebuffer completeness
+    // check for framebuffer completeness
+    if (!fb.isComplete()) LOG_ERROR("can't create GBuffer");
     return fb;
 }
 FrameBuffer FrameBuffer::makePostProcessFrameBuffer(const int width, const int height)
 {
     FrameBuffer fb;
     fb.attachTexture(std::make_shared<Texture>(width, height, nullptr, TextureType::COLOR_HDR,
-                                               Filtering::LINEAR, MipMapping::GENERATE_MIPMAP));
+                                               Filtering::LINEAR, MipMapping::NO_MIPMAP));
     fb.getColorTexture(0)->bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     fb.getColorTexture(0)->unBind();
 
+    // check for framebuffer completeness
     if (!fb.isComplete())
-        LOG_ERROR("can't create post process framebuffer"); // check for framebuffer completeness
+        LOG_ERROR("can't create post process framebuffer");
     return fb;
 }
 const bool FrameBuffer::isComplete()

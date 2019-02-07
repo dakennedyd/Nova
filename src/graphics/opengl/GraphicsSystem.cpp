@@ -57,7 +57,7 @@ void GraphicsSystem::startUp()
     LOG_INFO("RendererBackend:" << renderer);
     LOG_INFO("OpenGL version:" << version << " Vendor:" << vendor);
     checkExtensionsSupport();
-    glEnable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
     int width, height;
     glfwGetFramebufferSize(Window::getInstance().mGLFWindow, &width, &height);
     glViewport(0, 0, width, height); // create a a viewport as big as the framebuffer

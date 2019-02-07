@@ -41,7 +41,6 @@ namespace Nova
 GPUProgram::GPUProgram(const std::string &fileAndPath) 
 : mProgramID(0), mPathAndFile(fileAndPath)
 {
-    LOG_DEBUG("Loading shader:" << mPathAndFile);
     recompile();
 }
 
@@ -49,6 +48,7 @@ GPUProgram::~GPUProgram() { glDeleteProgram(mProgramID); }
 
 void GPUProgram::recompile(std::vector<std::pair<enum ShaderType, std::string>> defines)
 {
+    LOG_DEBUG("compiling shader:" << mPathAndFile);
     glDeleteProgram(mProgramID);    
     mProgramID = glCreateProgram();
     size_t secondLinePosition = 0;

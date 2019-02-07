@@ -197,8 +197,7 @@ void main()
     //color = max(albedo * skyboxMask, color); // so it doesnt light the skybox kinda ulgy..
 
     // gamma correct
-    //color = pow(color, vec3(1.0/2.2));        
-
+    //color = pow(color, vec3(1.0/2.2));            
     fragment = vec4(color, 1.0);
 }
 

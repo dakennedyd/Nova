@@ -28,6 +28,7 @@ cp -r ..Resources .
 
 ## Dependencies
 You don't need to download this should be included inside this repo, this is just in case for some reason it is not
+
 | Functionality  | Library |
 | --- | --- |
 | Mesh Loading | [assimp](https://github.com/assimp/assimp)   |

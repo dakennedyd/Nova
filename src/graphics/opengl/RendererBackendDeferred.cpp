@@ -32,6 +32,7 @@
 #include "graphics/opengl/Mesh.h"
 #include "graphics/opengl/Texture.h"
 #include "graphics/opengl/TextureCube.h"
+#include "math/miscellaneous.h"
 #include "resource_manager/ResourceManager.h"
 #include <string>
 #include <utility>
@@ -117,7 +118,7 @@ RendererBackendDeferred::RendererBackendDeferred()
       },
 
       mCurrentSkyBoxPacket(
-          std::make_shared<Mesh>(Mesh::makeSkyBoxMesh()),
+          mSkyboxMesh,
           std::make_shared<Material>(
               ResourceManager::getInstance().get<GPUProgram>("shaders/skybox_deferred_pbr"),
               std::vector<std::pair<std::shared_ptr<ITexture>, std::string>>{
@@ -183,6 +184,7 @@ void RendererBackendDeferred::render()
         {
             packet.second.bind();
             packet.second.updateCamera();
+            packet.second.setUniform("uTime", Timer::getTimeSinceEngineStart() / 1000.0f);
             packet.second.updateAllUniforms();
             packet.second.draw();
             // packet.second.unBind();
@@ -224,7 +226,7 @@ void RendererBackendDeferred::render()
         // mLightPassRenderPacket.unBind();
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.getFrameBufferID());
-        //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
         glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_DEPTH_BUFFER_BIT,
                           GL_NEAREST);
         // glBindFramebuffer(GL_READ_FRAMEBUFFER, mLightPassFrameBuffer.getFrameBufferID());
@@ -317,8 +319,7 @@ void RendererBackendDeferred::drawLine(const Vec3 &from, const Vec3 &to, const V
     auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
     auto id = shader->getProgramID();
     auto &camera = GraphicsSystem::getInstance().getCurrentCamera();
-    glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE,
-                       camera.view->getDataPtr());
+    glUniformMatrix4fv(glGetUniformLocation(id, "uView"), 1, GL_FALSE, camera.view->getDataPtr());
     glUniformMatrix4fv(glGetUniformLocation(id, "uProj"), 1, GL_FALSE,
                        camera.projection->getDataPtr());
 
@@ -369,5 +370,89 @@ void RendererBackendDeferred::addLight()
 }
 
 void RendererBackendDeferred::removeLight() { addLight(); }
+
+void RendererBackendDeferred::drawPacketListToTextureCube(const std::vector<RenderPacket> &packets,
+                                                          const std::shared_ptr<TextureCube> texCube)
+{
+    auto captureProjection = Mat4::makePerspectiveMatrix(toRadians(90.0f), 1.0, 0.1f, 10.0f);
+    Mat4 captureViews[] = {Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(1.0f, 0.0f, 0.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                  Vec3(0.0f, 0.0f, 1.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f),
+                                                  Vec3(0.0f, 0.0f, -1.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f))};
+
+    // auto shader = packet.getMaterial()->getGPUProgram();
+    FrameBuffer fb;
+    texCube->bind();
+    fb.bind();
+    // packet.setUniform("uProj", captureProjection);
+    glViewport(0, 0, texCube->getWidth(), texCube->getHeight());
+    for (int i = 0; i < 6; i++)
+    {
+        // attaches one side of cube texture to framebuffer
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, texCube->getTextureID(), 0);
+        // glClear(GL_COLOR_BUFFER_BIT);
+        for (size_t j = 0; j < packets.size(); i++)
+        {
+            packets[j].bind();
+            packets[j].setUniform("uView", captureViews[i]);
+            packets[j].draw();
+        }
+    }
+    fb.unBind();
+    texCube->unBind();
+}
+
+void RendererBackendDeferred::drawToTextureCube(const std::shared_ptr<GPUProgram> program,
+                                                const std::shared_ptr<TextureCube> texture)
+{
+    auto captureProjection = Mat4::makePerspectiveMatrix(toRadians(90.0f), 1.0, 0.1f, 10.0f);
+    Mat4 captureViews[] = {Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(1.0f, 0.0f, 0.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                  Vec3(0.0f, 0.0f, 1.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f),
+                                                  Vec3(0.0f, 0.0f, -1.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f)),
+                           Mat4::makeLookAtMatrix(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
+                                                  Vec3(0.0f, -1.0f, 0.0f))};
+
+    FrameBuffer fb;
+    program->bind();
+    fb.bind();
+    //texture->bind();
+    mSkyboxMesh->bind();
+    // packet.setUniform("uProj", captureProjection);
+    glUniformMatrix4fv(glGetUniformLocation(program->getProgramID(), "uProj"), 1, GL_FALSE,
+                           captureProjection.getDataPtr());
+    glViewport(0, 0, texture->getWidth(), texture->getHeight());
+    for (int i = 0; i < 6; i++)//can i draw this in one pass?
+    {
+        // attaches one side of cube texture to framebuffer
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, texture->getTextureID(), 0);
+        // glClear(GL_COLOR_BUFFER_BIT);
+
+        // updates the view matrix uniform
+        glUniformMatrix4fv(glGetUniformLocation(program->getProgramID(), "uView"), 1, GL_FALSE,
+                           captureViews[i].getDataPtr());
+        glDrawElements(GL_TRIANGLES, mSkyboxMesh->getNumIndices(), GL_UNSIGNED_INT, 0);
+    }
+    fb.unBind();
+    //texture->unBind();
+    program->unBind();
+    mSkyboxMesh->unBind();
+}
 
 } // namespace Nova

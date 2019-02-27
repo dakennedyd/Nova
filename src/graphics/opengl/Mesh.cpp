@@ -26,7 +26,9 @@
 #include "graphics/opengl/RendererInit.h"
 #include "math/Vector.h"
 //#include <GLFW/glfw3.h>
+#include "math/Constants.h"
 #include <glad/glad.h>
+#include <math.h>
 #include <vector>
 
 namespace Nova
@@ -191,6 +193,11 @@ Mesh Mesh::makeIcosahedron(const float size)
                              0.0f, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f});
 }
 
+/**
+ * @brief generates a cube with their faces pointing inwards
+ *
+ * @return Mesh
+ */
 Mesh Mesh::makeSkyBoxMesh()
 {
     return Mesh(
@@ -216,18 +223,30 @@ Mesh Mesh::makeSkyBoxMesh()
         });
 }
 
+/**
+ * @brief generates a sphere by subdiving the faces of an Icosahedron
+ *
+ * @param radius: the radius of the sphere
+ * @param iterations: the number of recursive subdivisions
+ * @return Mesh: returns a Mesh object
+ */
 Mesh Mesh::makeIcoSphere(const float radius, const int iterations)
 {
     const float x = 0.525731112119133606f / 2.0f * radius;
     const float z = 0.850650808352039932f / 2.0f * radius;
 
+    // vertices and indices of an Icosahedron
     std::vector<GLfloat> vertices{-x, 0.0f, z, x,  0.0f, z,  -x, 0.0f, -z, x,  0.0f, -z, 0.0f, z,
                                   x,  0.0,  z, -x, 0.0f, -z, x,  0.0f, -z, -x, z,    x,  0.0f, -z,
                                   x,  0.0f, z, -x, 0.0f, -z, -x, 0.0f};
     std::vector<GLuint> indices{0, 1, 4, 0, 4, 9, 9,  4, 5, 4,  8, 5, 4,  1,  8,  8, 1, 10, 8,  10,
                                 3, 5, 8, 3, 5, 3, 2,  2, 3, 7,  7, 3, 10, 7,  10, 6, 7, 6,  11, 11,
                                 6, 0, 0, 6, 1, 6, 10, 1, 9, 11, 0, 9, 2,  11, 9,  5, 2, 7,  11, 2};
+    std::vector<GLfloat> textureCoordinates;
 
+    // subdivides triangles into 4 sub triangles and adds
+    // their vertices to the vertex list
+    // also generates their indices
     for (int i = 0; i < iterations; i++)
     {
         size_t verticesSize = vertices.size();
@@ -281,7 +300,22 @@ Mesh Mesh::makeIcoSphere(const float radius, const int iterations)
         indices.erase(indices.begin(), indices.begin() + indicesSize);
     }
 
-    return Mesh{vertices, indices, vertices};
+    //generates the texture coordinates from vertices
+    const float oneOverPI = 1.0 / NOVA_PI;
+    for (size_t i = 0; i < vertices.size(); i += 3)
+    {
+        // float u = (atan2f(vertices[i], vertices[i+2]) / NOVA_PI) / 2.0f + 0.5f;
+        // float v = (asinf(-vertices[i+1]) / (NOVA_PI / 2.0f)) / 2.0f + 0.5f;
+        float u = 0.5f - 0.5f * atan2f(vertices[i], -vertices[i + 2]) * oneOverPI;
+        float v = 1.0f - acosf(vertices[i + 1]) * oneOverPI;
+        //LOG_INFO(u << "|" << v);
+        if(u >= 1.0f) u += 1.0f;
+        if(u <= 0.0f) u += 1.0f;
+        textureCoordinates.push_back(u);
+        textureCoordinates.push_back(v);
+    }
+   
+    return Mesh{vertices, indices, vertices, textureCoordinates};
 }
 
 Mesh Mesh::makeQuad(const float width, const float height,

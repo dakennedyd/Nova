@@ -63,6 +63,7 @@ class FrameBuffer : public IFrameBuffer
     static FrameBuffer makeDefaultFrameBuffer(const int width, const int height);
     static FrameBuffer makeGBuffer(const int width, const int height);
     static FrameBuffer makePostProcessFrameBuffer(const int width, const int height);
+    static FrameBuffer makeMinimalFrameBuffer(const int width, const int height);
     // auto getWidth() { return mWidth; }
     // auto getHeight() { return mHeight; }
     const bool isComplete();

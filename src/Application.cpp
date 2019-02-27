@@ -46,6 +46,9 @@
 #include "graphics/DebugUI.h"
 #include "resource_manager/ResourceManager.h"
 #include <thread>
+//***********************TEMPORARY CODE DELETE ASAP*****************************
+#include "graphics/opengl/TextureCube.h"
+//***********************TEMPORARY CODE DELETE ASAP*****************************
 
 namespace Nova
 {
@@ -256,6 +259,9 @@ void Application::startMainLoop()
         auto &input = InputSystem::getInstance();
         auto &mouse = input.getMouse();
         long frameTime = 0; //, fps = 0; //, entityUpdateTime, renderTime;
+        //***********************TEMPORARY CODE DELETE ASAP*****************************
+        //std::shared_ptr<TextureCube> tc;
+        //***********************TEMPORARY CODE DELETE ASAP*****************************
 
         window.show();
         Timer frameTimeClock, renderClock, entityUpdateClock, soundCleanUp;
@@ -294,16 +300,26 @@ void Application::startMainLoop()
 
             renderClock.reset();
             rendererBackend.render();
-            mProfileTimes["Render time"] = renderClock.getMicro();            
+            mProfileTimes["Render time"] = renderClock.getMicro();
             window.swapFrameBuffers();
             // glFinish();
             frameTime = frameTimeClock.getMillis();
 
             auto s = FileSystem::getInstance().checkIfShadersChanged();
-            for(auto &shaderFile : s)
+            for (auto &shaderFile : s)
             {
-                //LOG_INFO("Recompiling shader:" << shaderFile);                
+                // LOG_INFO("Recompiling shader:" << shaderFile);
                 ResourceManager::getInstance().get<GPUProgram>(shaderFile)->recompile();
+
+                //***********************TEMPORARY CODE DELETE ASAP*****************************
+                // std::vector<void*> textureData;
+                // if (shaderFile == "shaders/noise_cube")
+                // {
+                //     // tc = std::make_shared<TextureCube>(textureData, 1024, 1024);
+                //     // rendererBackend.drawToTextureCube(
+                //     //     ResourceManager::getInstance().get<GPUProgram>("shaders/noise_cube"), tc);
+                // }
+                //***********************TEMPORARY CODE DELETE ASAP*****************************
             }
 
             std::this_thread::sleep_for(
@@ -312,7 +328,7 @@ void Application::startMainLoop()
             // window.setTitle(NOVA_DESCRIPTION_STRING + "| FPS:" + std::to_string(fps) +
             //                 " frametime:" + std::to_string(frameTime) +
             //                 "ms. render:" + std::to_string(renderTime) +
-            //                 " us. logic:" + std::to_string(entityUpdateTime) + " us.");            
+            //                 " us. logic:" + std::to_string(entityUpdateTime) + " us.");
             timeDelta += frameTimeClock.getMillis();
         }
         this->shutDown();

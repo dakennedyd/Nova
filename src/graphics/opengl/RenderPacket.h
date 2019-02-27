@@ -62,6 +62,7 @@ class RenderPacket : public IRenderPacket
 
     void setUniform(const std::string &name, const float value) const override;
     void setUniform(const std::string &name, const int value) const override;
+    void setUniform(const std::string &name, const Mat4 &value) const override;
   private:
     std::shared_ptr<Mesh> mMesh = nullptr;
     std::shared_ptr<Material> mMaterial = nullptr;

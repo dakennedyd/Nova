@@ -25,5 +25,15 @@
 		<program name="shaders/physicsDebugDraw">
 			<opengl version="3.3">PhysicsDebugDraw.glsl</opengl>	
 		</program>
+		<program name="shaders/noise_cube">
+			<opengl version="3.3">noise_cube.glsl</opengl>	
+		</program>
+		<program name="shaders/geometry_pass_PBR_planetGen">
+			<opengl version="3.3">geometry_pass_PBR_planetGen.glsl</opengl>	
+		</program>
+		<program name="shaders/colors">
+			<opengl version="3.3">colors.glsl</opengl>	
+		</program>
+
 	</programs>
 </resources>

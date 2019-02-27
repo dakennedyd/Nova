@@ -27,6 +27,7 @@
 #include "Settings.h"
 #include <GLFW/glfw3.h>
 //#include <glad/glad.h>
+//#include "logger/Logger.h"
 
 namespace Nova
 {
@@ -60,6 +61,7 @@ void Window::startUp()
     {
         mWidth = vmode->width;
         mHeight = vmode->height;
+        //LOG_INFO("window dimensions:" << mWidth << "x" << mHeight);
         mGLFWindow = glfwCreateWindow(mWidth, mHeight, "Nova", mon, nullptr);
     }
     else

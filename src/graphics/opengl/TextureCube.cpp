@@ -109,7 +109,7 @@ TextureCube &TextureCube::operator=(TextureCube &&other)
 //	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 //}
 
-TextureCube::TextureCube(const std::vector<void *> textureData, int width, int height, int bpp,
+TextureCube::TextureCube(const std::vector<void *> &textureData, int width, int height, int bpp,
                          bool isHDR)
 {
     glGenTextures(1, &mTextureID);
@@ -123,6 +123,26 @@ TextureCube::TextureCube(const std::vector<void *> textureData, int width, int h
     // Set the texture filtering options
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 4);
     // glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    if (textureData.size() < 1)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, static_cast<GLsizei>(width),
+                         static_cast<GLsizei>(height), 0, GL_RGB, GL_FLOAT, nullptr);
+        }
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        return;
+    }
+    else if (textureData[0] == nullptr)
+    {
+         for (int i = 0; i < 6; i++)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, static_cast<GLsizei>(width),
+                         static_cast<GLsizei>(height), 0, GL_RGB, GL_FLOAT, nullptr);
+        }
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        return;
+    }
     if (textureData.size() > 1)
     {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

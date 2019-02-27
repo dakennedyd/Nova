@@ -27,6 +27,9 @@
 namespace Nova
 {
 struct PBRSkybox;
+class RenderPacket;
+class TextureCube;
+class GPUProgram;
 class IRendererBackend
 {
   public:
@@ -44,10 +47,14 @@ class IRendererBackend
     so insted uses the move constructor*/
     // virtual std::uint64_t addPacket(RenderPacket primitive) = 0;
     // virtual void setSkyBox(RenderPacket *skyBox) = 0;
-    //virtual void physicsDebugDraw() = 0;
+    // virtual void physicsDebugDraw() = 0;
     virtual void drawLine(const Vec3 &from, const Vec3 &to, const Vec3 &color) = 0;
     virtual void addLight() = 0;
     virtual void removeLight() = 0;
+    virtual void drawPacketListToTextureCube(const std::vector<RenderPacket> &,
+                                             const std::shared_ptr<TextureCube> ) = 0;
+    virtual void drawToTextureCube(const std::shared_ptr<GPUProgram>,
+                                             const std::shared_ptr<TextureCube> ) = 0;
 };
 
 } // namespace Nova

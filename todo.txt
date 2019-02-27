@@ -27,7 +27,7 @@ coordinates sometimes are reversed why???
 dark outline when moving camera??
 complete the math library implement all operators(maybe some optimizations)
 GPUprogram Uniform mess!
-make settings not ignore resolution when starting in fulscreen mode(also fullscreen uses all available cpu for some reason)
+make settings not ignore resolution when starting in fullscreen mode(also fullscreen uses all available cpu for some reason)
 Logger is too slow
 ECS system should recieve as parameter only the required components not the whole entity
 fix the input actions they are weird now

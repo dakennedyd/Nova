@@ -58,8 +58,8 @@ class Texture : public ITexture
 
     // binds and unbinds the texture
     void setFiltering(const enum Filtering &option);
-    GLuint getTextureID() { return mTextureID; }
-    TextureType getTextureType() { return mType; }
+    unsigned getTextureID() const { return mTextureID; }
+    TextureType getTextureType() const { return mType; }
 
     static Texture makeShadowMap(const int width, const int height)
     {
@@ -71,7 +71,7 @@ class Texture : public ITexture
 
   private:
     Texture(const TextureInfo &textureInfo);
-    GLuint mTextureID; // opengl texture handle
+    unsigned mTextureID; // opengl texture handle
     float mBorderColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     // TextureState mState;
     int mWidth;

@@ -309,6 +309,21 @@ FrameBuffer FrameBuffer::makePostProcessFrameBuffer(const int width, const int h
         LOG_ERROR("can't create post process framebuffer");
     return fb;
 }
+FrameBuffer FrameBuffer::makeMinimalFrameBuffer(const int width, const int height)
+{
+    FrameBuffer fb;
+    fb.attachTexture(std::make_shared<Texture>(width, height, nullptr, TextureType::COLOR,
+                                               Filtering::LINEAR, MipMapping::NO_MIPMAP));
+    fb.getColorTexture(0)->bind();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    fb.getColorTexture(0)->unBind();
+
+    // check for framebuffer completeness
+    if (!fb.isComplete())
+        LOG_ERROR("can't create post process framebuffer");
+    return fb;
+}
 const bool FrameBuffer::isComplete()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferID);

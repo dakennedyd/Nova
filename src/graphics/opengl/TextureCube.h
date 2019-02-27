@@ -41,7 +41,7 @@ class TextureCube : public ITexture
   public:
     TextureCube() = delete;
     // TextureCube(const std::array<TextureInfo, 6>& textureInfoArray);
-    TextureCube(const std::vector<void *> textureData, int width, int height, int bitsPerPixel,
+    TextureCube(const std::vector<void *> &textureData, int width, int height, int bitsPerPixel = 0,
                 bool isHDR = false);
     TextureCube(const TextureInfo &textureInfo);
     TextureCube(const std::string &fileAndPath);
@@ -54,6 +54,9 @@ class TextureCube : public ITexture
 
     void bind() const override;
     void unBind() const override;
+    unsigned getTextureID() const { return mTextureID; }
+    int getWidth() const { return mWidth; }
+    int getHeight() const { return mHeight; }
 
   private:
     unsigned mTextureID = 0;

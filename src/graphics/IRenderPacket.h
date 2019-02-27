@@ -40,5 +40,6 @@ class IRenderPacket : public Bindable
     virtual uint64_t getID() const = 0;
     virtual void setUniform(const std::string &name, const float value) const = 0;
     virtual void setUniform(const std::string &name, const int value) const = 0;
+    virtual void setUniform(const std::string &name, const Mat4 &value) const = 0;
 };
 } // namespace Nova

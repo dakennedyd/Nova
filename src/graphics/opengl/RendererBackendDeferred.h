@@ -79,9 +79,16 @@ class RendererBackendDeferred : public IRendererBackend
     std::unordered_map<std::string, long> &getProfileTimes() override { return mProfileTimes; };
 
     void drawLine(const Vec3 &from, const Vec3 &to, const Vec3 &color = Vec3(1.0f)) override;
-    void addLight() override;    
+    void addLight() override;
     void removeLight() override;
-    
+    // draws to all six sides of a cubemap with one or more renderpackets
+    void drawPacketListToTextureCube(const std::vector<RenderPacket> &packets,
+                                     const std::shared_ptr<TextureCube> texCube) override;
+
+    // draws to all six sides of a cubemap with a shader
+    void drawToTextureCube(const std::shared_ptr<GPUProgram> program,
+                           const std::shared_ptr<TextureCube> texture) override;
+
   private:
     void inline updateLights();
     void PhysicsDebugDraw() { Physics::getInstance().mDynamicsWorld->debugDrawWorld(); };
@@ -89,6 +96,7 @@ class RendererBackendDeferred : public IRendererBackend
     int mWidth = Window::getInstance().getWidth();
     int mHeight = Window::getInstance().getHeight();
     std::shared_ptr<Mesh> mScreenQuad = std::make_shared<Mesh>(Mesh::makeQuad(2.0f, 2.0f));
+    std::shared_ptr<Mesh> mSkyboxMesh = std::make_shared<Mesh>(Mesh::makeSkyBoxMesh());
     std::shared_ptr<PBRSkybox> mCurrentSkybox = nullptr;
     FrameBuffer mGBuffer;
     FrameBuffer mLightPassFrameBuffer;

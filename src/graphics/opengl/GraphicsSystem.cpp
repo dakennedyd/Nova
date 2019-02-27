@@ -25,13 +25,52 @@
 #include "Error.h"
 #include "RendererInit.h"
 #include "Settings.h"
+#ifdef NOVA_LINUX_PLATFORM
 #include "linux/Window.h"
+#elif defined NOVA_WINDOWS_PLATFORM
+#include "windows/Window.h"
+#endif
 #include "logger/Logger.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 namespace Nova
 {
+void printCapabilities()
+{
+    // get version info
+    const GLubyte *renderer = glGetString(GL_RENDERER); // get renderer string
+    const GLubyte *version = glGetString(GL_VERSION);   // version as a string
+    const GLubyte *vendor = glGetString(GL_VENDOR);
+    LOG_INFO("RendererBackend:" << renderer);
+    LOG_INFO("OpenGL version:" << version << " Vendor:" << vendor);
+    GLint mrtMax;
+    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &mrtMax);
+    LOG_INFO("Max draw buffers:" << mrtMax);
+    GLint maxTexSize;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+    LOG_INFO("Max texture size:" << maxTexSize);
+    // GLint maxVarFloats;
+    // glGetIntegerv(GL_MAX_VARYING_FLOATS, &maxVarFloats);
+    // LOG_INFO("Max varying floats:" << maxVarFloats);
+    GLint maxVertAttribs;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertAttribs);
+    LOG_INFO("Max vertex attributes:" << maxVertAttribs);
+    GLint maxTexUnits;
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxTexUnits);
+    LOG_INFO("Max texture units:" << maxTexUnits);
+    GLint max3dTexSize;
+    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &max3dTexSize);
+    LOG_INFO("Max 3d texture size:" << max3dTexSize);
+    GLint maxColorAttachments;
+    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
+    LOG_INFO("Max color attachments:" << maxColorAttachments);
+    
+    int width, height;
+    glfwGetFramebufferSize(Window::getInstance().mGLFWindow, &width, &height);
+    LOG_INFO("Framebuffer dimensions:" << width << "x" << height);    
+}
+
 // RendererBackend GraphicsSystem::mRenderer;
 void GraphicsSystem::startUp()
 {
@@ -50,14 +89,9 @@ void GraphicsSystem::startUp()
     {
         error("could not start GLAD");
     }
-    // get version info
-    const GLubyte *renderer = glGetString(GL_RENDERER); // get renderer string
-    const GLubyte *version = glGetString(GL_VERSION);   // version as a string
-    const GLubyte *vendor = glGetString(GL_VENDOR);
-    LOG_INFO("RendererBackend:" << renderer);
-    LOG_INFO("OpenGL version:" << version << " Vendor:" << vendor);
-    checkExtensionsSupport();
     //glEnable(GL_MULTISAMPLE);
+    printCapabilities();
+    checkExtensionsSupport();
     int width, height;
     glfwGetFramebufferSize(Window::getInstance().mGLFWindow, &width, &height);
     glViewport(0, 0, width, height); // create a a viewport as big as the framebuffer

@@ -71,6 +71,14 @@ void RenderPacket::setUniform(const std::string &name, const int value) const
                 value);
 }
 
+// note: program has to be binded already
+void RenderPacket::setUniform(const std::string &name, const Mat4 &value) const
+{
+    glUniformMatrix4fv(
+        glGetUniformLocation(mMaterial->getGPUProgram()->getProgramID(), name.c_str()), 1, GL_FALSE,
+        value.getDataPtr());
+}
+
 RenderPacket::RenderPacket(const std::shared_ptr<Mesh> &mesh,
                            const std::shared_ptr<Material> &material)
     : mMesh(std::move(mesh)), mMaterial(std::move(material))
@@ -91,7 +99,6 @@ RenderPacket::~RenderPacket()
     mID = count--;
 }
 
-
 void RenderPacket::updateCamera() const
 {
     GLuint id = mMaterial->getGPUProgram()->getProgramID();
@@ -104,7 +111,7 @@ void RenderPacket::updateCamera() const
 
 /*todo: this function should be replaced by the ECSystem*/
 void RenderPacket::updateAllUniforms() const
-{    
+{
     for (IGPUProgramParameter *parameter : mParameters)
     {
         parameter->update();

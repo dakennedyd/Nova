@@ -133,7 +133,7 @@ void DebugUI::drawGUI()
         style.AntiAliasedLines = false;
 
         if (ImGui::Begin(
-                "", &yes,
+                "Debug", &yes,
                 (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar |
                     ImGuiWindowFlags_NoResize |
                     /*ImGuiWindowFlags_AlwaysAutoResize |*/ ImGuiWindowFlags_NoSavedSettings |

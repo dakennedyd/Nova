@@ -31,8 +31,8 @@
 		<program name="shaders/geometry_pass_PBR_planetGen">
 			<opengl version="3.3">geometry_pass_PBR_planetGen.glsl</opengl>	
 		</program>
-		<program name="shaders/colors">
-			<opengl version="3.3">colors.glsl</opengl>	
+		<program name="shaders/geometry_pass_billboard">
+			<opengl version="3.3">geometry_pass_billboard.glsl</opengl>	
 		</program>
 
 	</programs>

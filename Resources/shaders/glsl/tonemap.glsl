@@ -191,7 +191,7 @@ void main()
 {
 	vec2 rcpFrame = 1.0/vec2(1440.0,900.0);
 	vec4 uv = vec4( lerpedTexCoords, lerpedTexCoords - (rcpFrame * (0.5 + FXAA_SUBPIX_SHIFT)));
-	fragment = vec4(FxaaPixelShader(uv, uRenderedImage, rcpFrame),1.0) + texture(uBlurredImage, lerpedTexCoords)*0.09;
+	fragment = vec4(FxaaPixelShader(uv, uRenderedImage, rcpFrame),1.0);// + texture(uBlurredImage, lerpedTexCoords)*0.09;
     //fragment = texture(uRenderedImage, lerpedTexCoords)*0.65 + texture(uBlurredImage, lerpedTexCoords)*0.09;
 	//fragment = texture(uBlurredImage, lerpedTexCoords);
   	//fragment = (texture(uRenderedImage, lerpedTexCoords) + texture(uBlurredImage, lerpedTexCoords))+glitch(0.4);

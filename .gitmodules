@@ -1,0 +1,21 @@
+[submodule "Dependencies/assimp"]
+	path = Dependencies/assimp
+	url = https://github.com/assimp/assimp
+[submodule "Dependencies/bullet3"]
+	path = Dependencies/bullet3
+	url = https://github.com/bulletphysics/bullet3
+[submodule "Dependencies/glfw"]
+	path = Dependencies/glfw
+	url = https://github.com/glfw/glfw
+[submodule "Dependencies/imgui-master"]
+	path = Dependencies/imgui-master
+	url = https://github.com/ocornut/imgui
+[submodule "Dependencies/openal-soft-master"]
+	path = Dependencies/openal-soft-master
+	url = https://github.com/kcat/openal-soft
+[submodule "Dependencies/stb"]
+	path = Dependencies/stb
+	url = https://github.com/nothings/stb
+[submodule "Dependencies/tinyxml2"]
+	path = Dependencies/tinyxml2
+	url = https://github.com/leethomason/tinyxml2

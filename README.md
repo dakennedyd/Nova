@@ -3,6 +3,7 @@
 
 ## Description
 Nova is a 3d game engine(not yet usable) that i developed as a hobby trying to learn OpenGL and computer graphics in general, is very simple and is in a very rough state so keep that in mind.
+Here are a few videos showing the engine https://www.youtube.com/channel/UCI-gu4Uz3p4gsd32sa1-YWA
 
 ## Getting Started
 Nova has a bunch of dependencies, they are listed in a table in this document, most dependencies are already inside this repo if you are building on Windows and already have installed Visual Studio 2017 or later you are almost done, if you are on Linux you need your tool chain set up that means GCC, cmake, make and git.

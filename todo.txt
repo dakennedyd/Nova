@@ -4,7 +4,7 @@ implement the layer system - maybe not
 create a real renderer(sort by material before rendering)
 create a generic input system(process inputs(network too maybe in future) in a message pump for debugging)
 Maybe replace normal inheritance with policy based design(compile time polimorphism)
-make resouce object manage cpu and gpu memory(have to read more about templates)
+make resouce object manage cpu and gpu memory
 change raw pointers to smart pointers ASAP!!!!(smart pointers are used in the resource manager)
 Get rid of exceptions!(maybe switch to EASTL?)
 support compressed textures

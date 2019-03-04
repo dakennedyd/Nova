@@ -5,12 +5,19 @@
 Nova is a 3d game engine(not yet usable) that i developed as a hobby trying to learn OpenGL and computer graphics in general, is very simple and is in a very rough state so keep that in mind.
 
 ## Getting Started
-Nova has a bunch of dependencies, they are listed in a table in this document, most dependencies are already inside this repo if you are building on Windows and already have installed Visual Studio 2017 you are all set, if you are on Linux you need your tool chain set up that means GCC, cmake, make and git.
+Nova has a bunch of dependencies, they are listed in a table in this document, most dependencies are already inside this repo if you are building on Windows and already have installed Visual Studio 2017 or later you are almost done, if you are on Linux you need your tool chain set up that means GCC, cmake, make and git.
+
+### Intruction for all platforms
+Download the resources(textures, 3d models etc) from:
+https://drive.google.com/file/d/12aKuHqQie6UIXcSeQm_gk1i0riaNzQoI/view?usp=sharing
 
 ### Windows instructions:
 1. Download the repo as a zip file by clicking the "clone or download" button.
 2. Uncompress the zip file into a directory of your choice.
-3. Right click that directory and select open with Visual Studio.
+3. Create a new directory named bin inside the directory where you put your source files
+3. Uncompress the resource directory resource.zip to the binary directory you just created
+4. Copy the dir engine/resources to bin/engine/
+5. Right click the source directory and select open with Visual Studio.
 Visual Studio should be able to configure, compile and build the project for you.
 
 ### Linux(Ubuntu) instructions:
@@ -18,12 +25,15 @@ Open a terminal and type:
 ```bash
 sudo apt install build-essential cmake git libpulse-dev portaudio19-dev libsndio-dev
 git clone https://github.com/dakennedyd/Nova
-cd Nova
+cd Nova-development
 mkdir bin
 cd bin
-cmake ..
-make
-cp -r ..Resources .
+cp -r ../engine/resources ./engine
+```
+Uncompress the resource directory resource.zip to the binary directory you just created
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -- -j2
 ```
 
 ## Dependencies
@@ -37,7 +47,7 @@ You don't need to download this should be included inside this repo, this is jus
 | Windowing and Input | [glfw](https://github.com/glfw/glfw)        |
 | Texture and sound decoding | [stb](https://github.com/nothings/stb)   |
 | Graphical UI | [Imgui](https://github.com/ocornut/imgui)  |
-| Sound | [OpenAL Soft](https://github.com/kcat/openal-soft) (LGPL licensed)|
+| Sound | [OpenAL Soft](https://github.com/kcat/openal-soft) |
 | XML parser | [Tinyxml2](https://github.com/leethomason/tinyxml2)   |
 
 ## License

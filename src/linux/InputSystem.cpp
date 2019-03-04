@@ -98,6 +98,14 @@ void InputSystem::startUp()
     glfwSetMouseButtonCallback(window.mGLFWindow, mouseButtonCallback);
     glfwSetCursorPosCallback(window.mGLFWindow, mouseCursorPosCallback);
     glfwSetScrollCallback(window.mGLFWindow, mouseScrollCallback);
+    if (glfwRawMouseMotionSupported() == GLFW_TRUE)
+    {
+        glfwSetInputMode(window.mGLFWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    }else
+    {
+        LOG_WARNING("raw mouse motion not supported on this platform");
+    }
+    
 
     mKeyMap[Keys::KEY_A] = "key_a";
     mKeyMap[Keys::KEY_B] = "key_b";

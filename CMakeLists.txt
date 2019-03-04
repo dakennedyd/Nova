@@ -61,6 +61,7 @@ option(ASSIMP_BUILD_X3D_IMPORTER OFF)
 option(ASSIMP_BUILD_GLTF_IMPORTER OFF)
 option(ASSIMP_BUILD_3MF_IMPORTER OFF)
 option(ASSIMP_BUILD_MMD_IMPORTER OFF)
+option(ASSIMP_BUILD_STEP_IMPORTER OFF)
 option(ASSIMP_BUILD_STATIC_LIB ON)
 option(ASSIMP_ENABLE_BOOST_WORKAROUND ON)
 option(ASSIMP_BUILD_SHARED_LIBS OFF)
@@ -86,11 +87,9 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++14")
     #add_compile_options(/W4 /permissive-)
 else()
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++11")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")    
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")    
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")        
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -std=c++14")    
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -Wpedantic -Wfatal-errors -msse2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14 -Wpedantic -Wfatal-errors -msse2")
     
     if(NOT WIN32)
         set(GLAD_LIBRARIES dl)
@@ -99,16 +98,12 @@ endif()
 
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
-file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
-                                #Dependencies/stb/stb_image.h
-
+file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c                                
                                 Dependencies/imgui-master/*.cpp                               
                                 Dependencies/imgui-master/examples/imgui_impl_glfw.cpp
                                 Dependencies/imgui-master/examples/imgui_impl_opengl3.cpp
-
                                 Dependencies/tinyxml2/tinyxml2.cpp)
-                                #Dependencies/glm/glm/glm.hpp)
-                                # file(GLOB PROJECT_HEADERS src/*.hpp src/*.h)
+                                #Dependencies/glm/glm/glm.hpp)                                
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
 
 if(WIN32)
@@ -121,25 +116,10 @@ else()
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/InputSystem.cpp)
 endif()
 
-# file(GLOB PROJECT_SHADERS Resources/Shaders/glsl/*.glsl
-#                           Resources/Shaders/glsl/*.frag
-#                           Resources/Shaders/glsl/*.geom
-#                           Resources/Shaders/glsl/*.vert)
-# file(GLOB PROJECT_CONFIGS CMakeLists.txt
-#                           Readme.md
-#                          .gitattributes
-#                          .gitignore
-#                          .gitmodules)
-
-source_group("Headers" FILES ${PROJECT_HEADERS})
-source_group("Shaders" FILES ${PROJECT_SHADERS})
-source_group("Sources" FILES ${PROJECT_SOURCES})
-source_group("Dependencies" FILES ${DEPENDENCIES_SOURCES})
-
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\"
 -D IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
-#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/Dependencies/openal-soft-master/)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS}
@@ -153,17 +133,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                     Dependencies/bullet3/src/
                     Dependencies/
                     Dependencies/glad/include/
-                    Dependencies/glfw/include/
-
-                    #Dependencies/openal-soft-master/
+                    Dependencies/glfw/include/                    
                     Dependencies/openal-soft-master/include/
-
                     Dependencies/imgui-master/
                     Dependencies/imgui-master/examples/
                     ${CMAKE_CURRENT_BINARY_DIR}/
-                    Dependencies/glm/)
-                    #Dependencies/stb/
-                    #Dependencies/tinyxml2/)
+                    Dependencies/glm/)                    
 
 include (GenerateExportHeader)
 generate_export_header(${PROJECT_NAME}
@@ -174,10 +149,14 @@ generate_export_header(${PROJECT_NAME}
     )
                                
 target_link_libraries(${PROJECT_NAME} PRIVATE
-                        glfw assimp
-                        ${GLAD_LIBRARIES}
-                        BulletDynamics BulletCollision LinearMath
-                        openal)
+                                    optimized glfw
+                                    optimized assimp
+                                    optimized ${GLAD_LIBRARIES}
+                                    optimized BulletDynamics
+                                    optimized BulletCollision
+                                    optimized LinearMath
+                                    optimized openal
+                                    )
                                
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

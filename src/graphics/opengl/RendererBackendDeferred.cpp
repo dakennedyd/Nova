@@ -358,7 +358,7 @@ void RendererBackendDeferred::addLight()
     size_t numLights = GraphicsSystem::getInstance().getNumLights();
     if (numLights <= MAX_LIGHTS && numLights > 0)
     {
-        LOG_DEBUG("adding light:" << GraphicsSystem::getInstance().getNumLights());
+        LOG_DEBUG("adding light:" << numLights);
         mLightPassRenderPacket.getMaterial()->getGPUProgram()->recompile(
             {{ShaderType::FRAGMENT_SHADER,
               "#define MAX_LIGHTS " + std::to_string(numLights) + "\n"}});

@@ -4,6 +4,8 @@ project(Nova)
 message("")
 message("********************* NOVA DEBUG BUILD *********************")
 message("")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(GLFW_BUILD_DOCS ON)
@@ -74,6 +76,7 @@ option(BUILD_OPENGL3_DEMOS OFF)
 option(BUILD_UNIT_TESTS OFF)
 add_subdirectory(Dependencies/bullet3)
 
+option(BUILD_SHARED_LIBS ON)
 option(ALSOFT_UTILS OFF)
 option(ALSOFT_EXAMPLES OFF)
 option(ALSOFT_TESTS OFF)
@@ -84,12 +87,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(MSVC)
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++14")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     #add_compile_options(/W4 /permissive-)
 else()
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wfatal-errors -std=c++14")        
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -std=c++14")    
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14 -Wpedantic -Wfatal-errors -msse2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wpedantic -Wfatal-errors -msse2")
     
     if(NOT WIN32)
         set(GLAD_LIBRARIES dl)
@@ -107,17 +110,17 @@ file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
 
 if(WIN32)
-    list(REMOVE_ITEM PROJECT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Window.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/FileSystem.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/InputSystem.cpp)
+    list(REMOVE_ITEM PROJECT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Window.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/linux/FileSystem.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/linux/InputSystem.cpp")
 else()
-    list(REMOVE_ITEM PROJECT_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Window.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/FileSystem.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/InputSystem.cpp)
+    list(REMOVE_ITEM PROJECT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Window.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/windows/FileSystem.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/windows/InputSystem.cpp")
 endif()
 
-add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\"
--D IMGUI_IMPL_OPENGL_LOADER_GLAD)
+add_definitions(-DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
+ -D IMGUI_IMPL_OPENGL_LOADER_GLAD -D LIBTYPE=DYNAMIC)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/Dependencies/openal-soft-master/)
@@ -149,15 +152,16 @@ generate_export_header(${PROJECT_NAME}
     )
                                
 target_link_libraries(${PROJECT_NAME} PRIVATE
-                                    optimized glfw
-                                    optimized assimp
-                                    optimized ${GLAD_LIBRARIES}
-                                    optimized BulletDynamics
-                                    optimized BulletCollision
-                                    optimized LinearMath
-                                    optimized openal
+                                    glfw
+                                    assimp
+                                    ${GLAD_LIBRARIES}
+                                    openal
+                                    BulletDynamics
+                                    BulletCollision
+                                    LinearMath
                                     )
                                
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+#set_target_properties(${PROJECT_NAME} PROPERTIES
+#RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

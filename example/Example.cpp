@@ -407,7 +407,7 @@ world.GetSystem<VisualSystem>()->registerEntity(world.getEntity("star"));
     planet.getComponent<RotationComponent>().speed = .2f;
     engine.getWorld().GetSystem<RotationSystem>()->registerEntity(planet);
     planet.addComponent<VisualComponent>(
-        rm.get<Mesh>("meshes/icosphere"),
+        rm.get<Mesh>("meshes/sphere"),
         rm.get<Material>("materials/planet"));
     engine.getWorld().GetSystem<VisualSystem>()->registerEntity(planet);
 

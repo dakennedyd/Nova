@@ -157,6 +157,12 @@ const aiScene *FileSystem::loadModel(const std::string &pathAndFileName)
 
     return scene;
 }
+
+std::vector<std::string> FileSystem::checkIfShadersChanged()
+{
+	std::vector<std::string> r;	
+	return r;
+}
 // std::vector<std::string> FileSystem::getFilenamesInDirectory(const std::string & path, bool
 // recursive)
 //{

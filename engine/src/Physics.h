@@ -154,7 +154,7 @@ class Physics : public ISingleton<Physics>, public ISubSystem
         ca.callback = new PhysicalContactCallback(callback);
         mCollisionActions.push_back(ca);
     }
-    void removeContactCallback(u_int64_t id)
+    void removeContactCallback(uint64_t id)
     {
         auto pred = [id](const CollisionAction &item) { return item.id == id; };
         auto it = std::find_if(std::begin(mCollisionActions), std::end(mCollisionActions), pred);

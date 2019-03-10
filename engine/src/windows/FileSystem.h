@@ -27,6 +27,14 @@
 #include <string>
 #include <vector>
 #include <windows.h>
+#if (NTDDI_VERSION >= NTDDI_WIN8)//PathRemoveFileSpec is deprecated in Windows 8 and up
+#include <Pathcch.h>
+#pragma comment(lib, "Pathcch.lib")
+#else
+#include <Shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
+#endif
+#include <iostream>
 
 struct aiScene;
 namespace Nova
@@ -69,7 +77,7 @@ class FileSystem : public ISingleton<FileSystem>, public ISubSystem
 
     bool static fileExists(const std::string &name)
     {
-        LPCTSTR szPath = name;
+        LPCTSTR szPath = name.c_str();
         DWORD dwAttrib = GetFileAttributes(szPath);
 
         return (dwAttrib != INVALID_FILE_ATTRIBUTES /*&& !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY)*/);
@@ -77,10 +85,33 @@ class FileSystem : public ISingleton<FileSystem>, public ISubSystem
 
     std::string static getExecutablePath()
     {
-        char result[MAX_PATH];
-        return std::string(result, GetModuleFileName(NULL, result, MAX_PATH));
+        TCHAR pathAndExe[MAX_PATH];
+		DWORD length = GetModuleFileName(NULL, pathAndExe, MAX_PATH);
+		//#if (NTDDI_VERSION >= NTDDI_WIN8)
+		//	PathCchRemoveFileSpec((PWSTR)pathAndExe, length);//casting this away is a BAD idea
+		//#else
+		//	//if (MAX_PATH > destSize) return NULL;
+		//	PathRemoveFileSpec(pathAndExe);
+		//#endif
+		if (length > 0)
+		{
+			std::string str{ pathAndExe };
+			auto const pos = str.find_last_of('/\\');
+			const auto path = str.substr(0, pos) + "\\";
+			return path;
+		}
+		else
+		{
+			return "";
+		}
     }
-
+	
+	/**
+	* @brief checks if shaders in SHADERS_PATH changed and
+	* return a vector of strings containing the names of
+	* the shaders that have been modified
+	*/
+	std::vector<std::string> checkIfShadersChanged();
   private:
 };
 } // namespace Nova

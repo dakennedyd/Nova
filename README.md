@@ -9,7 +9,7 @@ Here are a few videos showing the engine https://www.youtube.com/channel/UCI-gu4
 Open a terminal and type:
 ```bash
 sudo apt install build-essential cmake git libpulse-dev portaudio19-dev libsndio-dev
-git clone https://github.com/dakennedyd/Nova
+git clone --recursive https://github.com/dakennedyd/Nova
 cd Nova
 mkdir bin
 cd bin

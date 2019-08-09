@@ -63,20 +63,20 @@ void ResourceManager::startUp()
 
     /* loads resources from resource index file
     TODO: this should be extensible */
-    {
-        XMLNode resource(mEngineResourceIndex.getRootElement());
-        resource = resource.getFirstChild();
-        while (!resource.isEmpty())
-        {
-            XMLNode node(resource.getFirstChild());
-            while (!node.isEmpty())
-            {
-                registerResource(node);
-                node = node.getNextElement();
-            }
-            resource = resource.getNextElement();
-        }
-    }
+    // {
+    //     XMLNode resource(mEngineResourceIndex.getRootElement());
+    //     resource = resource.getFirstChild();
+    //     while (!resource.isEmpty())
+    //     {
+    //         XMLNode node(resource.getFirstChild());
+    //         while (!node.isEmpty())
+    //         {
+    //             registerResource(node);
+    //             node = node.getNextElement();
+    //         }
+    //         resource = resource.getNextElement();
+    //     }
+    // }
     {
         XMLNode resource(mApplicationResourceIndex.getRootElement());
         resource = resource.getFirstChild();

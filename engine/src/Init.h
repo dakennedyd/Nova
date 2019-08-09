@@ -39,7 +39,7 @@ static const std::string NOVA_DESCRIPTION_STRING("NOVA " + std::to_string(NOVA_V
 
 static const std::string PATH_TO_BINARY(FileSystem::getExecutablePath());
 static const std::string PATH_TO_ENGINE_BINARY(FileSystem::getExecutablePath() + "engine/");
-static const std::string RESOURCES_PATH("Resources/");
+static const std::string RESOURCES_PATH("../Resources/");
 static const std::string TEXTURES_PATH(RESOURCES_PATH + "textures/");
 static const std::string MODELS_PATH(RESOURCES_PATH + "models/");
 static const std::string SOUNDS_PATH(RESOURCES_PATH + "sounds/");

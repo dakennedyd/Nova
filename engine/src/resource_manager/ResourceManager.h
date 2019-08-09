@@ -46,8 +46,8 @@ class ResourceManager : public ISingleton<ResourceManager>, public ISubSystem
 {
   public:
     ResourceManager()
-        : mEngineResourceIndex(PATH_TO_ENGINE_BINARY + RESOURCE_INDEX_FILE_NAME),
-          mApplicationResourceIndex(PATH_TO_BINARY + RESOURCE_INDEX_FILE_NAME){};
+        //: mEngineResourceIndex(PATH_TO_ENGINE_BINARY + RESOURCE_INDEX_FILE_NAME){};
+        : mApplicationResourceIndex(PATH_TO_BINARY + RESOURCE_INDEX_FILE_NAME){};
     ~ResourceManager() = default;
 
     void startUp() override;
@@ -164,7 +164,7 @@ class ResourceManager : public ISingleton<ResourceManager>, public ISubSystem
     size_t mResourcesRegistered = 0;
     std::unordered_map<std::string, std::function<std::shared_ptr<ResourceBase>(const XMLNode &)>>
         mLoaders;
-    XMLFile mEngineResourceIndex;
+    //XMLFile mEngineResourceIndex;
     XMLFile mApplicationResourceIndex;
 };
 } // namespace Nova

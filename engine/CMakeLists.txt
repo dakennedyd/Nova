@@ -5,16 +5,33 @@ message("")
 message("********************* NOVA DEBUG BUILD *********************")
 message("")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 option(GLFW_BUILD_DOCS ON)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
 add_subdirectory(Dependencies/glfw)
 
+option(ASSIMP_NO_EXPORT OFF)
+option(ASSIMP_BUILD_GLTF_EXPORTER OFF)
+option(ASSIMP_BUILD_3DS_EXPORTER OFF)
+option(ASSIMP_BUILD_ASSBIN_EXPORTER OFF)
+option(ASSIMP_BUILD_ASSXML_EXPORTER OFF)
+option(ASSIMP_BUILD_COLLADA_EXPORTER OFF)
+option(ASSIMP_BUILD_OBJ_EXPORTER OFF)
+option(ASSIMP_BUILD_OPENGEX_EXPORTER OFF)
+option(ASSIMP_BUILD_PLY_EXPORTER OFF)
+option(ASSIMP_BUILD_FBX_EXPORTER OFF)
+option(ASSIMP_BUILD_STL_EXPORTER OFF)
+option(ASSIMP_BUILD_X_EXPORTER OFF)
+option(ASSIMP_BUILD_X3D_EXPORTER OFF)
+option(ASSIMP_BUILD_3MF_EXPORTER OFF)
+option(ASSIMP_BUILD_ASSJSON_EXPORTER OFF)
+option(ASSIMP_BUILD_STEP_EXPORTER OFF)
+
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 option(ASSIMP_BUILD_SAMPLES OFF)
 option(ASSIMP_BUILD_TESTS OFF)
-option(ASSIMP_NO_EXPORT ON)
 option(ASSIMP_BUILD_COLLADA_IMPORTER OFF)
 option(ASSIMP_BUILD_AMF_IMPORTER OFF)
 option(ASSIMP_BUILD_3DS_IMPORTER OFF)
@@ -78,7 +95,7 @@ option(ALSOFT_UTILS OFF)
 option(ALSOFT_EXAMPLES OFF)
 option(ALSOFT_TESTS OFF)
 option(ALSOFT_INSTALL OFF)
-add_subdirectory(Dependencies/openal-soft-master)
+add_subdirectory(Dependencies/openal-soft)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -99,9 +116,9 @@ endif()
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 file(GLOB DEPENDENCIES_SOURCES Dependencies/glad/src/glad.c                                
-                                Dependencies/imgui-master/*.cpp                               
-                                Dependencies/imgui-master/examples/imgui_impl_glfw.cpp
-                                Dependencies/imgui-master/examples/imgui_impl_opengl3.cpp
+                                Dependencies/imgui/*.cpp                               
+                                Dependencies/imgui/examples/imgui_impl_glfw.cpp
+                                Dependencies/imgui/examples/imgui_impl_opengl3.cpp
                                 Dependencies/tinyxml2/tinyxml2.cpp)
                                 #Dependencies/glm/glm/glm.hpp)                                
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.c)
@@ -120,7 +137,7 @@ add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\"
 -D IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/Dependencies/openal-soft-master/)
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/Dependencies/openal-soft/)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                 ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
@@ -134,9 +151,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                     Dependencies/
                     Dependencies/glad/include/
                     Dependencies/glfw/include/                    
-                    Dependencies/openal-soft-master/include/
-                    Dependencies/imgui-master/
-                    Dependencies/imgui-master/examples/
+                    Dependencies/openal-soft/include/
+                    Dependencies/imgui/
+                    Dependencies/imgui/examples/
                     ${CMAKE_CURRENT_BINARY_DIR}/
                     Dependencies/glm/)                    
 

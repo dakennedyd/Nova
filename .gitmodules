@@ -1,0 +1,24 @@
+[submodule "engine/Dependencies/assimp"]
+	path = engine/Dependencies/assimp
+	url = https://github.com/assimp/assimp
+[submodule "engine/Dependencies/bullet3"]
+	path = engine/Dependencies/bullet3
+	url = https://github.com/bulletphysics/bullet3
+[submodule "engine/Dependencies/glad"]
+	path = engine/Dependencies/glad
+	url = https://github.com/Dav1dde/glad
+[submodule "engine/Dependencies/glfw"]
+	path = engine/Dependencies/glfw
+	url = https://github.com/glfw/glfw
+[submodule "engine/Dependencies/stb"]
+	path = engine/Dependencies/stb
+	url = https://github.com/nothings/stb
+[submodule "engine/Dependencies/imgui"]
+	path = engine/Dependencies/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "engine/Dependencies/openal-soft"]
+	path = engine/Dependencies/openal-soft
+	url = https://github.com/kcat/openal-soft
+[submodule "engine/Dependencies/tinyxml2"]
+	path = engine/Dependencies/tinyxml2
+	url = https://github.com/leethomason/tinyxml2

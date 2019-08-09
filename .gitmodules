@@ -4,9 +4,6 @@
 [submodule "engine/Dependencies/bullet3"]
 	path = engine/Dependencies/bullet3
 	url = https://github.com/bulletphysics/bullet3
-[submodule "engine/Dependencies/glad"]
-	path = engine/Dependencies/glad
-	url = https://github.com/Dav1dde/glad
 [submodule "engine/Dependencies/glfw"]
 	path = engine/Dependencies/glfw
 	url = https://github.com/glfw/glfw

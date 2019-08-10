@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
-project(TestGame)
-message("********************* BUILDING TESTGAME *********************")
+project(example)
+message("********************* BUILDING EXAMPLE *********************")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 add_subdirectory(engine/)
 

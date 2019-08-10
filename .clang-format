@@ -1,0 +1,10 @@
+﻿---
+BasedOnStyle: LLVM
+IndentPPDirectives: AfterHash
+UseTab: Never
+IndentWidth: 4
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: true
+IndentCaseLabels: false
+ColumnLimit: 100
+...

@@ -1,0 +1,28 @@
+language: cpp
+os:
+  - linux
+sudo: required
+dist: xenial
+
+compiler:
+  - gcc
+#  - clang
+
+# blocklist
+# branches:
+#   except:
+# #  - experimental
+
+# # safelist
+# branches:
+#   only:
+#   - master
+#   - stable
+  
+
+before_install:
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt update -y; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt install -y libxinerama-dev libxcursor-dev xorg-dev libpulse-dev portaudio19-dev libsndio-dev; fi
+script:
+- if [ $TRAVIS_OS_NAME == linux ]; then cmake . -DCMAKE_BUILD_TYPE=Release && cmake --build . -- -j2; fi
+after_success:

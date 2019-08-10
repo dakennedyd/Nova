@@ -1,22 +1,24 @@
 # Nova
 ![](https://i.imgur.com/CriXiIo.jpg?raw=true)
+[![Build Status](https://travis-ci.com/dakennedyd/Nova.svg?token=sNzFKmUxnz5KdnspDAiK&branch=development)](https://travis-ci.com/dakennedyd/Nova)
 
 ## Description
 Nova is a 3d game engine(not yet usable) that i developed as a hobby trying to learn OpenGL and computer graphics in general, is very simple and is in a very rough state so keep that in mind.
 Here are a few videos showing the engine https://www.youtube.com/channel/UCI-gu4Uz3p4gsd32sa1-YWA
 
-### Linux(Ubuntu 16.04) instructions:
+### Linux(Ubuntu 16.04) build instructions:
 Open a terminal and type:
 ```bash
-sudo apt install build-essential cmake git libpulse-dev portaudio19-dev libsndio-dev
+sudo apt update -y
+sudo apt install -y build-essential cmake git libxinerama-dev libxcursor-dev xorg-dev libpulse-dev portaudio19-dev libsndio-dev
 git clone --recursive https://github.com/dakennedyd/Nova
 cd Nova
 mkdir bin
 cd bin
 ```
 Download the resources(textures, 3d models etc) from:
-https://drive.google.com/file/d/12aKuHqQie6UIXcSeQm_gk1i0riaNzQoI/view?usp=sharing
-Uncompress the resource directory resource.zip to the directory you just created
+https://drive.google.com/open?id=1CWzjkL3k5ac-coCcCM6IyrDKfIiEifFI
+Copy the "Resources" directory from Resources.zip to the directory "bin" you just created
 
 then type
 ```
@@ -25,7 +27,7 @@ cmake --build . -- -j2
 ```
 
 ## Dependencies
-You don't need to download this it should be included inside this repo, this is just for information purposes
+You don't need to download this it should be included inside this repo, this is just for completeness
 
 | Functionality  | Library |
 | --- | --- |

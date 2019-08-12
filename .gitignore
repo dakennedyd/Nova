@@ -347,7 +347,12 @@ ASALocalRun/
 
 # End of https://www.gitignore.io/api/visualstudio,visualstudiocode
 #[Dd]ependencies/
-[Rr]esources/
+#[Rr]esources/
+[Rr]esources/[Ff]onts/
+[Rr]esources/[Mm]odels/
+[Rr]esources/[Ss]ounds/
+[Rr]esources/[Tt]extures/
+
 [Dd]ebug_[Bb]uild/
 [Rr]elease_[Bb]uild/
 [Dd]ebug[Bb]uild/

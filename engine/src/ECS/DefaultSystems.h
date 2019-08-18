@@ -41,9 +41,11 @@ common enough to be necessary in any game*/
 #    include "graphics/opengl/FrameBuffer.h"
 #    include "graphics/opengl/GraphicsSystem.h"
 #endif
-#include "Physics.h"
+#include "Physics/Physics.h"
 #include "audio/Audio.h"
 #include "logger/Logger.h"
+
+#include "Application.h"
 
 namespace Nova
 {

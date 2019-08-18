@@ -114,6 +114,12 @@ class IKeyboardObserver
     virtual void onKeyPress() = 0;
 };
 
+class IMouseObserver
+{
+  public:
+    virtual void onMouseButtonPress() = 0;
+};
+
 template <typename T> class ISubject
 {
   public:
@@ -136,13 +142,18 @@ class InputSystem : public IInputSystem, public ISingleton<InputSystem>, public 
         void setKeyState(int keyCode, bool keyState) { mState[keyCode] = keyState; };
 
       private:
-        std::vector<IKeyboardObserver *> mObservers;
+        std::vector<IKeyboardObserver *> mKeyboardObservers;
         std::unordered_map<int, bool> mState;
     };
-    class Mouse
+
+    class Mouse : public ISubject<IMouseObserver>
     {
       public:
         Mouse();
+        void registerObserver(IMouseObserver *observer) override;
+        void removeObserver(IMouseObserver *observer) override;
+        void notifyObservers() override;
+
         bool getButtonState(int button) { return mButtonState[button]; };
         void setButtonState(int button, bool state) { mButtonState[button] = state; };
         // void setPosition(int x, int y) { mX = x; mY = y; };
@@ -159,6 +170,7 @@ class InputSystem : public IInputSystem, public ISingleton<InputSystem>, public 
       private:
         // bool mButtonState[3];
         // std::array<bool, 3> mButtonState;
+        std::vector<IMouseObserver *> mMouseObservers;
         std::unordered_map<int, bool> mButtonState;
         float mSensitivity;
     };

@@ -50,7 +50,10 @@ void Physics::startUp()
     mDynamicsWorld =
         new btDiscreteDynamicsWorld(mDispatcher, mBroadPhase, mSolver, mCollisionConfiguration);
 
-    mDynamicsWorld->setGravity(btVector3(0, -9.81f, 0));
+    //mDynamicsWorld->setInternalTickCallback()
+
+    //mDynamicsWorld->setGravity(btVector3(0, -9.81f, 0));
+    mDynamicsWorld->setGravity(btVector3(0, 0, 0));
 
     mDebugDrawer = new PhysicsDebugDrawer();
     mDynamicsWorld->setDebugDrawer(mDebugDrawer);

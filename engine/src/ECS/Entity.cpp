@@ -32,7 +32,7 @@
 //#include <memory>
 //#include <string>
 #include "DefaultComponents.h"
-#include "Physics.h"
+#include "Physics/Physics.h"
 
 namespace Nova
 {

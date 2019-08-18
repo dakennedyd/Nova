@@ -35,7 +35,7 @@
 #include "ECS/Entity.h"
 #include "GraphicsSystem.h"
 #include "Mesh.h"
-#include "Physics.h"
+#include "Physics/Physics.h"
 #include <memory>
 
 namespace Nova

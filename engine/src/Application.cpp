@@ -41,7 +41,7 @@
 #    include "graphics/opengl/GraphicsSystem.h"
 #    include "graphics/opengl/RendererBackendDeferred.h"
 #endif
-#include "Physics.h"
+#include "Physics/Physics.h"
 #include "audio/Audio.h"
 #include "graphics/DebugUI.h"
 #include "resource_manager/ResourceManager.h"
@@ -148,6 +148,10 @@ void Application::World::update()
     for (auto &keyEntityPair : mWorldTree)
     {
         keyEntityPair.second->setFinalTransformAndPropagate(Mat4::makeIdentityMatrix());
+        if(keyEntityPair.second->isMarkedForDeletion())
+        {
+            mEntitiesMarkedForDeletion.push_back(keyEntityPair.second);
+        }
     }
 
     // do processEntities for each entity registered with a system
@@ -202,6 +206,7 @@ void Application::startUp()
 
         // registers application to get keyboard events
         InputSystem::getInstance().getKeyboard().registerObserver(this);
+        InputSystem::getInstance().getMouse().registerObserver(this);
 
         // registers systems to the ECS
         mWorld.registerSystem<VisualSystem>();
@@ -222,6 +227,8 @@ void Application::startUp()
                 std::exit(EXIT_SUCCESS);
             }
         });
+
+        setMouseButtonCallback([]() {});
 
         // creates a camera entity and set it as the default camera entity
         Entity &defaultCamera = getWorld().createEntity("Default Camera");
@@ -283,11 +290,18 @@ void Application::startMainLoop()
                 mouse.wheel = 0;
                 Audio::getInstance().updateListenerData();
             }
+            //for(auto e : mWorld.mEntitiesMarkedForDeletion)
+            while (!mWorld.mEntitiesMarkedForDeletion.empty())
+            {
+                auto e = mWorld.mEntitiesMarkedForDeletion.back();
+                mWorld.destroyEntity(*e);
+                mWorld.mEntitiesMarkedForDeletion.pop_back();
+            }
             // sync physics sim with the graphics system
             for (auto &IDEntityPair : mWorld.GetSystem<PhysicalSystem>()->getEntities())
             {
                 auto &e = *IDEntityPair.second;
-                auto t = Physics::getInstance().getObjectTransform(e.getID());
+                const auto &t = Physics::getInstance().getObjectTransform(e.getID());
                 e.setPosition(t.translation);
                 e.setRotation(t.rotation);
             }

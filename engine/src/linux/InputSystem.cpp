@@ -37,11 +37,11 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     const std::string &actionString(
         EngineSettings::getInstance().getString("Default-ActionContext", is.getKeyString(key)));
 
-    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    if (action == GLFW_PRESS /*|| action == GLFW_REPEAT*/)
     {
         keyboard.setKeyState(key, true);
-        keyboard.notifyObservers();
         is.activateAction(SID(actionString.c_str()));
+        keyboard.notifyObservers();
     }
     else if (action == GLFW_RELEASE)
     {
@@ -57,11 +57,11 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
     auto &mouse = InputSystem::getInstance().getMouse();
     const std::string &actionString(EngineSettings::getInstance().getString(
         "Default-ActionContext", is.getMouseButtonString(button)));
-    // if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     if (action == GLFW_PRESS)
     {
         mouse.setButtonState(button, true);
         is.activateAction(SID(actionString.c_str()));
+        mouse.notifyObservers();
     }
     else if (action == GLFW_RELEASE)
     {
@@ -174,92 +174,54 @@ void InputSystem::processInputs()
     // if(!window.isCursorShown()) handleMouse(window.mGLFWindow);
 }
 
-/*const float moveSpeed = 0.05f;
-const float turnSpeed = 2.0f;
-bool wireframeOn = false;*/
-
-/*void handleKeys(void* window)
-{
-        FPSCamera* pCCamera = (FPSCamera*)GraphicsSystem::getInstance().getCurrentCamera();
-        if (GLFW_PRESS == glfwGetKey((GLFWwindow*)window, GLFW_KEY_A))
-        {
-                pCCamera->moveLeft(moveSpeed);
-        }
-        if (GLFW_PRESS == glfwGetKey((GLFWwindow*)window, GLFW_KEY_D))
-        {
-                pCCamera->moveRight(moveSpeed);
-        }
-        if (GLFW_PRESS == glfwGetKey((GLFWwindow*)window, GLFW_KEY_W))
-        {
-                pCCamera->moveForward(moveSpeed);
-        }
-        if (GLFW_PRESS == glfwGetKey((GLFWwindow*)window, GLFW_KEY_S))
-        {
-                pCCamera->moveBackwards(moveSpeed);
-        }
-        if (GLFW_PRESS == glfwGetKey((GLFWwindow*)window, GLFW_KEY_SPACE))
-        {
-                pCCamera->moveUp(moveSpeed);
-        }
-        if (GLFW_PRESS == glfwGetKey((GLFWwindow*)window, GLFW_KEY_X))
-        {
-                pCCamera->moveDown(moveSpeed);
-        }
-}*/
-
-/*float previousMouseX = 0.0f;
-float previousMouseY = 0.0f;
-//glfwGetCursorPos((GLFWwindow*)window, &previousMouseX, &previousMouseY);
-float mouseSensitivity = 0.2f;
-float mouseXDelta = 0.0f;
-float mouseYDelta = 0.0f;
-Vec3 dir;
-void handleMouse(void* window)
-{
-        FPSCamera* pCCamera = (FPSCamera*)GraphicsSystem::getInstance().getCurrentCamera();
-        double xpos = 0, ypos = 0;
-        glfwGetCursorPos((GLFWwindow*)window, &xpos, &ypos);
-        //LOG("Mouse:X->" << xpos << " Y->" << ypos);
-        mouseXDelta = static_cast<float>(xpos) - previousMouseX;
-        mouseYDelta = static_cast<float>(ypos) - previousMouseY;
-        pCCamera->rotate(pCCamera->getUp(), toRadians(mouseXDelta * mouseSensitivity));
-//this is ugly
-
-        dir.rotateSelf(pCCamera->getLeft(), -toRadians(mouseYDelta * mouseSensitivity));
-        if (dir.getY() < 0.99f && dir.getY() > -0.99f)	//lock the camera so it doesn't fail - this
-is a ugly hack....
-        {
-                pCCamera->rotate(pCCamera->getLeft(), -toRadians(mouseYDelta * mouseSensitivity));
-        }
-        dir = pCCamera->getDirection();
-        //dir.debugPrint();
-        previousMouseX = static_cast<float>(xpos);
-        previousMouseY = static_cast<float>(ypos);
-}*/
-
 void InputSystem::Keyboard::registerObserver(IKeyboardObserver *observer)
 {
-    mObservers.push_back(observer);
+    mKeyboardObservers.push_back(observer);
 }
 
 void InputSystem::Keyboard::removeObserver(IKeyboardObserver *observer)
 {
-    for (std::size_t i = 0; i < mObservers.size(); i++)
+    for (std::size_t i = 0; i < mKeyboardObservers.size(); i++)
     {
-        if (mObservers[i] == observer)
+        if (mKeyboardObservers[i] == observer)
         {
-            mObservers.erase(mObservers.begin() + i);
+            mKeyboardObservers.erase(mKeyboardObservers.begin() + i);
         }
     }
 }
 
 void InputSystem::Keyboard::notifyObservers()
 {
-    for (IKeyboardObserver *observer : mObservers)
+    for (IKeyboardObserver *observer : mKeyboardObservers)
     {
         observer->onKeyPress();
     }
 }
+
+void InputSystem::Mouse::registerObserver(IMouseObserver *observer)
+{
+    mMouseObservers.push_back(observer);
+}
+
+void InputSystem::Mouse::removeObserver(IMouseObserver *observer)
+{
+    for (std::size_t i = 0; i < mMouseObservers.size(); i++)
+    {
+        if (mMouseObservers[i] == observer)
+        {
+            mMouseObservers.erase(mMouseObservers.begin() + i);
+        }
+    }
+}
+
+void InputSystem::Mouse::notifyObservers()
+{
+    for (IMouseObserver *observer : mMouseObservers)
+    {
+        observer->onMouseButtonPress();
+    }
+}
+
 InputSystem::Mouse::Mouse()
 {
     float s = EngineSettings::getInstance().getInteger("Input", "mouse_sensitivity") * 0.0001f;

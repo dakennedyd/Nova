@@ -26,7 +26,7 @@
 #include <memory>
 //#include "graphics/opengl/FrameBuffer.h"
 #include "IComponent.h"
-#include "Physics.h"
+#include "Physics/Physics.h"
 #include "math/Matrix.h"
 #include "math/Vector.h"
 

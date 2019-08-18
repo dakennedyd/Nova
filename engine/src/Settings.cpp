@@ -192,6 +192,7 @@ void EngineSettings::startUp()
     add("Default-ActionContext", "key_a", "strafe_left");
     add("Default-ActionContext", "key_left", "turn_left");
     add("Default-ActionContext", "key_up", "turn_down");
+    add("Default-ActionContext", "mouse_left", "fire");
 
     loadConfFile();
 }

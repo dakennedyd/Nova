@@ -40,7 +40,7 @@
 namespace Nova
 {
 // class Entity;
-class Application final : public ISingleton<Application>, public IKeyboardObserver
+class Application final : public ISingleton<Application>, public IKeyboardObserver, public IMouseObserver
 {
     friend class Entity;
 
@@ -48,6 +48,7 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
     class World
     {
         friend class Entity;
+        friend class Application;
 
       public:
         World() = default;
@@ -99,6 +100,8 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
 
         void deleteFromWorldTree(const Entity &entity);
         void addToWorldTree(Entity &entity);
+
+        std::vector<Entity*> mEntitiesMarkedForDeletion;
     };
 
   public:
@@ -113,11 +116,16 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
 
     // https://stackoverflow.com/questions/32840369/no-matching-function-
     // error-when-passing-lambda-function-as-argument#32840595
-    template <typename F> void setKeyCallback(F callback) { mCallback = callback; }
+    template <typename F> void setKeyCallback(F callback) { mKeyboardCallback = callback; }
+    template <typename F> void setMouseButtonCallback(F callback) { mMouseCallback = callback; }
     // void setKeyCallback(void (*callback)()) { mCallback = callback; };
     void onKeyPress() override
     {
-        if (mCallback) mCallback();
+        if (mKeyboardCallback) mKeyboardCallback();
+    };
+    void onMouseButtonPress() override
+    {
+        if (mMouseCallback) mMouseCallback();
     };
     World mWorld;
 
@@ -127,7 +135,8 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
     // Timer mTimer;
     bool mIsClosing = false;
     bool mIsInitialized = false;
-    std::function<void()> mCallback;
+    std::function<void()> mKeyboardCallback;
+    std::function<void()> mMouseCallback;
     // void (*mCallback)() = nullptr;
     std::unordered_map<std::string, long> mProfileTimes;
 };

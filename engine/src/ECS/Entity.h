@@ -160,6 +160,9 @@ class Entity
     void playSound(const std::shared_ptr<SoundBuffer> soundBuffer);
     void stopSound();
 
+    void markForDeletion() {mMarkedForDeletion = true;}
+    bool isMarkedForDeletion() {return mMarkedForDeletion;}
+
   private:
     void setFinalTransformAndPropagate(const Mat4 &propagatedTransform);
     // void setFinalTransform();
@@ -176,6 +179,7 @@ class Entity
     // std::vector<Entity*> mChildren;
     std::unordered_map<uint32_t, Entity *> mChildren;
     Entity *mParent = nullptr;
+    bool mMarkedForDeletion = false;
 };
 
 } // namespace Nova

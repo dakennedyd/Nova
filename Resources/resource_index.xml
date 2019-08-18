@@ -229,6 +229,9 @@
 		<sound name="sounds/music1">
 			<filename>music1.ogg</filename>
 		</sound>
+		<sound name="sounds/laser">
+			<filename>laser.ogg</filename>
+		</sound>
 
 	</sounds>
 	

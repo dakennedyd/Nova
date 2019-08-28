@@ -29,6 +29,7 @@
 //#include "math/Vector.h"
 #include "Crc.h"
 #include "graphics/opengl/GraphicsSystem.h"
+#include "ECS/DefaultSystems.h"
 #include <string>
 
 namespace Nova
@@ -50,10 +51,22 @@ void Physics::startUp()
     mDynamicsWorld =
         new btDiscreteDynamicsWorld(mDispatcher, mBroadPhase, mSolver, mCollisionConfiguration);
 
-    //mDynamicsWorld->setInternalTickCallback()
+    mDynamicsWorld->setInternalTickCallback([&](btDynamicsWorld *world, btScalar timeStep){
+        for (auto &IDEntityPair : Application::getInstance().getWorld().getSystem<PhysicalSystem>()->getEntities())
+        {
+            auto &e = *IDEntityPair.second;
+            if(e.getComponent<PhysicalComponent>().mass == 0)
+            {
+                PhysicsTransform t;
+                t.translation = e.getTransformStruct().finalTranslation;
+                t.rotation = e.getTransformStruct().rotation; //rotation or final rotation??? i dont remember
+                Physics::getInstance().setObjectTransform(e.getID(), t);
+            }
+        }
+    }, mDynamicsWorld->getWorldUserInfo() , true);
 
     //mDynamicsWorld->setGravity(btVector3(0, -9.81f, 0));
-    mDynamicsWorld->setGravity(btVector3(0, 0, 0));
+    mDynamicsWorld->setGravity(btVector3(0, -9, 0));
 
     mDebugDrawer = new PhysicsDebugDrawer();
     mDynamicsWorld->setDebugDrawer(mDebugDrawer);
@@ -61,6 +74,8 @@ void Physics::startUp()
     //mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe );
     //mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawAabb);
     mDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+
+
 
     //===================================================================
 
@@ -175,7 +190,7 @@ void Physics::addObject(const uint64_t id, const PhysicalShape shape, const Vec3
     object.id = new uint64_t{id};
     object.body->setUserPointer(object.id);
     // add the body to the dynamics world
-    mDynamicsWorld->addRigidBody(object.body);
+    mDynamicsWorld->addRigidBody(object.body);    
     // mObjects.emplace_back(std::pair<uint64_t, PhysicsObject>(id, std::move(object)));
     mObjects[id] = object;
     // object.body->setCollisionFlags(object.body->getCollisionFlags() |
@@ -233,6 +248,29 @@ PhysicsTransform Physics::getObjectTransform(const uint64_t id)
     // LOG_ERROR("can't find physical object with id:" << id);
     // return nullptr;
 }
+
+void Physics::setObjectTransform(const uint64_t id, const PhysicsTransform &newTransform)
+{
+    btVector3 newPos{newTransform.translation.getX(),
+            newTransform.translation.getY(),
+            newTransform.translation.getZ(),};
+    btTransform currentTransform;
+    mObjects.at(id).motionState->getWorldTransform(currentTransform);
+    //btVector3 vel = newPos - currentTransform.getOrigin();
+    currentTransform.setOrigin(newPos);
+    //currentTransform.setOrigin(currentTransform.getOrigin() + kinematic_linear_vel * SIMULATION_TIME_STEP);
+    currentTransform.setRotation(btQuaternion{newTransform.rotation.getX(),
+                                            newTransform.rotation.getY(),
+                                            newTransform.rotation.getZ(),
+                                            newTransform.rotation.getW()});    
+    mObjects.at(id).motionState->setWorldTransform(currentTransform);
+
+    mObjects.at(id).body->setWorldTransform(currentTransform);    
+    mObjects.at(id).body->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
+    mObjects.at(id).body->setAngularVelocity(btVector3(0.0f, 0.0f, 0.0f));
+    mObjects.at(id).body->clearForces();
+}
+
 void Physics::removeObject(const uint64_t id)
 {
     // for (auto &object : mObjects)

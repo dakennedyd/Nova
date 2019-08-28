@@ -136,7 +136,7 @@ class Physics : public ISingleton<Physics>, public ISubSystem
     /**
      * @brief add a callback for when a entity with id "id" collides with any other object
      *
-     * @param id of the entity that colliding with any other entity
+     * @param id of the entity that is colliding with any other entity
      * @param callback that defines the action to take when the object collides
      */
     void addContactCallback(uint64_t id, std::function<void(int, int)> &callback)
@@ -172,6 +172,7 @@ class Physics : public ISingleton<Physics>, public ISubSystem
     }
 
     PhysicsTransform getObjectTransform(const uint64_t id);
+    void setObjectTransform(const uint64_t id, const PhysicsTransform &newTransform);
 
     btDiscreteDynamicsWorld *mDynamicsWorld;
 

@@ -67,15 +67,28 @@ class FireSystem final : public Nova::System
             //bullet.setScale(1.0f);
             bullet.setPosition(entity->getTransformStruct().finalTranslation);
             bullet.setRotation(entity->getRotation());
-            bullet.setScale(Vec3(0.5f,0.5f,7.0f));
+            bullet.setScale(Vec3(0.5f,0.25f,7.0f));
 
             bullet.addComponent<VisualComponent>(rm.get<Mesh>("meshes/cube"),
                                                 rm.get<Material>("materials/aluminium"));
-            engine.getWorld().GetSystem<VisualSystem>()->registerEntity(bullet);
+            engine.getWorld().getSystem<VisualSystem>()->registerEntity(bullet);
             bullet.addComponent<LightComponent>(LightType::POINT_LIGHT, Vec3(0.0f, 200.0f, 0.0f), false);
-            engine.getWorld().GetSystem<LightSystem>()->registerEntity(bullet);
+            engine.getWorld().getSystem<LightSystem>()->registerEntity(bullet);
             bullet.addComponent<ProjectileComponent>(1,500);
-            engine.getWorld().GetSystem<ProjectileSystem>()->registerEntity(bullet);
+            engine.getWorld().getSystem<ProjectileSystem>()->registerEntity(bullet);
+            bullet.addComponent<PhysicalComponent>(0.0f, PhysicalShape::CUBE, Vec3(0.25f,0.125f,0.5f));
+            // , 1.5f, 0.5f, [&](int id1, int id2) {
+            //     //engine.getWorld().getEntity(id2).playSound(rm.get<SoundBuffer>("sounds/ping"));
+            //     //engine.getWorld().getEntity("ship").playSound(rm.get<SoundBuffer>("sounds/ping"));
+            //     auto &engine = Application::getInstance();
+            //     auto &e1 = engine.getWorld().getEntity(id1);
+            //     auto &e2 = engine.getWorld().getEntity(id2);
+            //     // if(e1.getID() != entity->getID())
+            //     // {
+            //     //     e1.markForDeletion();
+            //     // }
+            // });
+            //engine.getWorld().GetSystem<PhysicalSystem>()->registerEntity(bullet);
 
             entity->playSound(rm.get<SoundBuffer>("sounds/laser"));
         }

@@ -238,7 +238,7 @@ void Application::startUp()
             static_cast<float>(EngineSettings::getInstance().getInteger("Video", "width")) /
                 EngineSettings::getInstance().getInteger("Video", "height"),
             0.1f, 300.0f));
-        getWorld().GetSystem<CameraSystem>()->registerEntity(defaultCamera);
+        getWorld().getSystem<CameraSystem>()->registerEntity(defaultCamera);
         GraphicsSystem::getInstance().setCurrentCamera(&defaultCamera);
 
         // sets the current renderer
@@ -280,6 +280,7 @@ void Application::startMainLoop()
             {
                 entityUpdateClock.reset();
                 mWorld.update(); // updates all entities in the world
+                
                 Physics::getInstance().simulate(1.0f / timeDelta);
 
                 mProfileTimes["Entities update"] = entityUpdateClock.getMicro();
@@ -288,23 +289,23 @@ void Application::startMainLoop()
                 mouse.mPreviousX = mouse.mX;
                 mouse.mPreviousY = mouse.mY; // needed so that mouse.getMotionVector() can work
                 mouse.wheel = 0;
-                Audio::getInstance().updateListenerData();
             }
-            //for(auto e : mWorld.mEntitiesMarkedForDeletion)
+            //deletes entities marked to be deleted
             while (!mWorld.mEntitiesMarkedForDeletion.empty())
             {
                 auto e = mWorld.mEntitiesMarkedForDeletion.back();
                 mWorld.destroyEntity(*e);
                 mWorld.mEntitiesMarkedForDeletion.pop_back();
             }
-            // sync physics sim with the graphics system
-            for (auto &IDEntityPair : mWorld.GetSystem<PhysicalSystem>()->getEntities())
+            // position of objects from the physics sim are copied to the graphics system
+            for (auto &IDEntityPair : mWorld.getSystem<PhysicalSystem>()->getEntities())
             {
                 auto &e = *IDEntityPair.second;
                 const auto &t = Physics::getInstance().getObjectTransform(e.getID());
                 e.setPosition(t.translation);
                 e.setRotation(t.rotation);
             }
+            Audio::getInstance().updateListenerData();
             if (soundCleanUp.getMillis() > 500)
             {
                 Audio::getInstance().cleanUpSources();

@@ -192,10 +192,10 @@ void RendererBackendDeferred::render()
         /*glStencilMask(0x00);*/
 
         //=======DEBUG DRAW=========
-        // auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
-        // shader->bind();
-        // PhysicsDebugDraw();
-        // shader->unBind();
+        auto shader = ResourceManager::getInstance().get<GPUProgram>("shaders/physicsDebugDraw");
+        shader->bind();
+        PhysicsDebugDraw();
+        shader->unBind();
 
         // mGBuffer.unBind();
         mProfileTimes["Geometry pass"] = timer.getMicro();

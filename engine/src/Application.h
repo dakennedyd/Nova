@@ -84,7 +84,7 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
 
         /*Gets a system of the type specified. If the type specified does not
         exist then it launches an exception*/
-        template <typename T> T *GetSystem()
+        template <typename T> T *getSystem()
         {
             return (static_cast<T *>(mSystems.at(std::type_index(typeid(T)))));
         }

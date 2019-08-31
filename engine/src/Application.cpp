@@ -78,7 +78,7 @@ void Application::World::destroyEntity(Entity &entity)
     }
 
     // unsubscribe entity from all systems
-    for (auto it : mSystems)
+    for (auto &it : entity.mSubscribedSystems)
     {
         it.second->unregisterEntity(entity);
     }
@@ -150,7 +150,8 @@ void Application::World::update()
         keyEntityPair.second->setFinalTransformAndPropagate(Mat4::makeIdentityMatrix());
         if(keyEntityPair.second->isMarkedForDeletion())
         {
-            mEntitiesMarkedForDeletion.push_back(keyEntityPair.second);
+            //mEntitiesMarkedForDeletion.push_back(keyEntityPair.second);
+            mEntitiesMarkedForDeletion[keyEntityPair.first] = keyEntityPair.second;
         }
     }
 
@@ -291,12 +292,11 @@ void Application::startMainLoop()
                 mouse.wheel = 0;
             }
             //deletes entities marked to be deleted
-            while (!mWorld.mEntitiesMarkedForDeletion.empty())
+            for(auto &keyEntityPair : mWorld.mEntitiesMarkedForDeletion)
             {
-                auto e = mWorld.mEntitiesMarkedForDeletion.back();
-                mWorld.destroyEntity(*e);
-                mWorld.mEntitiesMarkedForDeletion.pop_back();
+                mWorld.destroyEntity(*keyEntityPair.second);
             }
+            mWorld.mEntitiesMarkedForDeletion.clear();
             // position of objects from the physics sim are copied to the graphics system
             for (auto &IDEntityPair : mWorld.getSystem<PhysicalSystem>()->getEntities())
             {

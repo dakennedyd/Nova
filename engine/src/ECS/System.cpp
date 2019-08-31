@@ -38,7 +38,8 @@ void System::registerEntity(Entity &entity)
     }*/
     if (mRegisteredEntities.insert(std::make_pair(entity.getID(), &entity))
             .second) // did and insertion actually happen?
-    {
+    {        
+        entity.mSubscribedSystems.emplace(std::make_pair(std::type_index(typeid(*this)), this));
         onRegister(&entity);
     }
     else

@@ -173,8 +173,9 @@ class Entity
     std::string mName;
     uint32_t mEntityID;
     std::unordered_map<std::type_index, IComponent *>
-        mComponents; // only one of each type of component is allowed
-    // std::vector<System*> mSubscribedSystems;	//to make entity destruction faster
+        mComponents; // only one of each type of component is allowed    
+    std::unordered_map<std::type_index, System *>
+        mSubscribedSystems; // only one of each type of system is allowed
     Transform mTransform;
     // std::vector<Entity*> mChildren;
     std::unordered_map<uint32_t, Entity *> mChildren;

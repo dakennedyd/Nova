@@ -101,7 +101,8 @@ class Application final : public ISingleton<Application>, public IKeyboardObserv
         void deleteFromWorldTree(const Entity &entity);
         void addToWorldTree(Entity &entity);
 
-        std::vector<Entity*> mEntitiesMarkedForDeletion;
+        //std::vector<Entity*> mEntitiesMarkedForDeletion;
+        std::unordered_map<uint32_t, Entity*> mEntitiesMarkedForDeletion;
     };
 
   public:
